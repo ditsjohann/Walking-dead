@@ -81,5 +81,11 @@
 	"outbreak.moodle.heavy.3": "Badly overloaded",
 	"outbreak.moodle.heavy.4": "Crushing load",
 	"key.outbreak.open_bag": "Open worn bag",
-	"outbreak.health.carrying": "Carrying: %s / %s kg"
+	"outbreak.health.carrying": "Carrying: %s / %s kg",
+	"outbreak.hud.day": "Day %s",
+	"outbreak.hud.health": "Health %s%%",
+	"outbreak.hud.noise.0": "Silent",
+	"outbreak.hud.noise.1": "Quiet",
+	"outbreak.hud.noise.2": "Noisy",
+	"outbreak.hud.noise.3": "Loud"
 }

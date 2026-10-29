@@ -55,7 +55,7 @@ import net.minecraft.tags.DamageTypeTags;
  */
 public class Walker extends Zombie {
 	/** Fraction of the walker's height above which a hit counts as a headshot. */
-	private static final double HEAD_START = 0.78;
+	public static final double HEAD_START = 0.78;
 	private static final float HEADSHOT_MULTIPLIER = 4.0F;
 	private static final float BODY_MULTIPLIER = 0.5F;
 	/** Cosine of the half-angle of a walker's field of view (~65 degrees). */

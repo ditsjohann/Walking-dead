@@ -93,7 +93,7 @@ public class HealthPanelScreen extends Screen {
 			if (level > 0) {
 				any = true;
 				int x = textX + column * 115;
-				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SurvivorHud.sprite(moodle), x, y - 4, 16, 16);
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, OutbreakHud.moodleSprite(moodle), x, y - 4, 16, 16);
 				graphics.text(this.font, Component.translatable(moodle.translationKey(level)), x + 19, y, levelColor(level));
 				column++;
 				if (column == 2) {

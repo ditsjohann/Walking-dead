@@ -6,6 +6,8 @@ itself still has to be generated with Arnis.
 
 | | |
 |---|---|
+| ![](screenshots/hud/1-at-rest.png) The outbreak HUD: hotbar, status panel, moodles, item name. | ![](screenshots/hud/2-headshot.png) Lined up on a walker's head: the crosshair turns red. |
+| ![](screenshots/hud/4-running.png) Running: the noise meter says Loud. | ![](screenshots/hud/5-underwater.png) Underwater: breath bar over the hotbar. |
 | ![](screenshots/tour/01-herd.png) A herd: walkers spawn in groups that follow a leader. | ![](screenshots/tour/02-night.png) The same herd at night. |
 | ![](screenshots/tour/03-all-moodles.png) A really bad day: every moodle, the body doll and a bandaged leg. | ![](screenshots/tour/04-health-panel.png) The health panel (H). |
 | ![](screenshots/tour/05-inventory.png) Everything you can find so far. | ![](screenshots/tour/06-break-in.png) A walker smashed the window and is at the barricade. |

@@ -42,7 +42,7 @@ doesn't fit, it gets removed or replaced.
 |---|---|
 | Title screen, world creation | **Replaced.** Our own menu: *New survivor* → pick a scenario (start location and day) → create a character → spawn in Groningen. |
 | Character | **Replaced.** PZ-style **profession and traits**: nurse, police officer, student, carpenter, farmer; *Strong*, *Smoker*, *Short-sighted*... |
-| Hearts, hunger, XP bar | **Replaced.** A health panel per body part, plus moodle icons. No XP orbs, no levels. |
+| HUD (hotbar, hearts, hunger, XP, crosshair, effects) | **Replaced** by our own HUD (see `HUD.md`): slim hotbar, headshot crosshair, status panel with body doll, day/time, noise meter and weight, moodles. No XP orbs, no levels. |
 | Inventory | **Replaced.** Weight-based, with bags/backpacks as equipment and containers you open and loot. |
 | Crafting table, recipes | **Trimmed, then extended.** Building recipes stay, so you can build your own house from wood and stone: planks, stairs, slabs, doors, fences, bricks, stone bricks, glass, furniture, food, boats. Recipes for tools, weapons, armour, redstone, enchanting, potions, the Nether/End and ore processing are removed: tools are found, not crafted. Real-world recipes (barricades, bandages, molotovs) come later. |
 | Mining and building | **Build anywhere, but no punching.** You can place and break blocks freely, but wood (logs, planks, wooden doors...) needs an axe, and stone, brick, concrete and metal need a pickaxe. Without the right tool these blocks don't break at all. Breaking blocks makes **noise**, which attracts walkers. Barricades are an extra layer on top. |

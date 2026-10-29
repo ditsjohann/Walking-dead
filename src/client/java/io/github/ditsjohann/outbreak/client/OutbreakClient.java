@@ -10,8 +10,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -27,10 +25,8 @@ public class OutbreakClient implements ClientModInitializer {
 		// Walkers borrow the zombie model until they get their own.
 		EntityRenderers.register(OutbreakEntities.WALKER, ZombieRenderer::new);
 
-		// No XP in the outbreak; hearts, hunger and armour are replaced by the survivor HUD.
-		HudElementRegistry.removeElement(VanillaHudElements.EXPERIENCE_LEVEL);
-		HudElementRegistry.removeElement(VanillaHudElements.INFO_BAR);
-		SurvivorHud.register();
+		// The vanilla HUD is replaced entirely by our own.
+		OutbreakHud.register();
 
 		KeyMappingHelper.registerKeyMapping(HEALTH_KEY);
 		KeyMappingHelper.registerKeyMapping(BAG_KEY);
