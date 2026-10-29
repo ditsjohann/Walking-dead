@@ -29,7 +29,7 @@ build and the people you meet.
 The mod's code does **not** depend on the map: it runs in any world. Players
 get everything as **one package**: a Modrinth modpack (`.mrpack`) with the
 mod, its performance companions (Sodium, Distant Horizons) and the Groningen
-world. Later, an optional "map data" file (see §8) can give the mod extra
+world. Later, an optional "map data" file (see §9) can give the mod extra
 knowledge about Groningen.
 
 ## 3. Total conversion
@@ -75,7 +75,7 @@ doesn't fit, it gets removed or replaced.
 
 ## 5. Walkers
 
-- **Movement:** slow shamblers by default. A sandbox option (see §10) allows
+- **Movement:** slow shamblers by default. A sandbox option (see §11) allows
   fast shamblers or sprinters.
 - **Killing them:** body hits only knock them down or slow them. A **headshot**
   or a stomp on a downed walker kills.
@@ -131,7 +131,54 @@ doesn't fit, it gets removed or replaced.
 - **Camouflage (TWD):** smear walker guts on yourself to walk through a herd
   until it rains or you run.
 
-## 8. Groningen-specific content
+## 8. Vehicles and weapons
+
+We build our own vehicle system. Existing vehicle mods are NeoForge-only,
+closed source, and either stuck on an older version (Immersive Vehicles,
+26.1.2) or too simple (Ultimate Car Mod). Owning the system means vehicles
+can be fully tied into walkers, noise and loot. The flat Netherlands keeps
+driving physics simple: ground and water only, no flying.
+
+**Vehicles** (in build order):
+1. **Bicycle.** Silent, needs no fuel, has a chain and tires, and Groningen
+   is full of them.
+2. **Scooter / moped.** Fast and loud, with a small tank.
+3. **Car** (hatchback, sedan, estate), then a **van** and a **pickup**.
+4. **Boat.** A rowing boat, then a motorboat for the canals and lakes.
+5. Later maybe a bus, a tractor, or an army truck at the Euroborg.
+
+**Parts** (PZ-style). Every part is an item with its own **condition**
+(0–100%), and you install it by hand with the right tool:
+- **Tires**, one per wheel: they can be flat, worn or missing. A flat tire
+  makes the vehicle pull to one side and go slower. A missing tire means it
+  can't drive. Replace with a jack and a wrench.
+- **Engine:** its condition affects starting and top speed. Repairs need skill and parts.
+- **Battery:** drains when you leave the lights on, needed to start. Jump-start or charge it.
+- **Fuel tank** (liters): petrol or diesel.
+- **Doors, windows, windscreen, hood, trunk:** walkers can break windows to grab you.
+- **Headlights, seats, trunk storage** (a container), and the **key**.
+
+**Getting going:**
+- Find the **key** in the car, the nearby house or a walker's pocket, or **hotwire** it (needs electrical skill).
+- **Fuel:**
+  - siphon it from wrecks with a hose and a jerrycan;
+  - gas station pumps only work while the **power is on**, or with a generator;
+  - fuel slowly goes stale over time.
+- **Noise:** starting an engine and driving are loud and pull walkers.
+  Crashing into a herd damages the car. A car alarm is a free herd magnet.
+
+**The world:** parked cars and wrecks spawn along the Arnis roads with
+random part conditions, a random amount of fuel, and a key that may or may
+not be there. Most need work before they drive.
+
+**Weapons:** we build our own small, realistic set, tied into the noise
+system:
+- Melee: bat, crowbar, kitchen knife, axe, machete — they wear out.
+- A crossbow with bolts you can pick back up.
+- A few scarce, very loud guns: police pistol, shotgun, hunting rifle.
+  Ammo is rare.
+
+## 9. Groningen-specific content
 
 | Place | Gameplay role |
 |---|---|
@@ -151,14 +198,14 @@ pharmacy, supermarket, police, school, etc.) into a small JSON shipped with
 the map. The mod then knows that a building is a pharmacy and gives its
 containers pharmacy loot, which makes the "local knowledge" pillar real.
 
-## 9. People (TWD heart, later phase)
+## 10. People (TWD heart, later phase)
 
 - Survivor NPCs: loners, families and raiders, who can be recruited, traded with or fought.
 - Factions with territories, for example students holding Zernike, a militia at
   the Euroborg, and raiders on the ring road.
 - Community building: recruits get jobs (guard, farmer, medic, scavenger).
 
-## 10. Sandbox settings (PZ-style)
+## 11. Sandbox settings (PZ-style)
 
 Almost every hard number above is a world option, so you can tune the game
 anywhere from TWD-heroic to PZ-brutal:
@@ -171,20 +218,21 @@ anywhere from TWD-heroic to PZ-brutal:
 - permadeath on or off
 - whether vanilla mobs are on
 
-## 11. Build phases
+## 12. Build phases
 
 | Phase | Content | Playable result |
 |---|---|---|
 | 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
 | 1 | **Strip vanilla:** remove mobs, vanilla recipes, ores, the Nether/End, XP, the vanilla HUD and advancements. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, everyone turns | Groningen with walkers, and nothing vanilla left to see |
 | 2 | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
-| 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades | Scavenge and fortify |
-| 4 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
-| 5 | **World winds down:** day counter, power and water shutoff, broadcasts, meta events, herds that migrate, weapons, guts camouflage | Full loop |
-| 6 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |
-| 7 | **People:** survivor NPCs, factions, community | The TWD heart |
+| 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades, melee weapons | Scavenge and fortify |
+| 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat | Travel Groningen |
+| 5 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
+| 6 | **World winds down:** day counter, power and water shutoff (gas pumps die), broadcasts, meta events, migrating herds, guns, guts camouflage | Full loop |
+| 7 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |
+| 8 | **People:** survivor NPCs, factions, community | The TWD heart |
 
-## 12. Open questions
+## 13. Open questions
 
 **Decided:**
 - **Building:** mostly vanilla. Free breaking and placing, but it makes noise and there are no vanilla recipes or ores.
@@ -193,7 +241,12 @@ anywhere from TWD-heroic to PZ-brutal:
 - **Story:** a sandbox with story clues. Notes, broadcasts and places like
   the UMCG and Zernike slowly reveal what happened. There's no forced ending.
 
-**Still open:**
-1. How important are guns and vehicles (cars, bikes, boats)? Vehicles are a lot of work.
-2. Should we use existing mods as dependencies (GeckoLib for animations is
-   almost certain), or keep everything in-house?
+- **Vehicles:** important. You can build anywhere and travel long distances
+  in different vehicles, with PZ-style parts (see §8). We build our own
+  system on Fabric 26.3.
+- **Dependencies:** allowed.
+  - Required: **GeckoLib**, for walker, vehicle and gun models and animations.
+  - Likely: a config library (for example YACL) for the sandbox settings screen.
+  - In the modpack: Sodium and Distant Horizons for performance.
+
+**Still open:** nothing blocking.
