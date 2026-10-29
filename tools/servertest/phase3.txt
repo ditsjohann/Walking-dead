@@ -1,0 +1,123 @@
+# Phase 3 checks: loot, weapons, barricades, carry weight, bags.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+== loot: a kitchen chest (furnaces nearby) fills on first open
+setblock 10 -57 0 minecraft:chest[facing=west]
+setblock 12 -57 1 minecraft:furnace
+setblock 12 -57 -1 minecraft:smoker
+tp Bot 8 -57 0
+player Bot look at 10 -56.5 0.5
+player Bot use once
+wait 1
+data get block 10 -57 0 Items
+== loot: a chest that had a vanilla loot table gets outbreak loot instead
+setblock 10 -57 6 minecraft:chest[facing=west]{LootTable:"minecraft:chests/simple_dungeon"}
+tp Bot 8 -57 6
+player Bot look at 10 -56.5 6.5
+player Bot use once
+wait 1
+data get block 10 -57 6 Items
+== loot: a chest the player places stays empty
+give Bot minecraft:chest
+tp Bot 8 -57 12
+player Bot hotbar 5
+player Bot look at 10.5 -57 12.5
+player Bot use once
+wait 1
+execute if block 10 -57 12 minecraft:chest
+player Bot look at 10 -56.5 12.5
+player Bot use once
+wait 1
+data get block 10 -57 12 Items
+== weapons: a baseball bat headshot kills in one swing (6 x 4 = 24)
+tp Bot 0 -57 20
+item replace entity Bot hotbar.0 with outbreak:baseball_bat
+player Bot hotbar 1
+summon outbreak:walker 2 -57 20 {Tags:["bat"],NoAI:1b,PersistenceRequired:1b}
+player Bot look at 2 -55.3 20
+wait 1.5
+player Bot attack once
+wait 1
+execute if entity @e[type=outbreak:walker,tag=bat]
+data get entity Bot SelectedItem
+== barricade: inside a closed room, hammer 4 planks in front of the window (1 plank + 2 nails each)
+fill -3 -58 28 3 -54 36 minecraft:stone hollow
+setblock 0 -57 36 minecraft:glass_pane
+setblock 0 -56 36 minecraft:glass_pane
+summon outbreak:walker 0 -57 41 {Tags:["breaker"],PersistenceRequired:1b,Rotation:[180f,0f]}
+tp Bot 0 -57 33
+item replace entity Bot hotbar.0 with outbreak:hammer
+item replace entity Bot hotbar.5 with minecraft:oak_planks 4
+item replace entity Bot hotbar.6 with outbreak:nails 8
+player Bot hotbar 1
+player Bot look at 0.5 -56.5 36
+player Bot use once
+wait 0.6
+player Bot look at 0.5 -56.5 35.9
+player Bot use once
+wait 0.6
+player Bot use once
+wait 0.6
+player Bot use once
+wait 1
+execute if block 0 -57 35 outbreak:barricade[planks=4]
+clear Bot outbreak:nails 0
+clear Bot minecraft:oak_planks 0
+== ...the walker that heard the hammering smashes the window (expect both panes gone, barricade still up), then the planks
+gamemode spectator Bot
+tp Bot 0 -50 30
+wait 12
+execute if block 0 -57 36 minecraft:glass_pane
+execute if block 0 -56 36 minecraft:glass_pane
+execute if block 0 -57 35 outbreak:barricade
+wait 35
+execute if block 0 -57 35 outbreak:barricade
+data get entity @e[tag=breaker,limit=1] Pos
+gamemode survival Bot
+tp Bot 0 -57 20
+== carry weight: 2 stacks of cobblestone overload you (slowness)
+outbreak cure Bot
+clear Bot
+give Bot minecraft:cobblestone 128
+wait 3
+outbreak status Bot
+data get entity Bot active_effects
+== ...a worn hiking bag carries them much lighter
+clear Bot
+item replace entity Bot armor.chest with outbreak:hiking_bag[minecraft:container=[{slot:0,item:{id:"minecraft:cobblestone",count:64}},{slot:1,item:{id:"minecraft:cobblestone",count:64}}]]
+wait 3
+outbreak status Bot
+data get entity Bot active_effects
+== walkers have things in their pockets
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+summon outbreak:walker 0 -57 60 {NoAI:1b}
+tp Cam 0 -50 60
+wait 2
+kill @e[type=outbreak:walker]
+wait 2
+execute if entity @e[type=item]

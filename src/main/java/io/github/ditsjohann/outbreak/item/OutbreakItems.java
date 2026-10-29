@@ -13,11 +13,17 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.item.equipment.Equippable;
 
 public final class OutbreakItems {
 	public static final Item RAG = register("rag", p -> new MedicalItem(Treatment.Kind.RAG, p), medical(1.5F).stacksTo(16));
@@ -33,16 +39,53 @@ public final class OutbreakItems {
 			.build())
 		.usingConvertsTo(Items.GLASS_BOTTLE));
 
+	// Melee weapons. Attack damage shown in game is 1 + the baseline; a headshot does 4x that.
+	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F));
+	public static final Item BASEBALL_BAT = register("baseball_bat", Item::new, weapon(200, 5.0F, -3.0F));
+	public static final Item CROWBAR = register("crowbar", Item::new, weapon(600, 5.0F, -2.8F));
+	public static final Item MACHETE = register("machete", Item::new, weapon(250, 6.0F, -2.6F));
+	public static final Item HAMMER = register("hammer", HammerItem::new, weapon(300, 3.0F, -2.8F));
+	public static final Item NAILS = register("nails", Item::new, new Item.Properties());
+
+	// Bags: rows of storage, and how much lighter their contents are while worn.
+	public static final Item SCHOOL_BAG = register("school_bag", p -> new BagItem(2, 0.3F, p), bag());
+	public static final Item HIKING_BAG = register("hiking_bag", p -> new BagItem(3, 0.6F, p), bag());
+
 	private OutbreakItems() {
 	}
 
 	public static void register() {
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT).register(output -> {
+			output.accept(KITCHEN_KNIFE);
+			output.accept(BASEBALL_BAT);
+			output.accept(CROWBAR);
+			output.accept(MACHETE);
+		});
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
+			output.accept(HAMMER);
+			output.accept(NAILS);
+			output.accept(SCHOOL_BAG);
+			output.accept(HIKING_BAG);
+		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(output -> {
 			output.accept(RAG);
 			output.accept(BANDAGE);
 			output.accept(DISINFECTANT);
 			output.accept(BOILED_WATER);
 		});
+	}
+
+	private static Item.Properties bag() {
+		return new Item.Properties()
+			.stacksTo(1)
+			.component(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+			.component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).setEquipSound(SoundEvents.ARMOR_EQUIP_LEATHER).build());
+	}
+
+	/** A melee weapon that wears out. Material only sets durability; damage and speed are per weapon. */
+	private static Item.Properties weapon(int durability, float attackDamage, float attackSpeed) {
+		ToolMaterial material = new ToolMaterial(BlockTags.INCORRECT_FOR_IRON_TOOL, durability, 6.0F, 0.0F, 1, ItemTags.IRON_TOOL_MATERIALS);
+		return new Item.Properties().sword(material, attackDamage, attackSpeed);
 	}
 
 	/** Medical items use the consumable component only for the hold-to-use timing and animation. */

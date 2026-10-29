@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.github.ditsjohann.outbreak.inventory.CarryWeight;
 import io.github.ditsjohann.outbreak.survivor.Moodle;
 import io.github.ditsjohann.outbreak.survivor.SurvivorState;
 import io.github.ditsjohann.outbreak.survivor.Survivors;
@@ -63,6 +64,9 @@ public class HealthPanelScreen extends Screen {
 		int y = top;
 		int health = Math.round(player.getHealth() / player.getMaxHealth() * 100);
 		graphics.text(this.font, Component.translatable("outbreak.health.overall", health), textX, y, 0xFFFFFFFF);
+		y += 12;
+		graphics.text(this.font, Component.translatable("outbreak.health.carrying",
+			String.format(Locale.ROOT, "%.1f", CarryWeight.total(player)), String.format(Locale.ROOT, "%.0f", CarryWeight.CAPACITY)), textX, y, 0xFFC8C8C8);
 		y += 14;
 
 		if (state.wounds.isEmpty()) {

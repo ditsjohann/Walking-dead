@@ -1,8 +1,11 @@
 package io.github.ditsjohann.outbreak;
 
+import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
 import io.github.ditsjohann.outbreak.command.OutbreakCommand;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.item.OutbreakItems;
+import io.github.ditsjohann.outbreak.loot.ContainerLoot;
+import io.github.ditsjohann.outbreak.network.OpenBagPayload;
 import io.github.ditsjohann.outbreak.survivor.BodySimulation;
 import io.github.ditsjohann.outbreak.survivor.Injuries;
 import io.github.ditsjohann.outbreak.survivor.StarterKit;
@@ -23,6 +26,7 @@ public class Outbreak implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		OutbreakBlocks.register();
 		OutbreakEntities.register();
 		VanillaRules.register();
 		Turning.register();
@@ -32,6 +36,8 @@ public class Outbreak implements ModInitializer {
 		Injuries.register();
 		BodySimulation.register();
 		OutbreakCommand.register();
+		ContainerLoot.register();
+		OpenBagPayload.register();
 		LOGGER.info("Outbreak loaded. Good luck out there.");
 	}
 

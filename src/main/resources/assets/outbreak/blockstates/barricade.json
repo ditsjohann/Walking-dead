@@ -1,0 +1,64 @@
+{
+	"variants": {
+		"facing=north,planks=1": {
+			"model": "outbreak:block/barricade_1"
+		},
+		"facing=north,planks=2": {
+			"model": "outbreak:block/barricade_2"
+		},
+		"facing=north,planks=3": {
+			"model": "outbreak:block/barricade_3"
+		},
+		"facing=north,planks=4": {
+			"model": "outbreak:block/barricade_4"
+		},
+		"facing=east,planks=1": {
+			"model": "outbreak:block/barricade_1",
+			"y": 90
+		},
+		"facing=east,planks=2": {
+			"model": "outbreak:block/barricade_2",
+			"y": 90
+		},
+		"facing=east,planks=3": {
+			"model": "outbreak:block/barricade_3",
+			"y": 90
+		},
+		"facing=east,planks=4": {
+			"model": "outbreak:block/barricade_4",
+			"y": 90
+		},
+		"facing=south,planks=1": {
+			"model": "outbreak:block/barricade_1",
+			"y": 180
+		},
+		"facing=south,planks=2": {
+			"model": "outbreak:block/barricade_2",
+			"y": 180
+		},
+		"facing=south,planks=3": {
+			"model": "outbreak:block/barricade_3",
+			"y": 180
+		},
+		"facing=south,planks=4": {
+			"model": "outbreak:block/barricade_4",
+			"y": 180
+		},
+		"facing=west,planks=1": {
+			"model": "outbreak:block/barricade_1",
+			"y": 270
+		},
+		"facing=west,planks=2": {
+			"model": "outbreak:block/barricade_2",
+			"y": 270
+		},
+		"facing=west,planks=3": {
+			"model": "outbreak:block/barricade_3",
+			"y": 270
+		},
+		"facing=west,planks=4": {
+			"model": "outbreak:block/barricade_4",
+			"y": 270
+		}
+	}
+}

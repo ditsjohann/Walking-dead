@@ -10,6 +10,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import io.github.ditsjohann.outbreak.inventory.CarryWeight;
 import io.github.ditsjohann.outbreak.survivor.BodySimulation;
 import io.github.ditsjohann.outbreak.survivor.Injuries;
 import io.github.ditsjohann.outbreak.survivor.SurvivorState;
@@ -95,7 +96,8 @@ public final class OutbreakCommand {
 		StringBuilder text = new StringBuilder(player.getName().getString())
 			.append(String.format(Locale.ROOT, ": health %.1f, thirst %.2f, fatigue %.2f, panic %.2f, sickness %.2f",
 				player.getHealth(), state.thirst, state.fatigue, state.panic, state.sickness))
-			.append(state.knox ? String.format(Locale.ROOT, ", KNOX %.0f%%", BodySimulation.knoxProgress(state) * 100) : ", no knox");
+			.append(state.knox ? String.format(Locale.ROOT, ", KNOX %.0f%%", BodySimulation.knoxProgress(state) * 100) : ", no knox")
+			.append(String.format(Locale.ROOT, ", carrying %.1f/%.0f kg", CarryWeight.total(player), CarryWeight.CAPACITY));
 		state.wounds.forEach((part, wound) -> text.append("\n  ").append(part.getSerializedName()).append(": ").append(describe(wound)));
 		source.sendSuccess(() -> Component.literal(text.toString()), false);
 		return 1;

@@ -1,5 +1,7 @@
 package io.github.ditsjohann.outbreak.survivor;
 
+import io.github.ditsjohann.outbreak.inventory.CarryWeight;
+
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -14,7 +16,8 @@ public enum Moodle {
 	BLEEDING("bleeding"),
 	PAIN("pain"),
 	SICK("sick"),
-	INJURED("injured");
+	INJURED("injured"),
+	HEAVY("heavy");
 
 	private final String name;
 
@@ -40,6 +43,7 @@ public enum Moodle {
 			case PAIN -> above(state.pain(), 0.1F, 0.3F, 0.6F, 0.9F);
 			case SICK -> above(state.sickness, 0.1F, 0.35F, 0.6F, 0.85F);
 			case INJURED -> below(player.getHealth(), 16, 12, 8, 4);
+			case HEAVY -> above(CarryWeight.ratio(player), 1.0001F, 1.25F, 1.5F, 1.75F);
 		};
 	}
 

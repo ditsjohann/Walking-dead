@@ -4,10 +4,12 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.network.OpenBagPayload;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.entity.ZombieRenderer;
 public class OutbreakClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Outbreak.id("outbreak"));
 	static final KeyMapping HEALTH_KEY = new KeyMapping("key.outbreak.health", InputConstants.KEY_H, CATEGORY);
+	static final KeyMapping BAG_KEY = new KeyMapping("key.outbreak.open_bag", InputConstants.KEY_B, CATEGORY);
 
 	@Override
 	public void onInitializeClient() {
@@ -30,10 +33,17 @@ public class OutbreakClient implements ClientModInitializer {
 		SurvivorHud.register();
 
 		KeyMappingHelper.registerKeyMapping(HEALTH_KEY);
+		KeyMappingHelper.registerKeyMapping(BAG_KEY);
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (HEALTH_KEY.consumeClick()) {
 				if (minecraft.player != null && minecraft.gui.screen() == null) {
 					minecraft.gui.setScreen(new HealthPanelScreen());
+				}
+			}
+
+			while (BAG_KEY.consumeClick()) {
+				if (minecraft.player != null && minecraft.gui.screen() == null) {
+					ClientPlayNetworking.send(new OpenBagPayload());
 				}
 			}
 		});

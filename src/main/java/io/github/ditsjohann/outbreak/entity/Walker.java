@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.entity;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
 
@@ -99,6 +100,7 @@ public class Walker extends Zombie {
 	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(1, new BreakDoorGoal(this, difficulty -> true));
+		this.goalSelector.addGoal(1, new BreakObstacleGoal(this));
 		this.goalSelector.addGoal(2, new ZombieAttackGoal(this, 1.15, false));
 		this.goalSelector.addGoal(4, new InvestigateNoiseGoal(this, 1.0));
 		this.goalSelector.addGoal(5, new FollowHerdLeaderGoal(this, 0.9));

@@ -96,7 +96,8 @@ public final class BodySimulation {
 	}
 
 	private static void stepNeeds(ServerPlayer player, SurvivorState state) {
-		float exertion = player.isSprinting() ? 2.0F : 1.0F;
+		int load = Moodle.HEAVY.level(player, state);
+		float exertion = (player.isSprinting() ? 2.0F : 1.0F) * (1.0F + 0.5F * load);
 		state.thirst = Math.min(1.0F, state.thirst + THIRST_PER_STEP * (player.isSprinting() ? 1.5F : 1.0F));
 		if (player.isSleeping()) {
 			state.fatigue = Math.max(0.0F, state.fatigue - 0.05F);
@@ -224,7 +225,10 @@ public final class BodySimulation {
 			}
 		}
 
-		if (limping || state.fatigue >= 0.85F || state.sickness >= 0.6F) {
+		int load = Moodle.HEAVY.level(player, state);
+		if (load >= 2) {
+			effect(player, MobEffects.SLOWNESS, load - 2 + (limping ? 1 : 0));
+		} else if (limping || state.fatigue >= 0.85F || state.sickness >= 0.6F) {
 			effect(player, MobEffects.SLOWNESS, 0);
 		}
 

@@ -8,8 +8,9 @@ played on a real 1:1 copy of Groningen generated with
 - [Groningen map](docs/MAP_GRONINGEN.md) — how to generate the map with Arnis
 - [Phase 1](docs/PHASE1.md) — walkers, noise, vanilla removed
 - [Phase 2](docs/PHASE2.md) — wounds, infection, needs, moodle HUD
+- [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags
 
-Status: phase 2 done (body, wounds, infection, needs, HUD). Next: phase 3, inventory, crafting and loot.
+Status: phase 3 done (loot, barricades, weapons, bags). Next: phase 4, vehicles.
 
 ## Development
 
@@ -26,6 +27,7 @@ Server test scenarios (uses Carpet fake players, dev only):
 ```bash
 python3 tools/servertest/driver.py . tools/servertest/phase1.txt run/phase1.log
 python3 tools/servertest/driver.py . tools/servertest/phase2.txt run/phase2.log
+python3 tools/servertest/driver.py . tools/servertest/phase3.txt run/phase3.log
 ```
 
 Client test with screenshots (real game window; on a headless Linux box use a virtual display):
@@ -34,4 +36,4 @@ Client test with screenshots (real game window; on a headless Linux box use a vi
 SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest   # build/run/clientGameTest/screenshots/
 ```
 
-Textures are generated from ASCII pixel art: `python3 tools/textures/make_textures.py`.
+Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`), loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).

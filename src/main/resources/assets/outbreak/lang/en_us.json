@@ -65,5 +65,21 @@
 	"outbreak.moodle.injured.1": "Minor injuries",
 	"outbreak.moodle.injured.2": "Injured",
 	"outbreak.moodle.injured.3": "Badly injured",
-	"outbreak.moodle.injured.4": "Critically injured"
+	"outbreak.moodle.injured.4": "Critically injured",
+	"block.outbreak.barricade": "Barricade",
+	"item.outbreak.kitchen_knife": "Kitchen Knife",
+	"item.outbreak.baseball_bat": "Baseball Bat",
+	"item.outbreak.crowbar": "Crowbar",
+	"item.outbreak.machete": "Machete",
+	"item.outbreak.hammer": "Hammer",
+	"item.outbreak.nails": "Nails",
+	"item.outbreak.school_bag": "School Bag",
+	"item.outbreak.hiking_bag": "Hiking Bag",
+	"outbreak.message.need_planks_and_nails": "You need a plank and 2 nails",
+	"outbreak.moodle.heavy.1": "Heavy load",
+	"outbreak.moodle.heavy.2": "Overloaded",
+	"outbreak.moodle.heavy.3": "Badly overloaded",
+	"outbreak.moodle.heavy.4": "Crushing load",
+	"key.outbreak.open_bag": "Open worn bag",
+	"outbreak.health.carrying": "Carrying: %s / %s kg"
 }

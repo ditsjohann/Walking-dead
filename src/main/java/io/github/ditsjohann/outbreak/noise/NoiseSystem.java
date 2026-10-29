@@ -103,9 +103,14 @@ public final class NoiseSystem {
 
 	/** Make a noise of the given radius. Usable directly for sounds that aren't game events (gunshots, car alarms...). */
 	public static void emit(ServerLevel level, Vec3 pos, float radius) {
+		emit(level, pos, radius, null);
+	}
+
+	/** Make a noise that every walker but {@code source} (the one making it) can hear. */
+	public static void emit(ServerLevel level, Vec3 pos, float radius, @Nullable Entity source) {
 		double radiusSqr = radius * radius;
 		AABB area = AABB.ofSize(pos, radius * 2.0, radius * 2.0, radius * 2.0);
-		for (Walker walker : level.getEntitiesOfClass(Walker.class, area, w -> w.distanceToSqr(pos) <= radiusSqr)) {
+		for (Walker walker : level.getEntitiesOfClass(Walker.class, area, w -> w != source && w.distanceToSqr(pos) <= radiusSqr)) {
 			walker.hearNoise(pos, radius);
 		}
 	}
