@@ -1,0 +1,121 @@
+# Combat checks: body hits never kill but can floor a walker, a downed walker dies to any hit,
+# fists shove, corpses stay a while.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode creative Bot
+clear Bot
+== a bat to the body of a walker on its last legs (3 health): it lives (expect health 1.0 or more)
+item replace entity Bot weapon.mainhand with outbreak:baseball_bat
+summon outbreak:walker 0 -57 2.5 {Tags:["last"],PersistenceRequired:1b,Rotation:[180f,0f],Health:3f}
+attribute @e[tag=last,limit=1] minecraft:movement_speed base set 0
+outbreak walker crawler @e[tag=last] false
+tp Bot 0 -57 0 0 18
+wait 0.5
+outbreak walker info @e[tag=last]
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=last]
+kill @e[tag=last]
+wait 1
+== a bat to the body, eight times, on a tough walker (so a hit while it's down doesn't finish it): it reels, goes down now and then, and gets back up (expect "down", "getting_up" and "standing" lines)
+summon outbreak:walker 0 -57 2.5 {Tags:["bat"],PersistenceRequired:1b,Rotation:[180f,0f],attributes:[{id:"minecraft:max_health",base:1000d}],Health:1000f}
+attribute @e[tag=bat,limit=1] minecraft:movement_speed base set 0
+outbreak walker crawler @e[tag=bat] false
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+tp @e[tag=bat] 0 -57 2.5 180 0
+wait 0.3
+player Bot look at 0 -56.6 2.5
+player Bot attack once
+wait 0.4
+outbreak walker info @e[tag=bat]
+wait 1.5
+kill @e[tag=bat]
+wait 6
+== knocked down, any hit is a head hit: one hit finishes a fresh walker (expect 1 corpse)
+summon outbreak:walker 0 -57 2.5 {Tags:["down"],PersistenceRequired:1b,Rotation:[180f,0f]}
+outbreak walker crawler @e[tag=down] false
+wait 0.5
+outbreak walker knockdown @e[tag=down] 0
+wait 1
+player Bot look at 0 -57 2.5
+player Bot attack once
+wait 0.3
+outbreak walker info @e[tag=down]
+execute positioned 0 -57 0 run outbreak walker corpses 8
+== ...and the corpse stays a few seconds (expect 1 corpse after 2 seconds, none after 6 more)
+wait 2
+execute positioned 0 -57 0 run outbreak walker corpses 8
+wait 6
+execute positioned 0 -57 0 run outbreak walker corpses 8
+== bare fists shove: the walker ends up further away (compare the z before and after)
+item replace entity Bot weapon.mainhand with minecraft:air
+summon outbreak:walker 0 -57 2 {Tags:["fist"],PersistenceRequired:1b,Rotation:[180f,0f]}
+attribute @e[tag=fist,limit=1] minecraft:movement_speed base set 0
+outbreak walker crawler @e[tag=fist] false
+wait 1
+outbreak walker info @e[tag=fist]
+player Bot look at 0 -56 2
+player Bot attack once
+wait 1.5
+outbreak walker info @e[tag=fist]
+== a crawler is low (its hitbox is 0.6 high)
+outbreak walker crawler @e[tag=fist] true
+wait 0.5
+outbreak walker info @e[tag=fist]
+execute if entity @e[tag=fist,dy=0.5,y=-56.5,x=-1,z=-5,dx=2,dz=10]
+execute as @e[tag=fist] at @s if entity @s[dy=0.7]

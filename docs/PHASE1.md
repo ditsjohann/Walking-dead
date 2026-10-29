@@ -5,7 +5,8 @@
 - **They don't burn** in daylight and **don't turn into drowned**: they walk along canal bottoms.
 - **Only the head counts:**
   - A hit in the top ~22% of the body does ×4 damage, so a worn iron axe kills in one swing.
-  - Body hits do half damage, stagger the walker (slowness) and **can never kill it**: it stays at 1 HP.
+  - Body hits do half damage, stagger the walker and **can never kill it**: it stays at 1 HP.
+  - Hits knock walkers about, floor them, and can leave them crawling: see [Combat](COMBAT.md).
   - Explosions, fire, falling and `/kill` still kill normally.
 - **Hearing:**
   - Walkers walk to the last noise they heard, look around there, then forget it after 30 seconds.

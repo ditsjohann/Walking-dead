@@ -22,9 +22,11 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SwingAnimationType;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.equipment.Equippable;
@@ -44,11 +46,11 @@ public final class OutbreakItems {
 		.usingConvertsTo(Items.GLASS_BOTTLE));
 
 	// Melee weapons. Attack damage shown in game is 1 + the baseline; a headshot does 4x that.
-	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F));
-	public static final Item BASEBALL_BAT = register("baseball_bat", Item::new, weapon(200, 5.0F, -3.0F));
-	public static final Item CROWBAR = register("crowbar", Item::new, weapon(600, 5.0F, -2.8F));
-	public static final Item MACHETE = register("machete", Item::new, weapon(250, 6.0F, -2.6F));
-	public static final Item HAMMER = register("hammer", HammerItem::new, weapon(300, 3.0F, -2.8F));
+	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F, 7));
+	public static final Item BASEBALL_BAT = register("baseball_bat", Item::new, weapon(200, 5.0F, -3.0F, 12));
+	public static final Item CROWBAR = register("crowbar", Item::new, weapon(600, 5.0F, -2.8F, 10));
+	public static final Item MACHETE = register("machete", Item::new, weapon(250, 6.0F, -2.6F, 10));
+	public static final Item HAMMER = register("hammer", HammerItem::new, weapon(300, 3.0F, -2.8F, 10));
 	public static final Item NAILS = register("nails", Item::new, new Item.Properties());
 
 	// Bags: rows of storage, and how much lighter their contents are while worn.
@@ -101,10 +103,14 @@ public final class OutbreakItems {
 			.component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST).setEquipSound(SoundEvents.ARMOR_EQUIP_LEATHER).build());
 	}
 
-	/** A melee weapon that wears out. Material only sets durability; damage and speed are per weapon. */
-	public static Item.Properties weapon(int durability, float attackDamage, float attackSpeed) {
+	/**
+	 * A melee weapon that wears out. Material only sets durability; damage and speed are per weapon,
+	 * and so is how long a swing takes to play out (vanilla's is 6 ticks; a bat is a big swing).
+	 */
+	public static Item.Properties weapon(int durability, float attackDamage, float attackSpeed, int swingTicks) {
 		ToolMaterial material = new ToolMaterial(BlockTags.INCORRECT_FOR_IRON_TOOL, durability, 6.0F, 0.0F, 1, ItemTags.IRON_TOOL_MATERIALS);
-		return new Item.Properties().sword(material, attackDamage, attackSpeed);
+		return new Item.Properties().sword(material, attackDamage, attackSpeed)
+			.component(DataComponents.ATTACK_ANIMATION, new SwingAnimation(SwingAnimationType.WHACK, swingTicks));
 	}
 
 	/** Medical items use the consumable component only for the hold-to-use timing and animation. */

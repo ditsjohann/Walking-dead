@@ -77,8 +77,9 @@ doesn't fit, it gets removed or replaced.
 
 - **Movement:** slow shamblers by default. A sandbox option (see §11) allows
   fast shamblers or sprinters.
-- **Killing them:** body hits only knock them down or slow them. A **headshot**
-  or a stomp on a downed walker kills.
+- **Killing them:** body hits only stagger them or knock them down. A **headshot**
+  kills; so does finishing one off on the ground (any hit on a downed walker or a
+  crawler counts as a headshot, see [Combat](COMBAT.md)).
 - **Senses:**
   - *Hearing* is their main sense. Sound events have a radius, and walkers move
     to the last thing they heard.

@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
+import io.github.ditsjohann.outbreak.client.walker.WalkerModel;
+import io.github.ditsjohann.outbreak.client.walker.WalkerRenderer;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
@@ -13,11 +15,11 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.ZombieRenderer;
 
 public class OutbreakClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Outbreak.id("outbreak"));
@@ -26,8 +28,9 @@ public class OutbreakClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		// Walkers borrow the zombie model until they get their own.
-		EntityRenderers.register(OutbreakEntities.WALKER, ZombieRenderer::new);
+		// Walkers: their own jointed model, skins and hit physics.
+		ModelLayerRegistry.registerModelLayer(WalkerRenderer.LAYER, WalkerModel::layer);
+		EntityRenderers.register(OutbreakEntities.WALKER, WalkerRenderer::new);
 
 		// The vanilla HUD is replaced entirely by our own.
 		OutbreakHud.register();

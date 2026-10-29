@@ -1,0 +1,98 @@
+package io.github.ditsjohann.outbreak.entity;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
+
+/**
+ * Operator commands to show off (and test) walker physics without a fight:
+ * <pre>
+ * /outbreak walker hit &lt;walkers&gt; &lt;yaw&gt; &lt;strength 0-2&gt; [head]  - a hit pushing towards yaw
+ * /outbreak walker knockdown &lt;walkers&gt; &lt;yaw&gt;                - falls over towards yaw
+ * /outbreak walker stand &lt;walkers&gt;                         - back on its feet at once
+ * /outbreak walker crawler &lt;walkers&gt; &lt;true|false&gt;
+ * /outbreak walker skin &lt;walkers&gt; &lt;0-23&gt;
+ * /outbreak walker info &lt;walkers&gt;
+ * /outbreak walker corpses &lt;radius&gt;                       - dead walkers still lying around (selectors skip them)
+ * </pre>
+ */
+public final class WalkerCommand {
+	private WalkerCommand() {
+	}
+
+	public static void register() {
+		CommandRegistrationCallback.EVENT.register((dispatcher, context, selection) -> register(dispatcher));
+	}
+
+	private static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+		var hit = Commands.literal("hit").then(walkers()
+			.then(Commands.argument("yaw", FloatArgumentType.floatArg())
+				.then(Commands.argument("strength", FloatArgumentType.floatArg(0.0F, 2.0F))
+					.executes(ctx -> hit(ctx, false))
+					.then(Commands.argument("head", BoolArgumentType.bool()).executes(ctx -> hit(ctx, BoolArgumentType.getBool(ctx, "head")))))));
+		var knockdown = Commands.literal("knockdown").then(walkers()
+			.then(Commands.argument("yaw", FloatArgumentType.floatArg())
+				.executes(ctx -> each(ctx, "knocked down", walker -> walker.knockDown(FloatArgumentType.getFloat(ctx, "yaw"), 80)))));
+		var stand = Commands.literal("stand").then(walkers().executes(ctx -> each(ctx, "stood up", Walker::standUp)));
+		var crawler = Commands.literal("crawler").then(walkers()
+			.then(Commands.argument("crawler", BoolArgumentType.bool())
+				.executes(ctx -> each(ctx, "changed", walker -> walker.setCrawler(BoolArgumentType.getBool(ctx, "crawler"))))));
+		var skin = Commands.literal("skin").then(walkers()
+			.then(Commands.argument("skin", IntegerArgumentType.integer(0, Walker.SKINS - 1))
+				.executes(ctx -> each(ctx, "reskinned", walker -> walker.setSkin(IntegerArgumentType.getInteger(ctx, "skin"))))));
+		var info = Commands.literal("info").then(walkers().executes(ctx -> each(ctx, "described", walker ->
+			ctx.getSource().sendSuccess(() -> Component.literal(String.format(java.util.Locale.ROOT,
+				"walker: skin %d, %s, %s, health %.1f%s, at %.1f %.1f %.1f", walker.skin(), walker.isCrawler() ? "crawler" : "walking",
+				walker.posture().name().toLowerCase(java.util.Locale.ROOT), walker.getHealth(), walker.isDeadOrDying() ? " (DEAD)" : "",
+				walker.getX(), walker.getY(), walker.getZ())), false))));
+		var corpses = Commands.literal("corpses").then(Commands.argument("radius", IntegerArgumentType.integer(1, 128))
+			.executes(ctx -> corpses(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius"))));
+		dispatcher.register(Commands.literal("outbreak")
+			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+			.then(Commands.literal("walker").then(hit).then(knockdown).then(stand).then(crawler).then(skin).then(info).then(corpses)));
+	}
+
+	private static RequiredArgumentBuilder<CommandSourceStack, ?> walkers() {
+		return Commands.argument("walkers", EntityArgument.entities());
+	}
+
+	private static int corpses(CommandSourceStack source, int radius) {
+		AABB area = AABB.ofSize(source.getPosition(), radius * 2, radius * 2, radius * 2);
+		int count = source.getLevel().getEntitiesOfClass(Walker.class, area, Walker::isDeadOrDying).size();
+		source.sendSuccess(() -> Component.literal(count + " walker corpse(s) within " + radius + " blocks"), false);
+		return count;
+	}
+
+	private static int hit(CommandContext<CommandSourceStack> ctx, boolean head) throws CommandSyntaxException {
+		float yaw = FloatArgumentType.getFloat(ctx, "yaw");
+		float strength = FloatArgumentType.getFloat(ctx, "strength");
+		return each(ctx, "hit", walker -> walker.react(yaw, strength, head));
+	}
+
+	private static int each(CommandContext<CommandSourceStack> ctx, String what, java.util.function.Consumer<Walker> action) throws CommandSyntaxException {
+		int count = 0;
+		for (Entity entity : EntityArgument.getEntities(ctx, "walkers")) {
+			if (entity instanceof Walker walker) {
+				action.accept(walker);
+				count++;
+			}
+		}
+
+		int done = count;
+		ctx.getSource().sendSuccess(() -> Component.literal(done + " walker(s) " + what), false);
+		return done;
+	}
+}

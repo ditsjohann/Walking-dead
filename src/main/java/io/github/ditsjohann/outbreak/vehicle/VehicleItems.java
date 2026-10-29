@@ -28,8 +28,8 @@ public final class VehicleItems {
 	public static final Item JERRYCAN = register("jerrycan", JerrycanItem::new,
 		new Item.Properties().stacksTo(1).component(VehicleComponents.FUEL, 0.0F));
 	public static final Item HOSE = register("hose", Item::new, new Item.Properties().durability(40));
-	public static final Item WRENCH = register("wrench", Item::new, OutbreakItems.weapon(300, 3.0F, -2.8F));
-	public static final Item SCREWDRIVER = register("screwdriver", Item::new, OutbreakItems.weapon(150, 2.0F, -1.8F));
+	public static final Item WRENCH = register("wrench", Item::new, OutbreakItems.weapon(300, 3.0F, -2.8F, 10));
+	public static final Item SCREWDRIVER = register("screwdriver", Item::new, OutbreakItems.weapon(150, 2.0F, -1.8F, 7));
 	public static final Item JACK = register("jack", Item::new, new Item.Properties().stacksTo(1));
 	public static final Item CAR_KEY = register("car_key", CarKeyItem::new, new Item.Properties().stacksTo(1));
 	public static final Item BICYCLE = register("bicycle", BicycleItem::new,

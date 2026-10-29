@@ -43,25 +43,38 @@ wait 1.5
 player Bot attack once
 wait 1
 execute if entity @e[type=outbreak:walker,tag=head]
-== body hits never kill (expect 15.5, then floor at 1.0, still alive)
+== body hits never kill a walker on its feet (expect 15.5, then floor at 1.0, still alive; stood back up after each hit, since a downed walker dies to any hit)
+wait 5
 summon outbreak:walker 2 -57 0 {Tags:["body"],NoAI:1b,PersistenceRequired:1b}
 player Bot look at 2 -56.2 0
 wait 1.5
 player Bot attack once
 wait 1.5
 data get entity @e[type=outbreak:walker,tag=body,limit=1] Health
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 player Bot attack once
 wait 1.5
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 player Bot attack once
 wait 1.5
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 player Bot attack once
 wait 1.5
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 player Bot attack once
 wait 1.5
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 player Bot attack once
 wait 1.5
 data get entity @e[type=outbreak:walker,tag=body,limit=1] Health
 execute if entity @e[type=outbreak:walker,tag=body]
+outbreak walker stand @e[tag=body]
+tp @e[tag=body] 2 -57 0
 == ...then a headshot finishes it
 player Bot look at 2 -55.3 0
 wait 1.5

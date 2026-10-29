@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.entity;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
@@ -13,7 +14,14 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
@@ -22,14 +30,18 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.BreakDoorGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -48,7 +60,6 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.tags.DamageTypeTags;
 
 /**
  * A walker: slow, doesn't burn, only dies from a head hit, hunts by sound first and sight second,
@@ -59,12 +70,57 @@ public class Walker extends Zombie {
 	/** Fraction of the walker's height above which a hit counts as a headshot. */
 	public static final double HEAD_START = 0.78;
 	private static final double VEHICLE_REACH = 0.6;
+	/** A crawler's hitbox: as wide as a standing walker (so changing to it never pushes anything up), but low. */
+	private static final EntityDimensions CRAWLING = EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.4F);
 	private static final float HEADSHOT_MULTIPLIER = 4.0F;
 	private static final float BODY_MULTIPLIER = 0.5F;
 	/** Cosine of the half-angle of a walker's field of view (~65 degrees). */
 	private static final double VIEW_CONE_COS = 0.42;
 	/** How long a heard noise stays interesting, in ticks. */
 	private static final int NOISE_MEMORY = 20 * 30;
+
+	/** How many skins there are (tools/walkers/make_walkers.py). */
+	public static final int SKINS = 24;
+	public static final float CRAWLER_CHANCE = 0.08F;
+	/** A corpse lies there this long before it's gone. */
+	public static final int CORPSE_TICKS = 20 * 5;
+	public static final int FALL_TICKS = 10;
+	public static final int GET_UP_TICKS = 24;
+
+	private static final EntityDataAccessor<Integer> DATA_VARIANT = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Boolean> DATA_CRAWLER = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.BOOLEAN);
+	/** {@link Posture} ordinal. */
+	private static final EntityDataAccessor<Byte> DATA_POSTURE = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.BYTE);
+	/** Game time the posture last changed: the client times falls and getting up from it. */
+	private static final EntityDataAccessor<Integer> DATA_POSTURE_SINCE = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
+	/** World yaw the walker fell (or is falling) towards. */
+	private static final EntityDataAccessor<Float> DATA_FALL_YAW = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.FLOAT);
+	/** The last hit, packed: see {@link Hit}. A new one has a new sequence number. */
+	private static final EntityDataAccessor<Integer> DATA_HIT = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
+	private static final Identifier CRAWLER_SPEED = Identifier.fromNamespaceAndPath("outbreak", "crawler");
+
+	/** Standing, knocked down (falling, then lying there), or getting back up. */
+	public enum Posture {
+		STANDING,
+		DOWN,
+		GETTING_UP
+	}
+
+	/** A hit as the client sees it: which way it pushed (world yaw), how hard (0-15), and whether it hit the head. */
+	public record Hit(int sequence, float yaw, int strength, boolean head) {
+		static int pack(int sequence, float yaw, int strength, boolean head) {
+			int yawByte = Math.floorMod(Math.round(yaw / 360.0F * 256.0F), 256);
+			return (sequence & 0xFF) | (Math.clamp(strength, 0, 15) << 8) | ((head ? 1 : 0) << 12) | (yawByte << 16);
+		}
+
+		public static Hit unpack(int packed) {
+			return new Hit(packed & 0xFF, ((packed >>> 16) & 0xFF) * 360.0F / 256.0F, (packed >>> 8) & 0xF, ((packed >>> 12) & 1) == 1);
+		}
+	}
+
+	private int staggerTicks;
+	private int downTicks;
+	private int hitSequence;
 
 	private @Nullable Vec3 noiseTarget;
 	private float noiseLoudness;
@@ -76,6 +132,18 @@ public class Walker extends Zombie {
 		super(type, level);
 		this.getNavigation().setCanOpenDoors(true);
 		this.xpReward = 0;
+		this.entityData.set(DATA_VARIANT, this.random.nextInt(SKINS));
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_VARIANT, 0);
+		builder.define(DATA_CRAWLER, false);
+		builder.define(DATA_POSTURE, (byte) 0);
+		builder.define(DATA_POSTURE_SINCE, 0);
+		builder.define(DATA_FALL_YAW, 0.0F);
+		builder.define(DATA_HIT, 0);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -85,7 +153,7 @@ public class Walker extends Zombie {
 			.add(Attributes.MOVEMENT_SPEED, 0.18F)
 			.add(Attributes.ATTACK_DAMAGE, 3.0)
 			.add(Attributes.ARMOR, 0.0)
-			.add(Attributes.KNOCKBACK_RESISTANCE, 0.1)
+			.add(Attributes.KNOCKBACK_RESISTANCE, 0.45)
 			.add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0.0);
 	}
 
@@ -134,27 +202,227 @@ public class Walker extends Zombie {
 		return this.getViewVector(1.0F).dot(toTarget) >= VIEW_CONE_COS;
 	}
 
-	// --- Damage: only the head counts ---
+	// --- Damage: only the head counts. Everything else knocks them about. ---
 
 	@Override
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
 		Entity direct = source.getDirectEntity();
 		boolean isAttack = direct != null && direct != this && !source.is(DamageTypeTags.IS_EXPLOSION);
+		boolean runOver = source.is(OutbreakDamageTypes.RUN_OVER);
+		boolean head = false;
 		// Run over by a vehicle: crushed, head or not.
-		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(OutbreakDamageTypes.RUN_OVER)) {
-			if (this.isHeadshot(direct)) {
+		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !runOver) {
+			// A walker on the ground can't protect its head: every hit is a head hit.
+			head = this.posture() != Posture.STANDING || this.isCrawler() || this.isHeadshot(direct);
+			if (head) {
 				damage *= HEADSHOT_MULTIPLIER;
 			} else {
 				// Body hits stagger but can never finish a walker off.
 				damage = Math.min(damage * BODY_MULTIPLIER, this.getHealth() - 1.0F);
-				this.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 30, 1));
 				if (damage <= 0.0F) {
 					damage = 0.01F;
 				}
 			}
 		}
 
-		return super.hurtServer(level, source, damage);
+		boolean hurt = super.hurtServer(level, source, damage);
+		if (hurt && isAttack) {
+			this.knockAbout(level, source, direct, head, runOver);
+		}
+
+		return hurt;
+	}
+
+	/** The physics of a hit: which way it throws the walker, a stagger, and maybe a fall. */
+	private void knockAbout(ServerLevel level, DamageSource source, Entity direct, boolean head, boolean runOver) {
+		Entity attacker = source.getEntity() != null ? source.getEntity() : direct;
+		WeaponStyle style = attacker instanceof LivingEntity living && direct == attacker ? WeaponStyle.of(living.getMainHandItem()) : WeaponStyle.OTHER;
+		Vec3 away = this.position().subtract(direct.position()).multiply(1.0, 0.0, 1.0);
+		if (direct instanceof Projectile || runOver) {
+			away = direct.getDeltaMovement().multiply(1.0, 0.0, 1.0);
+		}
+
+		if (away.lengthSqr() < 1.0E-6) {
+			away = this.getLookAngle().scale(-1.0);
+		}
+
+		// Yaw the blow pushes towards; a sideways swing comes across towards the attacker's left.
+		float yaw = (float) Math.toDegrees(Math.atan2(-away.x, away.z)) - (runOver ? 0.0F : style.lateral);
+		float strength = runOver ? 1.6F : style.strength * (head ? 1.3F : 1.0F);
+		this.hitSequence++;
+		this.entityData.set(DATA_HIT, Hit.pack(this.hitSequence, yaw, Math.round(strength * 8.0F), head));
+		if (this.isDeadOrDying()) {
+			this.entityData.set(DATA_FALL_YAW, yaw);
+			return;
+		}
+
+		float rad = yaw * Mth.DEG_TO_RAD;
+		// Sideways, not up: vanilla's knockback already gives the little hop.
+		float push = 0.15F + strength * 0.25F;
+		this.push(-Mth.sin(rad) * push, 0.02 + strength * 0.02, Mth.cos(rad) * push);
+		this.markHurt();
+		this.staggerTicks = Math.max(this.staggerTicks, Math.round(6 + strength * 14));
+
+		float chance = runOver ? 1.0F : head ? style.headKnockdown : style.knockdown;
+		if (style == WeaponStyle.FIST && this.staggerTicks > 12) {
+			// Shoving a walker that's already reeling.
+			chance += 0.25F;
+		}
+
+		if (!this.isCrawler() && this.posture() == Posture.STANDING && this.random.nextFloat() < chance) {
+			this.knockDown(yaw, 50 + this.random.nextInt(60));
+			// A hard enough hit (or a car) breaks the legs: it'll crawl from now on.
+			if (runOver || (style == WeaponStyle.SWING && !head && this.random.nextFloat() < 0.15F)) {
+				this.setCrawler(true);
+			}
+		}
+
+		level.playSound(null, this.getX(), this.getY(), this.getZ(), head ? SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR : SoundEvents.PLAYER_ATTACK_KNOCKBACK,
+			SoundSource.HOSTILE, 0.6F + strength * 0.3F, head ? 0.7F : 0.9F);
+	}
+
+	// --- Posture: stagger, knocked down, getting up, crawling ---
+
+	public int skin() {
+		return Math.floorMod(this.entityData.get(DATA_VARIANT), SKINS);
+	}
+
+	public void setSkin(int skin) {
+		this.entityData.set(DATA_VARIANT, Math.floorMod(skin, SKINS));
+	}
+
+	public boolean isCrawler() {
+		return this.entityData.get(DATA_CRAWLER);
+	}
+
+	public void setCrawler(boolean crawler) {
+		this.entityData.set(DATA_CRAWLER, crawler);
+		var speed = this.getAttribute(Attributes.MOVEMENT_SPEED);
+		if (speed != null) {
+			speed.removeModifier(CRAWLER_SPEED);
+			if (crawler) {
+				speed.addPermanentModifier(new AttributeModifier(CRAWLER_SPEED, -0.6, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+			}
+		}
+	}
+
+	public Posture posture() {
+		return Posture.values()[Math.clamp(this.entityData.get(DATA_POSTURE), 0, Posture.values().length - 1)];
+	}
+
+	/** Game time the current posture started. */
+	public int postureSince() {
+		return this.entityData.get(DATA_POSTURE_SINCE);
+	}
+
+	public float fallYaw() {
+		return this.entityData.get(DATA_FALL_YAW);
+	}
+
+	public Hit lastHit() {
+		return Hit.unpack(this.entityData.get(DATA_HIT));
+	}
+
+	private void setPosture(Posture posture) {
+		this.entityData.set(DATA_POSTURE, (byte) posture.ordinal());
+		this.entityData.set(DATA_POSTURE_SINCE, (int) this.level().getGameTime());
+	}
+
+	/** Falls over towards yaw and lies there for a while. */
+	public void knockDown(float yaw, int ticks) {
+		this.entityData.set(DATA_FALL_YAW, yaw);
+		this.setPosture(Posture.DOWN);
+		this.downTicks = ticks;
+		this.getNavigation().stop();
+	}
+
+	/** Back on its feet at once (for tests). */
+	public void standUp() {
+		this.setPosture(Posture.STANDING);
+		this.downTicks = 0;
+		this.staggerTicks = 0;
+	}
+
+	/** A hit for show (and for tests): push, stagger and maybe fall, as if hit from that side. */
+	public void react(float yaw, float strength, boolean head) {
+		this.hitSequence++;
+		this.entityData.set(DATA_HIT, Hit.pack(this.hitSequence, yaw, Math.round(strength * 8.0F), head));
+		this.staggerTicks = Math.max(this.staggerTicks, Math.round(6 + strength * 14));
+	}
+
+	/** Staggering, down or getting up: no walking, no biting. */
+	public boolean isHelpless() {
+		return this.staggerTicks > 0 || this.posture() != Posture.STANDING;
+	}
+
+	@Override
+	protected boolean isImmobile() {
+		return super.isImmobile() || this.posture() != Posture.STANDING;
+	}
+
+	@Override
+	public void aiStep() {
+		// Here rather than in customServerAiStep: that doesn't run while the walker is down (immobile).
+		if (!this.level().isClientSide() && this.isAlive()) {
+			if (this.staggerTicks > 0) {
+				this.staggerTicks--;
+			}
+
+			if (this.posture() == Posture.DOWN && --this.downTicks <= 0) {
+				this.setPosture(Posture.GETTING_UP);
+				this.downTicks = GET_UP_TICKS;
+			} else if (this.posture() == Posture.GETTING_UP && --this.downTicks <= 0) {
+				this.setPosture(Posture.STANDING);
+			}
+		}
+
+		super.aiStep();
+	}
+
+	@Override
+	protected void customServerAiStep(ServerLevel level) {
+		boolean helpless = this.isHelpless();
+		for (Goal.Flag flag : new Goal.Flag[] {Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP}) {
+			if (helpless) {
+				this.goalSelector.disableControlFlag(flag);
+			} else {
+				this.goalSelector.enableControlFlag(flag);
+			}
+		}
+
+		if (helpless) {
+			this.getNavigation().stop();
+		}
+
+		super.customServerAiStep(level);
+	}
+
+	/** Crawlers are low. A knocked-down walker keeps its standing hitbox: it's back up in a few seconds. */
+	@Override
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		if (this.isCrawler()) {
+			return CRAWLING;
+		}
+
+		return super.getDefaultDimensions(pose);
+	}
+
+	@Override
+	public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
+		super.onSyncedDataUpdated(accessor);
+		if (DATA_CRAWLER.equals(accessor)) {
+			this.refreshDimensions();
+		}
+	}
+
+	/** Corpses stay a while instead of vanishing in a puff. */
+	@Override
+	protected void tickDeath() {
+		this.deathTime++;
+		if (this.deathTime >= CORPSE_TICKS && !this.level().isClientSide() && !this.isRemoved()) {
+			this.level().broadcastEntityEvent(this, (byte) 60);
+			this.remove(RemovalReason.KILLED);
+		}
 	}
 
 	private boolean isHeadshot(Entity direct) {
@@ -254,6 +522,10 @@ public class Walker extends Zombie {
 		HerdData herd = groupData instanceof HerdData data ? data : new HerdData();
 		super.finalizeSpawn(level, difficulty, spawnReason, herd);
 		this.setCanPickUpLoot(false);
+		if (this.random.nextFloat() < CRAWLER_CHANCE) {
+			this.setCrawler(true);
+		}
+
 		if (herd.leader == null) {
 			herd.leader = this;
 			if (spawnReason != EntitySpawnReason.NATURAL && spawnReason != EntitySpawnReason.CHUNK_GENERATION) {
@@ -303,12 +575,17 @@ public class Walker extends Zombie {
 		if (this.leaderId != null) {
 			output.store("herd_leader", UUIDUtil.CODEC, this.leaderId);
 		}
+
+		output.putInt("skin", this.skin());
+		output.putBoolean("crawler", this.isCrawler());
 	}
 
 	@Override
 	protected void readAdditionalSaveData(ValueInput input) {
 		super.readAdditionalSaveData(input);
 		this.leaderId = input.read("herd_leader", UUIDUtil.CODEC).orElse(null);
+		input.getInt("skin").ifPresent(this::setSkin);
+		this.entityData.set(DATA_CRAWLER, input.getBooleanOr("crawler", false));
 	}
 
 	/** Shared between all walkers of one naturally spawned pack: the first one becomes the leader. */
