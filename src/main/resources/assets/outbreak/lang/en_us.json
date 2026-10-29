@@ -32,7 +32,7 @@
 	"outbreak.health.healing": "healing %s%%",
 	"outbreak.health.status": "How you feel",
 	"outbreak.health.fine": "Fine, for now",
-	"key.categories.outbreak": "Outbreak",
+	"key.category.outbreak.outbreak": "Outbreak",
 	"key.outbreak.health": "Health panel",
 	"outbreak.moodle.hungry.1": "Peckish",
 	"outbreak.moodle.hungry.2": "Hungry",

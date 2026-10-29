@@ -79,7 +79,7 @@ public class Walker extends Zombie {
 			.add(Attributes.MAX_HEALTH, 20.0)
 			.add(Attributes.FOLLOW_RANGE, 32.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.18F)
-			.add(Attributes.ATTACK_DAMAGE, 4.0)
+			.add(Attributes.ATTACK_DAMAGE, 3.0)
 			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 0.1)
 			.add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0.0);

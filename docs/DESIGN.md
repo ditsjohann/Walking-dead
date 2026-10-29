@@ -1,6 +1,6 @@
 # Design — Walking Dead × Project Zomboid in Groningen
 
-Status: **draft v0.3.** Phases 0 and 1 are built; see `docs/PHASE1.md` for what's in the game now.
+Status: **draft v0.4.** Phases 0–2 are built; see `docs/PHASE1.md` and `docs/PHASE2.md` for what's in the game now.
 
 ## 1. Pitch
 
@@ -224,7 +224,7 @@ anywhere from TWD-heroic to PZ-brutal:
 |---|---|---|
 | 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
 | 1 ✅ | **Strip vanilla:** remove mobs, non-building recipes, the Nether portal, XP, advancements; tools needed for wood and stone. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, herds, everyone turns | Groningen with walkers, and nothing vanilla left to see |
-| 2 | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
+| 2 ✅ | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
 | 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades, melee weapons | Scavenge and fortify |
 | 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat | Travel Groningen |
 | 5 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |

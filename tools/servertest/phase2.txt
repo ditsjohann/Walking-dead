@@ -1,0 +1,81 @@
+# Phase 2 checks: wounds, bleeding, bandages, thirst, drinking, Knox infection.
+== setup
+gamerule spawn_mobs false
+gamerule natural_health_regeneration
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+outbreak status Bot
+== a walker attack leaves wounds
+summon outbreak:walker 0 -57 2 {Tags:["biter"],PersistenceRequired:1b,Rotation:[180f,0f]}
+wait 4
+kill @e[type=outbreak:walker]
+outbreak status Bot
+data get entity Bot Health
+== bleeding: a laceration drains health until bandaged
+outbreak cure Bot
+effect give Bot minecraft:instant_health 1 10 true
+wait 1
+outbreak wound Bot left_arm laceration
+wait 26
+data get entity Bot Health
+== bandage it with a rag (hold use 1.5s): bleeding stops, one rag used
+give Bot outbreak:rag 2
+player Bot hotbar 5
+player Bot use continuous
+wait 2.5
+player Bot stop
+outbreak status Bot
+clear Bot outbreak:rag 0
+== nothing to treat: rag isn't used up
+outbreak cure Bot
+player Bot use continuous
+wait 2.5
+player Bot stop
+clear Bot outbreak:rag 0
+== a scratch stops bleeding by itself after 20s
+outbreak wound Bot torso scratch
+wait 3
+outbreak status Bot
+wait 20
+outbreak status Bot
+outbreak cure Bot
+== thirst: at 1.0 you lose health
+effect give Bot minecraft:instant_health 1 10 true
+outbreak set Bot thirst 1
+wait 22
+data get entity Bot Health
+== drinking a water bottle quenches thirst (~0.35)
+give Bot minecraft:potion[minecraft:potion_contents={potion:"minecraft:water"}]
+player Bot hotbar 6
+player Bot use continuous
+wait 2.5
+player Bot stop
+outbreak status Bot
+== recipes exist
+recipe give Bot outbreak:rag
+recipe give Bot outbreak:bandage_from_smelting
+recipe give Bot outbreak:disinfectant
+recipe give Bot outbreak:boiled_water_from_smelting
+== exhaustion: slowness and mining fatigue
+outbreak cure Bot
+outbreak set Bot fatigue 0.9
+wait 3
+data get entity Bot active_effects
+outbreak cure Bot
+== Knox at 50%: sick (visible), hunger + nausea
+outbreak infect Bot 0.5
+wait 3
+outbreak status Bot
+data get entity Bot active_effects
+== Knox at 97%: dies within ~45s, then turns
+effect give Bot minecraft:instant_health 1 10 true
+outbreak infect Bot 0.97
+wait 50
+execute if entity Bot
+wait 32
+execute if entity @e[type=outbreak:walker,name=Bot]

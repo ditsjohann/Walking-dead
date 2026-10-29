@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "outbreak-test",
+	"version": "1.0.0",
+	"name": "Outbreak tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"io.github.ditsjohann.outbreak.test.SurvivorHudClientTest"
+		]
+	},
+	"depends": {
+		"outbreak": "*"
+	}
+}

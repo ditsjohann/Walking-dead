@@ -28,6 +28,18 @@ loom {
 	}
 }
 
+fabricApi {
+	// Client game tests: `./gradlew runClientGameTest` starts a real client, builds a test world and
+	// takes screenshots (see src/gametest). Needs a display; on Linux use xvfb-run.
+	configureTests {
+		createSourceSet = true
+		modId = "outbreak-test"
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
