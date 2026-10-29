@@ -1,0 +1,130 @@
+# Phase 1 checks. Read the log: each `== label` says what the following lines should show.
+# "Test failed" after a kill/ban check means the thing is gone, which is the expected result there.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+== starter kit (expect 1 axe, 1 pickaxe)
+clear Bot minecraft:iron_axe 0
+clear Bot minecraft:stone_pickaxe 0
+== banned entities (creeper/skeleton/villager/xp fail, cow ok)
+summon minecraft:creeper 10 -57 10
+summon minecraft:skeleton 10 -57 10
+summon minecraft:villager 10 -57 10
+summon minecraft:experience_orb 10 -57 10
+summon minecraft:cow 10 -57 10
+wait 1
+execute if entity @e[type=minecraft:creeper]
+execute if entity @e[type=minecraft:villager]
+execute if entity @e[type=minecraft:experience_orb]
+execute if entity @e[type=minecraft:cow]
+== recipes (iron_pickaxe + enchanting_table removed, planks + stone_bricks kept)
+recipe give Bot minecraft:iron_pickaxe
+recipe give Bot minecraft:enchanting_table
+recipe give Bot minecraft:oak_planks
+recipe give Bot minecraft:stone_bricks
+recipe give Bot *
+== walker in daylight (should not burn, not baby)
+summon outbreak:walker 40 -57 40 {Tags:["sun"],PersistenceRequired:1b}
+wait 12
+execute if entity @e[type=outbreak:walker,tag=sun]
+data get entity @e[type=outbreak:walker,tag=sun,limit=1] Health
+data get entity @e[type=outbreak:walker,tag=sun,limit=1] IsBaby
+kill @e[type=outbreak:walker,tag=sun]
+== headshot kills in one axe hit
+gamemode creative Bot
+tp Bot 0 -57 0
+player Bot hotbar 1
+summon outbreak:walker 2 -57 0 {Tags:["head"],NoAI:1b,PersistenceRequired:1b}
+player Bot look at 2 -55.3 0
+wait 1.5
+player Bot attack once
+wait 1
+execute if entity @e[type=outbreak:walker,tag=head]
+== body hits never kill (expect 15.5, then floor at 1.0, still alive)
+summon outbreak:walker 2 -57 0 {Tags:["body"],NoAI:1b,PersistenceRequired:1b}
+player Bot look at 2 -56.2 0
+wait 1.5
+player Bot attack once
+wait 1.5
+data get entity @e[type=outbreak:walker,tag=body,limit=1] Health
+player Bot attack once
+wait 1.5
+player Bot attack once
+wait 1.5
+player Bot attack once
+wait 1.5
+player Bot attack once
+wait 1.5
+player Bot attack once
+wait 1.5
+data get entity @e[type=outbreak:walker,tag=body,limit=1] Health
+execute if entity @e[type=outbreak:walker,tag=body]
+== ...then a headshot finishes it
+player Bot look at 2 -55.3 0
+wait 1.5
+player Bot attack once
+wait 1
+execute if entity @e[type=outbreak:walker,tag=body]
+== no punching trees (log survives bare hand, breaks with axe; dirt breaks by hand)
+gamemode survival Bot
+tp Bot 0 -57 1
+setblock 0 -57 3 minecraft:oak_log
+player Bot look at 0 -56.5 3.5
+player Bot hotbar 5
+player Bot attack continuous
+wait 5
+player Bot stop
+execute if block 0 -57 3 minecraft:oak_log
+player Bot hotbar 1
+player Bot attack continuous
+wait 3
+player Bot stop
+execute if block 0 -57 3 minecraft:oak_log
+setblock 0 -57 3 minecraft:dirt
+player Bot hotbar 5
+player Bot attack continuous
+wait 3
+player Bot stop
+execute if block 0 -57 3 minecraft:dirt
+== noise: TNT draws a walker 30 blocks away
+gamemode spectator Bot
+tp Bot 0 -50 0
+summon outbreak:walker 30 -57 0 {Tags:["ear"],PersistenceRequired:1b}
+wait 2
+data get entity @e[tag=ear,limit=1] Pos
+summon minecraft:tnt 0 -57 10 {fuse:20}
+wait 25
+data get entity @e[tag=ear,limit=1] Pos
+execute positioned 0 -57 10 if entity @e[type=outbreak:walker,tag=ear,distance=..10]
+kill @e[type=outbreak:walker]
+== sight: a walker facing a survival player attacks
+gamemode survival Bot
+tp Bot 0 -57 -20
+effect clear Bot
+summon outbreak:walker 0 -57 -14 {Tags:["eye"],PersistenceRequired:1b,Rotation:[180f,0f]}
+wait 12
+data get entity Bot Health
+kill @e[type=outbreak:walker]
+== everyone turns: Bot dies, walker named Bot rises 30s later
+player Cam spawn at 0 -50 -20
+wait 3
+gamemode spectator Cam
+damage Bot 1000 minecraft:generic
+wait 33
+execute if entity @e[type=outbreak:walker,name=Bot]
+== natural spawning: only walkers
+gamerule spawn_mobs true
+player Scout spawn at 200 -57 200
+wait 3
+gamemode survival Scout
+effect give Scout minecraft:resistance infinite 4 true
+time set midnight
+wait 45
+execute if entity @e[type=outbreak:walker]
+execute if entity @e[type=minecraft:zombie]
+execute if entity @e[type=minecraft:skeleton]
+execute if entity @e[type=minecraft:spider]
+execute if entity @e[type=minecraft:creeper]

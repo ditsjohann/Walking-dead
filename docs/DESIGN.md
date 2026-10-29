@@ -1,6 +1,6 @@
 # Design — Walking Dead × Project Zomboid in Groningen
 
-Status: **draft v0.2: total conversion.** Phase 0 (project setup) is built; everything else is still open for discussion.
+Status: **draft v0.3.** Phases 0 and 1 are built; see `docs/PHASE1.md` for what's in the game now.
 
 ## 1. Pitch
 
@@ -44,8 +44,8 @@ doesn't fit, it gets removed or replaced.
 | Character | **Replaced.** PZ-style **profession and traits**: nurse, police officer, student, carpenter, farmer; *Strong*, *Smoker*, *Short-sighted*... |
 | Hearts, hunger, XP bar | **Replaced.** A health panel per body part, plus moodle icons. No XP orbs, no levels. |
 | Inventory | **Replaced.** Weight-based, with bags/backpacks as equipment and containers you open and loot. |
-| Crafting table, recipes | **Replaced.** All vanilla recipes are removed. Real-world recipes (barricade planks, bandages from torn clothes, molotovs) are made from the inventory or at a workbench, gated by skills. |
-| Mining and building | **Mostly vanilla.** Players can break and place blocks freely. Because vanilla recipes and ores are gone, materials come from scavenging and taking things apart. Breaking blocks makes **noise**, which attracts walkers. Barricades are an extra layer on top. |
+| Crafting table, recipes | **Trimmed, then extended.** Building recipes stay, so you can build your own house from wood and stone: planks, stairs, slabs, doors, fences, bricks, stone bricks, glass, furniture, food, boats. Recipes for tools, weapons, armour, redstone, enchanting, potions, the Nether/End and ore processing are removed: tools are found, not crafted. Real-world recipes (barricades, bandages, molotovs) come later. |
+| Mining and building | **Build anywhere, but no punching.** You can place and break blocks freely, but wood (logs, planks, wooden doors...) needs an axe, and stone, brick, concrete and metal need a pickaxe. Without the right tool these blocks don't break at all. Breaking blocks makes **noise**, which attracts walkers. Barricades are an extra layer on top. |
 | Mobs | **Removed.** No creepers, skeletons, villagers or vanilla zombies. Only walkers, animals that fit (birds, deer, dogs, livestock) and later survivor NPCs. |
 | Nether, End, portals, enchanting, potions, redstone toys | **Removed.** |
 | Ores, diamonds, vanilla progression, advancements | **Removed.** Progress is surviving days, skills and your base. |
@@ -223,7 +223,7 @@ anywhere from TWD-heroic to PZ-brutal:
 | Phase | Content | Playable result |
 |---|---|---|
 | 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
-| 1 | **Strip vanilla:** remove mobs, vanilla recipes, ores, the Nether/End, XP, the vanilla HUD and advancements. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, everyone turns | Groningen with walkers, and nothing vanilla left to see |
+| 1 ✅ | **Strip vanilla:** remove mobs, non-building recipes, the Nether portal, XP, advancements; tools needed for wood and stone. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, herds, everyone turns | Groningen with walkers, and nothing vanilla left to see |
 | 2 | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
 | 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades, melee weapons | Scavenge and fortify |
 | 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat | Travel Groningen |
@@ -235,7 +235,7 @@ anywhere from TWD-heroic to PZ-brutal:
 ## 13. Open questions
 
 **Decided:**
-- **Building:** mostly vanilla. Free breaking and placing, but it makes noise and there are no vanilla recipes or ores.
+- **Building:** build your own house from wood and stone anywhere. Building recipes stay, but there's no punching trees: wood and stone need the right tool. Breaking makes noise.
 - **Players:** singleplayer first, but everything is built to work on a server.
 - **Default difficulty:** PZ-brutal with slow walkers. Loot is scarce, infection risk is high, and you get one life per character.
 - **Story:** a sandbox with story clues. Notes, broadcasts and places like
