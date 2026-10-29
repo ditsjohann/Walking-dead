@@ -8,7 +8,6 @@ import io.github.ditsjohann.outbreak.entity.Walker;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -106,15 +105,24 @@ public class BreakObstacleGoal extends Goal {
 			return null;
 		}
 
-		Vec3 toGoal = goal.subtract(this.walker.position());
-		Direction facing = Direction.getApproximateNearest(toGoal.x, 0.0, toGoal.z);
+		// Any window or barricade right next to the walker (also diagonally, at feet or head height)
+		// that lies on the way to the goal will do; take the one closest to the goal.
 		BlockPos feet = this.walker.blockPosition();
-		for (BlockPos pos : new BlockPos[] {feet.relative(facing), feet.relative(facing).above(), feet}) {
-			if (Barricades.isBreakable(this.walker.level().getBlockState(pos))) {
-				return pos;
+		double ownDistance = here.distanceToSqr(goal);
+		@Nullable BlockPos best = null;
+		double bestDistance = Double.MAX_VALUE;
+		for (BlockPos pos : BlockPos.betweenClosed(feet.offset(-1, 0, -1), feet.offset(1, 1, 1))) {
+			if (!Barricades.isBreakable(this.walker.level().getBlockState(pos))) {
+				continue;
+			}
+
+			double distance = Vec3.atCenterOf(pos).distanceToSqr(goal);
+			if (distance < ownDistance && distance < bestDistance) {
+				bestDistance = distance;
+				best = pos.immutable();
 			}
 		}
 
-		return null;
+		return best;
 	}
 }

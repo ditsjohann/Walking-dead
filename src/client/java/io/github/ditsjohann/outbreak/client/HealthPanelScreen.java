@@ -85,14 +85,21 @@ public class HealthPanelScreen extends Screen {
 		y += 8;
 		graphics.text(this.font, Component.translatable("outbreak.health.status").withStyle(ChatFormatting.UNDERLINE), textX, y, 0xFFFFFFFF);
 		y += 14;
+		// Two columns, so a really bad day still fits on screen.
 		boolean any = false;
+		int column = 0;
 		for (Moodle moodle : Moodle.values()) {
 			int level = moodle.level(player, state);
 			if (level > 0) {
 				any = true;
-				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SurvivorHud.sprite(moodle), textX, y - 4, 16, 16);
-				graphics.text(this.font, Component.translatable(moodle.translationKey(level)), textX + 20, y, levelColor(level));
-				y += 16;
+				int x = textX + column * 115;
+				graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SurvivorHud.sprite(moodle), x, y - 4, 16, 16);
+				graphics.text(this.font, Component.translatable(moodle.translationKey(level)), x + 19, y, levelColor(level));
+				column++;
+				if (column == 2) {
+					column = 0;
+					y += 16;
+				}
 			}
 		}
 

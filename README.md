@@ -6,6 +6,7 @@ played on a real 1:1 copy of Groningen generated with
 
 - [Design](docs/DESIGN.md) — concept, systems, build phases, open questions
 - [Groningen map](docs/MAP_GRONINGEN.md) — how to generate the map with Arnis
+- [Screenshots](docs/SCREENSHOTS.md) — what it looks like so far
 - [Phase 1](docs/PHASE1.md) — walkers, noise, vanilla removed
 - [Phase 2](docs/PHASE2.md) — wounds, infection, needs, moodle HUD
 - [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags

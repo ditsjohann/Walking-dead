@@ -46,6 +46,7 @@ They all wear out. The damage shown in game is per hit; a headshot does 4×.
   - A window breaks after 3 blows.
   - A barricade loses a plank every 6 blows (about 24 seconds for all 4).
   - Every blow is noise that draws **other** walkers.
+  - It works from any side, also when the walker ends up diagonally next to the window.
   - Once a walker has started, it keeps going until the barricade gives.
 - **Nails:** 1 iron ingot gives 8 nails. You also find them in workshops and in walkers' pockets.
 
@@ -80,6 +81,9 @@ They all wear out. The damage shown in game is per hit; a headshot does 4×.
 - **Crafting:** still the vanilla crafting table with our recipes. A PZ-style crafting menu comes later.
 - **Room types:** guessed from nearby blocks for now. Phase 7 reads the real building types from
   OpenStreetMap (supermarket, pharmacy, police station...).
+
+## Admin and testing
+`/outbreak noise <x y z> <radius>` makes a noise there, for luring walkers.
 
 ## Tests
 - Server: `python3 tools/servertest/driver.py . tools/servertest/phase3.txt run/phase3.log`

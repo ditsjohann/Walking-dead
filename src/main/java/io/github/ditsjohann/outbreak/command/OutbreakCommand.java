@@ -11,6 +11,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import io.github.ditsjohann.outbreak.inventory.CarryWeight;
+import io.github.ditsjohann.outbreak.noise.NoiseSystem;
 import io.github.ditsjohann.outbreak.survivor.BodySimulation;
 import io.github.ditsjohann.outbreak.survivor.Injuries;
 import io.github.ditsjohann.outbreak.survivor.SurvivorState;
@@ -25,12 +26,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.phys.Vec3;
 
 /**
- * Admin and testing tools: {@code /outbreak status|wound|infect|cure|set}. Shows the hidden Knox
+ * Admin and testing tools: {@code /outbreak status|wound|infect|cure|set|noise}. Shows the hidden Knox
  * infection, so it's for operators only.
  */
 public final class OutbreakCommand {
@@ -44,6 +47,14 @@ public final class OutbreakCommand {
 	private static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("outbreak")
 			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+			.then(Commands.literal("noise").then(Commands.argument("pos", Vec3Argument.vec3())
+				.then(Commands.argument("radius", FloatArgumentType.floatArg(1.0F, 128.0F)).executes(ctx -> {
+					Vec3 pos = Vec3Argument.getVec3(ctx, "pos");
+					float radius = FloatArgumentType.getFloat(ctx, "radius");
+					NoiseSystem.emit(ctx.getSource().getLevel(), pos, radius);
+					ctx.getSource().sendSuccess(() -> Component.literal(String.format(Locale.ROOT, "Made a noise of %.0f blocks", radius)), false);
+					return 1;
+				}))))
 			.then(Commands.literal("status").then(player().executes(ctx -> status(ctx.getSource(), target(ctx)))))
 			.then(Commands.literal("wound").then(player()
 				.then(enumArgument("part", BodyPart.values())
