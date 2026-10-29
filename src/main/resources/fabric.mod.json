@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "outbreak",
+	"version": "${version}",
+	"name": "Outbreak: Groningen",
+	"description": "Walking Dead meets Project Zomboid survival, built for a real 1:1 Groningen generated with Arnis.",
+	"authors": [
+		"ditsjohann"
+	],
+	"contact": {
+		"sources": "https://github.com/ditsjohann/walking-dead"
+	},
+	"license": "All-Rights-Reserved",
+	"icon": "assets/outbreak/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"io.github.ditsjohann.outbreak.Outbreak"
+		],
+		"client": [
+			"io.github.ditsjohann.outbreak.client.OutbreakClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

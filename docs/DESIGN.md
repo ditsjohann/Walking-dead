@@ -15,12 +15,16 @@ build and the people you meet.
 
 ## 2. Platform decision
 
-| Option | Verdict |
-|---|---|
-| **Fabric 1.21.1** | **Chosen.** It's your preferred version, Fabric 1.21.1 has a mature ecosystem (GeckoLib, Sodium, Distant Horizons), and nothing we need is missing. |
-| NeoForge 1.21.1 | Same Minecraft version. Its edge is mostly modpack ecosystem. It doesn't make our own code better, so there's no reason to switch. |
-| Forge / older versions | No benefit, and older versions can't open Arnis worlds at all. |
-| Fabric 1.21.4+ | **Fallback.** Use it only if the Groningen world can't be made to load in 1.21.1 (see `MAP_GRONINGEN.md`). Arnis officially targets 1.21.4+. |
+**Fabric, Minecraft 26.3, Java 25.**
+
+- Arnis officially targets Java 1.21.4+ and recommends the newest version.
+  Its latest release (v3.3.0) includes fixes for 26.3. On 1.21.1 the world
+  would need a hack, so we went with 26.3 instead.
+- Every library we'd want has a 26.3 build: Fabric API, GeckoLib (animations),
+  Sodium (only as a beta), Distant Horizons and Mod Menu.
+- Since 26.1, Minecraft ships without obfuscation, so mod code uses the real
+  Mojang names. That makes the game code easier to read and to update.
+- Forge / NeoForge would bring nothing extra for our own code.
 
 The mod does **not** depend on the map. It works in any world, and the
 Groningen world is a separate download. Later, an optional "map data" file
@@ -138,7 +142,7 @@ anywhere from TWD-heroic to PZ-brutal:
 
 | Phase | Content | Playable result |
 |---|---|---|
-| 0 | Fabric 1.21.1 project setup and build; Groningen map guide and 1.21.1 load test | Mod loads, map loads |
+| 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
 | 1 | Walker entity: slow movement, headshots, hearing and sight, noise system, herds, everyone turns, vanilla mobs off | Survive walkers in Groningen |
 | 2 | Body injuries, bleeding, bandages, Knox infection, moodle HUD, thirst and fatigue | PZ-style survival |
 | 3 | Day counter, power and water shutoff, broadcasts, barricades, loot tables, carry weight | The world winds down |
