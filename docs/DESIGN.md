@@ -45,7 +45,7 @@ doesn't fit, it gets removed or replaced.
 | Hearts, hunger, XP bar | **Replaced.** A health panel per body part, plus moodle icons. No XP orbs, no levels. |
 | Inventory | **Replaced.** Weight-based, with bags/backpacks as equipment and containers you open and loot. |
 | Crafting table, recipes | **Replaced.** All vanilla recipes are removed. Real-world recipes (barricade planks, bandages from torn clothes, molotovs) are made from the inventory or at a workbench, gated by skills. |
-| Mining and building | **Restricted.** No punching trees, no digging through concrete. You need the right tool (axe, saw, sledgehammer, crowbar), and it's slow and loud. Building means carpentry: walls, barricades, rain collectors. |
+| Mining and building | **Mostly vanilla.** Players can break and place blocks freely. Because vanilla recipes and ores are gone, materials come from scavenging and taking things apart. Breaking blocks makes **noise**, which attracts walkers. Barricades are an extra layer on top. |
 | Mobs | **Removed.** No creepers, skeletons, villagers or vanilla zombies. Only walkers, animals that fit (birds, deer, dogs, livestock) and later survivor NPCs. |
 | Nether, End, portals, enchanting, potions, redstone toys | **Removed.** |
 | Ores, diamonds, vanilla progression, advancements | **Removed.** Progress is surviving days, skills and your base. |
@@ -176,7 +176,7 @@ anywhere from TWD-heroic to PZ-brutal:
 | Phase | Content | Playable result |
 |---|---|---|
 | 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
-| 1 | **Strip vanilla:** remove mobs, vanilla recipes, the Nether/End, XP, the vanilla HUD and advancements; set mining rules. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, everyone turns | Groningen with walkers, and nothing vanilla left to see |
+| 1 | **Strip vanilla:** remove mobs, vanilla recipes, ores, the Nether/End, XP, the vanilla HUD and advancements. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, everyone turns | Groningen with walkers, and nothing vanilla left to see |
 | 2 | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
 | 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades | Scavenge and fortify |
 | 4 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
@@ -186,9 +186,14 @@ anywhere from TWD-heroic to PZ-brutal:
 
 ## 12. Open questions
 
-1. Is the game singleplayer, or a multiplayer server with friends?
-2. Default difficulty: TWD (heroic, more ammo) or PZ (brutal)?
-3. Should there be a story or ending (find out what happened at Zernike), or pure sandbox?
-4. How important are guns and vehicles (cars, bikes, boats)? Vehicles are a lot of work.
-5. Should we use existing mods as dependencies (GeckoLib for animations is
+**Decided:**
+- **Building:** mostly vanilla. Free breaking and placing, but it makes noise and there are no vanilla recipes or ores.
+- **Players:** singleplayer first, but everything is built to work on a server.
+- **Default difficulty:** PZ-brutal with slow walkers. Loot is scarce, infection risk is high, and you get one life per character.
+- **Story:** a sandbox with story clues. Notes, broadcasts and places like
+  the UMCG and Zernike slowly reveal what happened. There's no forced ending.
+
+**Still open:**
+1. How important are guns and vehicles (cars, bikes, boats)? Vehicles are a lot of work.
+2. Should we use existing mods as dependencies (GeckoLib for animations is
    almost certain), or keep everything in-house?
