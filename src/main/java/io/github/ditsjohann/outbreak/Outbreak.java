@@ -1,7 +1,12 @@
 package io.github.ditsjohann.outbreak;
 
+import io.github.ditsjohann.outbreak.command.OutbreakCommand;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.item.OutbreakItems;
+import io.github.ditsjohann.outbreak.survivor.BodySimulation;
+import io.github.ditsjohann.outbreak.survivor.Injuries;
 import io.github.ditsjohann.outbreak.survivor.StarterKit;
+import io.github.ditsjohann.outbreak.survivor.Survivors;
 import io.github.ditsjohann.outbreak.survivor.Turning;
 import io.github.ditsjohann.outbreak.vanilla.VanillaRules;
 
@@ -22,6 +27,11 @@ public class Outbreak implements ModInitializer {
 		VanillaRules.register();
 		Turning.register();
 		StarterKit.register();
+		Survivors.register();
+		OutbreakItems.register();
+		Injuries.register();
+		BodySimulation.register();
+		OutbreakCommand.register();
 		LOGGER.info("Outbreak loaded. Good luck out there.");
 	}
 
