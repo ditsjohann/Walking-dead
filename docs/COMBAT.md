@@ -46,6 +46,7 @@ from your right sends the walker reeling to your left. The strength comes from t
 ![Falling, each way](screenshots/combat/falling.png)
 ![Down](screenshots/combat/down.png)
 ![A crawler](screenshots/combat/crawler.png)
+![Killed](screenshots/combat/killed.png)
 
 ## Weapons
 

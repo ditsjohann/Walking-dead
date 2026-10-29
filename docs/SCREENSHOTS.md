@@ -13,7 +13,7 @@ itself still has to be generated with Arnis.
 | ![](screenshots/combat/skins-2.png) More walker skins. | ![](screenshots/combat/herd.png) A herd, each walking its own way. |
 | ![](screenshots/combat/head-hit.png) A blow to the side of the head. | ![](screenshots/combat/falling.png) Knocked down: each falls the way it was hit. |
 | ![](screenshots/combat/down.png) Down: now any hit is a headshot. | ![](screenshots/combat/getting-up.png) Getting back up. |
-| ![](screenshots/combat/crawler.png) A crawler. | ![](screenshots/combat/corpse.png) A corpse, lying where it fell. |
+| ![](screenshots/combat/crawler.png) A crawler. | ![](screenshots/combat/killed.png) A headshot: dead before it hits the ground. |
 | ![](screenshots/phase4/1-lineup.png) Bicycle, scooter, hatchback, sedan, van and a wreck. | ![](screenshots/phase4/3-driving.png) Driving: the dashboard bottom right. |
 | ![](screenshots/phase4/4-mechanics.png) Working on a car: tires and battery, repairs. | ![](screenshots/phase4/6-bicycle.png) On a bicycle. |
 | ![](screenshots/ui/hud.png) The dark-paper HUD, with the four new containers behind it. | ![](screenshots/ui/inventory.png) The 18-slot inventory: 9 pockets and the hotbar. |
