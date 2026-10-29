@@ -1,6 +1,6 @@
 # Design — Walking Dead × Project Zomboid in Groningen
 
-Status: **draft v0.1, still open for discussion.** Nothing is built yet.
+Status: **draft v0.2: total conversion.** Phase 0 (project setup) is built; everything else is still open for discussion.
 
 ## 1. Pitch
 
@@ -26,11 +26,44 @@ build and the people you meet.
   Mojang names. That makes the game code easier to read and to update.
 - Forge / NeoForge would bring nothing extra for our own code.
 
-The mod does **not** depend on the map. It works in any world, and the
-Groningen world is a separate download. Later, an optional "map data" file
-(see §7) can give the mod extra knowledge about Groningen.
+The mod's code does **not** depend on the map: it runs in any world. Players
+get everything as **one package**: a Modrinth modpack (`.mrpack`) with the
+mod, its performance companions (Sodium, Distant Horizons) and the Groningen
+world. Later, an optional "map data" file (see §8) can give the mod extra
+knowledge about Groningen.
 
-## 3. Design pillars
+## 3. Total conversion
+
+This is not an add-on to Minecraft. **It replaces the game.** Everything a
+player sees and does should belong to the outbreak. If a vanilla system
+doesn't fit, it gets removed or replaced.
+
+| Vanilla system | What happens |
+|---|---|
+| Title screen, world creation | **Replaced.** Our own menu: *New survivor* → pick a scenario (start location and day) → create a character → spawn in Groningen. |
+| Character | **Replaced.** PZ-style **profession and traits**: nurse, police officer, student, carpenter, farmer; *Strong*, *Smoker*, *Short-sighted*... |
+| Hearts, hunger, XP bar | **Replaced.** A health panel per body part, plus moodle icons. No XP orbs, no levels. |
+| Inventory | **Replaced.** Weight-based, with bags/backpacks as equipment and containers you open and loot. |
+| Crafting table, recipes | **Replaced.** All vanilla recipes are removed. Real-world recipes (barricade planks, bandages from torn clothes, molotovs) are made from the inventory or at a workbench, gated by skills. |
+| Mining and building | **Restricted.** No punching trees, no digging through concrete. You need the right tool (axe, saw, sledgehammer, crowbar), and it's slow and loud. Building means carpentry: walls, barricades, rain collectors. |
+| Mobs | **Removed.** No creepers, skeletons, villagers or vanilla zombies. Only walkers, animals that fit (birds, deer, dogs, livestock) and later survivor NPCs. |
+| Nether, End, portals, enchanting, potions, redstone toys | **Removed.** |
+| Ores, diamonds, vanilla progression, advancements | **Removed.** Progress is surviving days, skills and your base. |
+| Sleep | **Changed.** Sleeping is dangerous (walkers can find you) and fatigue is a need. No skipping nights in multiplayer. |
+| Day/night, weather | **Kept and tuned.** A longer day; rain matters (wet, cold, it washes off walker guts). |
+| Blocks, rendering, sound engine | **Kept.** This is our engine. Vanilla blocks are what Arnis builds Groningen out of. |
+| Death | **Changed.** You turn into a walker, and you start a new character (see §6). |
+
+**Technical approach:**
+- Mostly data-driven where possible: recipe and loot overrides, tags, and
+  spawn rules in a built-in data pack.
+- Fabric API events and HUD layers.
+- Mixins only where Minecraft has no hook (for example mining rules, the
+  inventory, the title screen).
+- Vanilla content is hidden from players, not deleted from the registries,
+  so the game stays stable and other performance mods keep working.
+
+## 4. Design pillars
 
 1. **Every wound matters** (PZ). Health is a body, not a heart bar.
 2. **Noise is death** (PZ + TWD). Everything you do makes sound, and walkers come to it.
@@ -40,9 +73,9 @@ Groningen world is a separate download. Later, an optional "map data" file
 6. **Real place, real knowledge** (ours). Locals know where the hospital, the
    bridges and the supermarkets are, and that knowledge is an advantage.
 
-## 4. Walkers
+## 5. Walkers
 
-- **Movement:** slow shamblers by default. A sandbox option (see §9) allows
+- **Movement:** slow shamblers by default. A sandbox option (see §10) allows
   fast shamblers or sprinters.
 - **Killing them:** body hits only knock them down or slow them. A **headshot**
   or a stomp on a downed walker kills.
@@ -62,7 +95,7 @@ Groningen world is a separate download. Later, an optional "map data" file
 - **Cleanup:** all other hostile vanilla mobs are disabled (configurable).
 - **Model:** vanilla zombie model at first, custom GeckoLib models later.
 
-## 5. Survivor (the PZ layer)
+## 6. Survivor (the PZ layer)
 
 - **Body-part injuries:** scratch, laceration, bite, deep wound, fracture, burn.
   Each part can bleed and needs a bandage. Dirty bandages cause wound infection.
@@ -79,7 +112,7 @@ Groningen world is a separate download. Later, an optional "map data" file
 - **Permadeath option:** when you die you turn, and you start a new survivor
   in the same world. You can then meet your old self as a walker.
 
-## 6. World systems
+## 7. World systems
 
 - **Day counter** and an **outbreak timeline**:
   - Days 0–7: NL-Alert style emergency broadcasts on radio and TV, then silence.
@@ -98,7 +131,7 @@ Groningen world is a separate download. Later, an optional "map data" file
 - **Camouflage (TWD):** smear walker guts on yourself to walk through a herd
   until it rains or you run.
 
-## 7. Groningen-specific content
+## 8. Groningen-specific content
 
 | Place | Gameplay role |
 |---|---|
@@ -118,14 +151,14 @@ pharmacy, supermarket, police, school, etc.) into a small JSON shipped with
 the map. The mod then knows that a building is a pharmacy and gives its
 containers pharmacy loot, which makes the "local knowledge" pillar real.
 
-## 8. People (TWD heart, later phase)
+## 9. People (TWD heart, later phase)
 
 - Survivor NPCs: loners, families and raiders, who can be recruited, traded with or fought.
 - Factions with territories, for example students holding Zernike, a militia at
   the Euroborg, and raiders on the ring road.
 - Community building: recruits get jobs (guard, farmer, medic, scavenger).
 
-## 9. Sandbox settings (PZ-style)
+## 10. Sandbox settings (PZ-style)
 
 Almost every hard number above is a world option, so you can tune the game
 anywhere from TWD-heroic to PZ-brutal:
@@ -138,19 +171,20 @@ anywhere from TWD-heroic to PZ-brutal:
 - permadeath on or off
 - whether vanilla mobs are on
 
-## 10. Build phases
+## 11. Build phases
 
 | Phase | Content | Playable result |
 |---|---|---|
 | 0 | Fabric 26.3 project setup and build ✅; Groningen map guide ✅; load the Arnis map | Mod loads ✅, map loads |
-| 1 | Walker entity: slow movement, headshots, hearing and sight, noise system, herds, everyone turns, vanilla mobs off | Survive walkers in Groningen |
-| 2 | Body injuries, bleeding, bandages, Knox infection, moodle HUD, thirst and fatigue | PZ-style survival |
-| 3 | Day counter, power and water shutoff, broadcasts, barricades, loot tables, carry weight | The world winds down |
-| 4 | Weapons (melee durability, crossbow, scarce loud guns), guts camouflage, skills, sandbox settings screen | Full loop |
-| 5 | Map data file for Groningen (building-aware loot and spawns), meta events | Groningen feels real |
-| 6 | Survivor NPCs, factions, community | The TWD heart |
+| 1 | **Strip vanilla:** remove mobs, vanilla recipes, the Nether/End, XP, the vanilla HUD and advancements; set mining rules. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, everyone turns | Groningen with walkers, and nothing vanilla left to see |
+| 2 | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
+| 3 | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades | Scavenge and fortify |
+| 4 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
+| 5 | **World winds down:** day counter, power and water shutoff, broadcasts, meta events, herds that migrate, weapons, guts camouflage | Full loop |
+| 6 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |
+| 7 | **People:** survivor NPCs, factions, community | The TWD heart |
 
-## 11. Open questions
+## 12. Open questions
 
 1. Is the game singleplayer, or a multiplayer server with friends?
 2. Default difficulty: TWD (heroic, more ammo) or PZ (brutal)?
