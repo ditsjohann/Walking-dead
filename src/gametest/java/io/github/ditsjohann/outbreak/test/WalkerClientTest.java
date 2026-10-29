@@ -38,7 +38,7 @@ public class WalkerClientTest implements FabricClientGameTest {
 				context.takeScreenshot("walkers-1-skins-" + (page + 1));
 			}
 
-			server.runCommand("kill @e[tag=lineup]");
+			this.clear(context, server, "lineup");
 
 			// 2. A herd shambling towards the player (survival, so they come).
 			server.runCommand("gamemode survival @a");
@@ -49,7 +49,7 @@ public class WalkerClientTest implements FabricClientGameTest {
 
 			context.waitTicks(70);
 			context.takeScreenshot("walkers-2-herd");
-			server.runCommand("kill @e[tag=herd]");
+			this.clear(context, server, "herd");
 			server.runCommand("gamemode creative @a");
 			context.waitTicks(5);
 
@@ -67,7 +67,7 @@ public class WalkerClientTest implements FabricClientGameTest {
 			server.runCommand("outbreak walker hit @e[tag=hit] 0 1.0 false");
 			context.waitTicks(3);
 			context.takeScreenshot("walkers-4-shove");
-			server.runCommand("kill @e[tag=hit]");
+			this.clear(context, server, "hit");
 
 			// 4. Knocked down, each one outwards: to the player's left (+x), backwards, to their right (-x).
 			String[][] falls = {{"2", "-90"}, {"0", "0"}, {"-2", "90"}};
@@ -88,7 +88,7 @@ public class WalkerClientTest implements FabricClientGameTest {
 			context.waitTicks(64);
 			context.takeScreenshot("walkers-7-getting-up");
 			context.waitTicks(30);
-			server.runCommand("kill @e[tag=fall]");
+			this.clear(context, server, "fall");
 
 			// 5. A crawler coming for the player.
 			server.runCommand("gamemode survival @a");
@@ -96,7 +96,7 @@ public class WalkerClientTest implements FabricClientGameTest {
 			server.runCommand("outbreak walker crawler @e[tag=crawl] true");
 			context.waitTicks(60);
 			context.takeScreenshot("walkers-8-crawler");
-			server.runCommand("kill @e[tag=crawl]");
+			this.clear(context, server, "crawl");
 			server.runCommand("gamemode creative @a");
 
 			// 6. A headshot that kills: it falls back, away from the player, and lies there.
@@ -109,5 +109,11 @@ public class WalkerClientTest implements FabricClientGameTest {
 			context.waitTicks(25);
 			context.takeScreenshot("walkers-10-corpse");
 		}
+	}
+
+	/** Kills them, then waits for the corpses (which lie there 5 seconds) to go, so they don't clutter the next shot. */
+	private void clear(ClientGameTestContext context, TestServerContext server, String tag) {
+		server.runCommand("kill @e[tag=" + tag + "]");
+		context.waitTicks(110);
 	}
 }
