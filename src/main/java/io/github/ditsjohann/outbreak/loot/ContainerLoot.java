@@ -1,6 +1,7 @@
 package io.github.ditsjohann.outbreak.loot;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.block.StorageBlockEntity;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
@@ -25,8 +26,9 @@ import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 /**
- * Scavenging. The first time anyone opens a chest or barrel that a player didn't place, it gets
- * loot that fits the room it's in, judged from the blocks around it. Loot never comes back.
+ * Scavenging. The first time anyone opens a container that a player didn't place, it gets loot:
+ * chests and barrels by the room they're in (judged from the blocks around them), our own containers
+ * by what they are (a fridge has food). Loot never comes back.
  */
 public final class ContainerLoot {
 	/** Set on containers a player placed: those are never filled. */
@@ -69,7 +71,7 @@ public final class ContainerLoot {
 	/** Give the container at pos its loot table, if it's due one. Vanilla fills it as it opens. */
 	public static void prepare(ServerLevel level, BlockPos pos) {
 		BlockEntity blockEntity = level.getBlockEntity(pos);
-		if (!(blockEntity instanceof ChestBlockEntity || blockEntity instanceof BarrelBlockEntity)
+		if (!(blockEntity instanceof ChestBlockEntity || blockEntity instanceof BarrelBlockEntity || blockEntity instanceof StorageBlockEntity)
 			|| !(blockEntity instanceof RandomizableContainer container)
 			|| blockEntity.hasAttached(PLAYER_PLACED)
 			|| blockEntity.hasAttached(SCAVENGED)) {
@@ -80,7 +82,11 @@ public final class ContainerLoot {
 		ResourceKey<LootTable> current = container.getLootTable();
 		boolean vanillaLoot = current != null && !current.identifier().getNamespace().equals(Outbreak.MOD_ID);
 		if (vanillaLoot || (current == null && container.isEmpty())) {
-			container.setLootTable(roomAt(level, pos).lootTable(), level.getRandom().nextLong());
+			// Our own containers have their own loot (a fridge has food); chests and barrels go by the room.
+			ResourceKey<LootTable> table = blockEntity instanceof StorageBlockEntity storage
+				? ResourceKey.create(Registries.LOOT_TABLE, Outbreak.id("containers/" + storage.kind().id()))
+				: roomAt(level, pos).lootTable();
+			container.setLootTable(table, level.getRandom().nextLong());
 		}
 
 		blockEntity.setChanged();

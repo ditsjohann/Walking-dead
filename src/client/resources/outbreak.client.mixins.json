@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "io.github.ditsjohann.outbreak.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"InventoryScreenMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

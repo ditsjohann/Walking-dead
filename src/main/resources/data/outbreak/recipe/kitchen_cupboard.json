@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"key": {
+		"P": "#minecraft:planks",
+		"N": "minecraft:iron_nugget"
+	},
+	"pattern": [
+		"PPP",
+		"PNP",
+		"PPP"
+	],
+	"result": {
+		"id": "outbreak:kitchen_cupboard"
+	}
+}

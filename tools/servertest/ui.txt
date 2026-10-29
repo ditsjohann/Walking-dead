@@ -1,0 +1,61 @@
+# UI overhaul checks: 18-slot inventory, the new containers and their loot.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+clear Bot
+== pockets: 21 swords, only 18 fit (9 hotbar + 9 pockets), 3 end up on the ground
+give Bot minecraft:iron_sword 21
+wait 2
+data get entity Bot Inventory
+execute if entity @e[type=item,nbt={Item:{id:"minecraft:iron_sword"}}]
+kill @e[type=item]
+== pockets: an item in an old (locked) slot moves to a free pocket within a second
+clear Bot
+item replace entity Bot inventory.20 with minecraft:apple 5
+wait 2
+data get entity Bot Inventory
+== fridge: filled with food the first time it's opened
+setblock 10 -57 0 outbreak:fridge[facing=west]
+tp Bot 8 -57 0
+player Bot look at 10 -56.5 0.5
+player Bot use once
+wait 1
+data get block 10 -57 0 Items
+== toolbox: tools and hardware
+setblock 10 -57 4 outbreak:toolbox[facing=west]
+tp Bot 9 -57 4
+player Bot look at 10 -56.8 4.5
+player Bot use once
+wait 1
+data get block 10 -57 4 Items
+== metal cabinet
+setblock 10 -57 8 outbreak:metal_cabinet[facing=west]
+tp Bot 8 -57 8
+player Bot look at 10 -56.5 8.5
+player Bot use once
+wait 1
+data get block 10 -57 8 Items
+== kitchen cupboard
+setblock 10 -57 12 outbreak:kitchen_cupboard[facing=west]
+tp Bot 8 -57 12
+player Bot look at 10 -56.5 12.5
+player Bot use once
+wait 1
+data get block 10 -57 12 Items
+== barrel (crate): room loot, opened through our menu
+setblock 10 -57 16 minecraft:barrel[facing=west]
+tp Bot 8 -57 16
+player Bot look at 10 -56.5 16.5
+player Bot use once
+wait 1
+data get block 10 -57 16 Items
+== a broken fridge drops itself and what's inside
+setblock 10 -57 0 minecraft:air destroy
+wait 1
+execute if entity @e[type=item,nbt={Item:{id:"outbreak:fridge"}}]

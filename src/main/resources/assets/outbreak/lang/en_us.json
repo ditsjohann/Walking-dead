@@ -87,5 +87,20 @@
 	"outbreak.hud.noise.0": "Silent",
 	"outbreak.hud.noise.1": "Quiet",
 	"outbreak.hud.noise.2": "Noisy",
-	"outbreak.hud.noise.3": "Loud"
+	"outbreak.hud.noise.3": "Loud",
+	"container.outbreak.school_bag": "School Bag",
+	"container.outbreak.hiking_bag": "Hiking Bag",
+	"container.outbreak.cupboard": "Cupboard",
+	"container.outbreak.wardrobe": "Wardrobe",
+	"container.outbreak.crate": "Crate",
+	"container.outbreak.fridge": "Fridge",
+	"container.outbreak.kitchen_cupboard": "Kitchen Cupboard",
+	"container.outbreak.toolbox": "Toolbox",
+	"container.outbreak.metal_cabinet": "Metal Cabinet",
+	"block.outbreak.fridge": "Fridge",
+	"block.outbreak.kitchen_cupboard": "Kitchen Cupboard",
+	"block.outbreak.toolbox": "Toolbox",
+	"block.outbreak.metal_cabinet": "Metal Cabinet",
+	"outbreak.screen.pockets": "Pockets",
+	"outbreak.screen.find_a_bag": "Need more room? Find a bag."
 }

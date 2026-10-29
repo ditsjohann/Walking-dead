@@ -1,0 +1,108 @@
+{
+	"type": "minecraft:chest",
+	"pools": [
+		{
+			"rolls": {
+				"type": "minecraft:uniform",
+				"min": 2,
+				"max": 4
+			},
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "outbreak:hammer",
+					"weight": 4,
+					"modifier": [
+						{
+							"type": "minecraft:set_damage",
+							"damage": {
+								"type": "minecraft:uniform",
+								"min": 0.25,
+								"max": 0.8
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "outbreak:nails",
+					"weight": 8,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 4,
+								"max": 16
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "outbreak:crowbar",
+					"weight": 2,
+					"modifier": [
+						{
+							"type": "minecraft:set_damage",
+							"damage": {
+								"type": "minecraft:uniform",
+								"min": 0.25,
+								"max": 0.8
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "minecraft:iron_nugget",
+					"weight": 5,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 2,
+								"max": 8
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "minecraft:iron_ingot",
+					"weight": 2,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 1,
+								"max": 2
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "minecraft:string",
+					"weight": 3,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 1,
+								"max": 4
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:empty",
+					"weight": 6
+				}
+			]
+		}
+	]
+}

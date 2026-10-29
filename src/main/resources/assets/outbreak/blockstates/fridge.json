@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "outbreak:block/fridge"
+		},
+		"facing=east": {
+			"model": "outbreak:block/fridge",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "outbreak:block/fridge",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "outbreak:block/fridge",
+			"y": 270
+		}
+	}
+}

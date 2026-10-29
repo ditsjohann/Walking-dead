@@ -6,10 +6,12 @@
 	"environment": "*",
 	"entrypoints": {
 		"fabric-client-gametest": [
-			"io.github.ditsjohann.outbreak.test.HudClientTest",
 			"io.github.ditsjohann.outbreak.test.SurvivorHudClientTest",
 			"io.github.ditsjohann.outbreak.test.ScavengingClientTest",
-			"io.github.ditsjohann.outbreak.test.TourClientTest"
+			"io.github.ditsjohann.outbreak.test.TourClientTest",
+			"io.github.ditsjohann.outbreak.test.HudClientTest",
+			"io.github.ditsjohann.outbreak.test.UiClientTest",
+			"io.github.ditsjohann.outbreak.test.BackdropClientTest"
 		]
 	},
 	"depends": {

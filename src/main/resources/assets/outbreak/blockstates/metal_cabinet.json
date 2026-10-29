@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "outbreak:block/metal_cabinet"
+		},
+		"facing=east": {
+			"model": "outbreak:block/metal_cabinet",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "outbreak:block/metal_cabinet",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "outbreak:block/metal_cabinet",
+			"y": 270
+		}
+	}
+}

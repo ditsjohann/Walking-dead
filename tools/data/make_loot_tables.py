@@ -51,6 +51,30 @@ CONTAINERS = {
         ("minecraft:feather", 2, 1, 2), ("minecraft:ink_sac", 2, 1, 1), ("minecraft:candle", 3, 1, 2),
         ("minecraft:glass_bottle", 2, 1, 1), ("outbreak:disinfectant", 1, 1, 1), ("empty", 10),
     ]),
+    # Our own containers: loot by what they are.
+    "fridge": ((2, 5), [
+        ("minecraft:milk_bucket", 2, 1, 1), ("minecraft:cooked_chicken", 3, 1, 2), ("minecraft:cooked_beef", 2, 1, 2),
+        ("minecraft:apple", 5, 1, 3), ("minecraft:carrot", 5, 1, 4), ("minecraft:melon_slice", 4, 1, 4),
+        ("minecraft:potion", 5, 1, 2, "water"), ("outbreak:boiled_water", 4, 1, 2), ("minecraft:cake", 1, 1, 1),
+        ("minecraft:rotten_flesh", 4, 1, 3), ("empty", 8),
+    ]),
+    "kitchen_cupboard": ((1, 4), [
+        ("minecraft:bread", 5, 1, 2), ("minecraft:sugar", 5, 1, 4), ("minecraft:cookie", 4, 1, 6),
+        ("minecraft:bowl", 4, 1, 3), ("minecraft:glass_bottle", 5, 1, 3), ("minecraft:wheat", 3, 1, 4),
+        ("outbreak:kitchen_knife", 2, 1, 1, "worn"), ("outbreak:disinfectant", 2, 1, 1), ("outbreak:rag", 3, 1, 3),
+        ("empty", 10),
+    ]),
+    "toolbox": ((2, 4), [
+        ("outbreak:hammer", 4, 1, 1, "worn"), ("outbreak:nails", 8, 4, 16), ("outbreak:crowbar", 2, 1, 1, "worn"),
+        ("minecraft:iron_nugget", 5, 2, 8), ("minecraft:iron_ingot", 2, 1, 2), ("minecraft:string", 3, 1, 4),
+        ("empty", 6),
+    ]),
+    "metal_cabinet": ((1, 4), [
+        ("outbreak:nails", 4, 2, 10), ("minecraft:iron_ingot", 2, 1, 3), ("minecraft:paper", 5, 1, 6),
+        ("minecraft:book", 3, 1, 2), ("outbreak:bandage", 2, 1, 2), ("outbreak:disinfectant", 2, 1, 1),
+        ("minecraft:torch", 3, 2, 6), ("outbreak:machete", 1, 1, 1, "worn"), ("outbreak:hiking_bag", 1, 1, 1),
+        ("empty", 10),
+    ]),
 }
 
 # What walkers have in their pockets.

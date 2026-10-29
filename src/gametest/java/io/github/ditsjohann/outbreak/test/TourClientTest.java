@@ -73,6 +73,8 @@ public class TourClientTest implements FabricClientGameTest {
 			context.takeScreenshot("tour-03-all-moodles");
 			context.getInput().pressKey(InputConstants.KEY_H);
 			context.waitTicks(20);
+			context.getInput().setCursorPos(2, 2);
+			context.waitTicks(2);
 			context.takeScreenshot("tour-04-health-panel");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 
@@ -90,6 +92,8 @@ public class TourClientTest implements FabricClientGameTest {
 			context.waitTicks(10);
 			context.getInput().pressKey(options -> options.keyInventory);
 			context.waitTicks(20);
+			context.getInput().setCursorPos(2, 2);
+			context.waitTicks(2);
 			context.takeScreenshot("tour-05-inventory");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 

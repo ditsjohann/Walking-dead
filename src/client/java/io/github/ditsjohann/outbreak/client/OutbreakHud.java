@@ -27,14 +27,13 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 /**
- * The outbreak's own HUD, replacing vanilla's entirely: a slim hotbar, a crosshair that shows when
+ * The outbreak's own HUD, replacing vanilla's entirely, drawn as a survivor's notes on old paper: a hotbar, a crosshair that shows when
  * you're lined up for a headshot, a status panel (body, day and time, health, noise, weight),
  * moodles, and a breath bar underwater.
  */
 final class OutbreakHud {
 	private static final int SLOT = 20;
 	private static final int MOODLE_SIZE = 20;
-	private static final int[] MOODLE_COLORS = {0, 0xB0B89A3A, 0xB0D0702A, 0xB0C03028, 0xD08B0000};
 	private static final int ITEM_NAME_TICKS = 50;
 
 	private static int lastSelectedSlot = -1;
@@ -76,40 +75,42 @@ final class OutbreakHud {
 
 	// --- Hotbar ---
 
+	private static final Identifier HOTBAR = Outbreak.id("hud/hotbar");
+	private static final Identifier HOTBAR_SELECTION = Outbreak.id("hud/hotbar_selection");
+	private static final Identifier OFFHAND = Outbreak.id("hud/offhand");
+	private static final Identifier STATUS = Outbreak.id("hud/status");
+	private static final Identifier TAG = Outbreak.id("hud/tag");
+	private static final int HOTBAR_WIDTH = 188;
+	private static final int HOTBAR_HEIGHT = 28;
+
 	private static void extractHotbar(GuiGraphicsExtractor graphics, Minecraft minecraft, LocalPlayer player) {
 		Inventory inventory = player.getInventory();
-		int width = 9 * SLOT;
-		int left = graphics.guiWidth() / 2 - width / 2;
-		int top = graphics.guiHeight() - SLOT - 4;
-		HudStyle.panel(graphics, left - 2, top - 2, width + 4, SLOT + 4);
+		int left = graphics.guiWidth() / 2 - HOTBAR_WIDTH / 2;
+		int top = graphics.guiHeight() - HOTBAR_HEIGHT - 2;
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, HOTBAR, left, top, HOTBAR_WIDTH, HOTBAR_HEIGHT);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, HOTBAR_SELECTION, left + 4 + inventory.getSelectedSlot() * SLOT, top + 4, SLOT, SLOT);
 
-		int selected = inventory.getSelectedSlot();
 		for (int i = 0; i < 9; i++) {
-			int x = left + i * SLOT;
-			graphics.fill(x + 1, top + 1, x + SLOT - 1, top + SLOT - 1, HudStyle.SLOT);
-			if (i == selected) {
-				graphics.outline(x, top, SLOT, SLOT, HudStyle.ACCENT);
-			}
-
 			ItemStack stack = inventory.getItem(i);
 			if (!stack.isEmpty()) {
-				graphics.item(player, stack, x + 2, top + 2, i + 1);
-				graphics.itemDecorations(minecraft.font, stack, x + 2, top + 2);
+				int x = left + 6 + i * SLOT;
+				graphics.item(player, stack, x, top + 6, i + 1);
+				graphics.itemDecorations(minecraft.font, stack, x, top + 6);
 			}
 		}
 
 		ItemStack offhand = player.getOffhandItem();
 		if (!offhand.isEmpty()) {
-			int x = left + width + 8;
-			HudStyle.panel(graphics, x - 2, top - 2, SLOT + 4, SLOT + 4);
-			graphics.item(player, offhand, x + 2, top + 2, 10);
-			graphics.itemDecorations(minecraft.font, offhand, x + 2, top + 2);
+			int x = left + HOTBAR_WIDTH + 4;
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, OFFHAND, x, top, HOTBAR_HEIGHT, HOTBAR_HEIGHT);
+			graphics.item(player, offhand, x + 6, top + 6, 10);
+			graphics.itemDecorations(minecraft.font, offhand, x + 6, top + 6);
 		}
 
 		extractItemName(graphics, minecraft.font, player, inventory, top);
 	}
 
-	/** The selected item's name (and how worn it is) fades in above the hotbar when you switch. */
+	/** The selected item's name (and how worn it is) on a scrap of paper above the hotbar when you switch. */
 	private static void extractItemName(GuiGraphicsExtractor graphics, Font font, LocalPlayer player, Inventory inventory, int hotbarTop) {
 		ItemStack stack = inventory.getSelectedItem();
 		long now = player.level().getGameTime();
@@ -124,56 +125,54 @@ final class OutbreakHud {
 			return;
 		}
 
-		float alpha = age < ITEM_NAME_TICKS - 10 ? 1.0F : (ITEM_NAME_TICKS - age) / 10.0F;
 		String text = stack.getHoverName().getString();
 		if (stack.isDamageableItem()) {
 			int condition = Math.round(100.0F * (stack.getMaxDamage() - stack.getDamageValue()) / stack.getMaxDamage());
 			text += String.format(Locale.ROOT, "  %d%%", condition);
 		}
 
-		int width = font.width(text);
+		int width = font.width(text) + 12;
 		int x = graphics.guiWidth() / 2 - width / 2;
-		int y = hotbarTop - 16;
-		graphics.fill(x - 4, y - 3, x + width + 4, y + 11, HudStyle.fade(HudStyle.PANEL, alpha));
-		graphics.text(font, text, x, y, HudStyle.fade(HudStyle.TEXT, alpha), false);
+		int y = hotbarTop - 17;
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TAG, x, y, width, 15);
+		graphics.text(font, text, x + 6, y + 4, PaperStyle.INK, false);
 	}
 
 	// --- Status panel ---
 
 	private static void extractStatus(GuiGraphicsExtractor graphics, Minecraft minecraft, LocalPlayer player, SurvivorState state) {
 		Font font = minecraft.font;
-		int height = BodyDoll.HEIGHT * 2 + 8;
-		int left = 4;
-		int top = graphics.guiHeight() - height - 4;
-		HudStyle.panel(graphics, left, top, 118, height);
-		BodyDoll.draw(graphics, state, left + 4, top + 4, 2);
+		int left = 3;
+		int top = graphics.guiHeight() - 76 - 3;
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, STATUS, left, top, 124, 76);
+		BodyDoll.draw(graphics, state, left + 6, top + 6, 2);
 
 		int x = left + 44;
-		int y = top + 6;
+		int y = top + 9;
 		long time = player.level().getOverworldClockTime();
 		long day = time / 24000L + 1;
 		int hour = (int) ((time / 1000L + 6) % 24);
 		int minute = (int) (time % 1000L * 60 / 1000);
-		graphics.text(font, Component.translatable("outbreak.hud.day", day), x, y, HudStyle.TEXT, false);
-		graphics.text(font, String.format(Locale.ROOT, "%02d:%02d", hour, minute), x + 44, y, HudStyle.DIM, false);
+		graphics.text(font, Component.translatable("outbreak.hud.day", day), x, y, PaperStyle.INK, false);
+		graphics.text(font, String.format(Locale.ROOT, "%02d:%02d", hour, minute), x + 44, y, PaperStyle.PENCIL, false);
 		y += 13;
 
 		int health = Math.round(player.getHealth() / player.getMaxHealth() * 100);
-		graphics.text(font, Component.translatable("outbreak.hud.health", health), x, y, health <= 40 ? HudStyle.DANGER : HudStyle.TEXT, false);
+		graphics.text(font, Component.translatable("outbreak.hud.health", health), x, y, health <= 40 ? PaperStyle.MARKER_RED : PaperStyle.INK, false);
 		y += 13;
 
 		int noise = noiseLevel(player);
-		graphics.text(font, Component.translatable("outbreak.hud.noise." + noise), x, y, noise >= 3 ? HudStyle.DANGER : HudStyle.TEXT, false);
+		graphics.text(font, Component.translatable("outbreak.hud.noise." + noise), x, y, noise >= 3 ? PaperStyle.MARKER_RED : PaperStyle.INK, false);
 		for (int i = 0; i < 3; i++) {
 			int barX = x + 52 + i * 5;
 			int barHeight = 3 + i * 3;
-			graphics.fill(barX, y + 8 - barHeight, barX + 3, y + 8, i < noise ? (noise >= 3 ? HudStyle.DANGER : HudStyle.ACCENT) : 0x40FFFFFF);
+			graphics.fill(barX, y + 8 - barHeight, barX + 3, y + 8, i < noise ? (noise >= 3 ? PaperStyle.MARKER_RED : PaperStyle.INK) : 0x40261A10);
 		}
 
 		y += 13;
 		float weight = CarryWeight.total(player);
 		graphics.text(font, String.format(Locale.ROOT, "%.1f / %.0f kg", weight, CarryWeight.CAPACITY), x, y,
-			weight > CarryWeight.CAPACITY ? HudStyle.DANGER : HudStyle.DIM, false);
+			weight > CarryWeight.CAPACITY ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
 	}
 
 	/** How much noise your movement makes right now: 0 still, 1 sneaking, 2 walking, 3 running. */
@@ -192,6 +191,7 @@ final class OutbreakHud {
 
 	// --- Moodles ---
 
+	/** Paper tags down the right edge; the marker colour says how bad it is. Level 4 flickers. */
 	static int drawMoodles(GuiGraphicsExtractor graphics, LocalPlayer player, SurvivorState state, int x, int y) {
 		int drawn = 0;
 		for (Moodle moodle : Moodle.values()) {
@@ -201,14 +201,9 @@ final class OutbreakHud {
 			}
 
 			int top = y + drawn * (MOODLE_SIZE + 2);
-			int color = MOODLE_COLORS[level];
-			if (level == 4 && (Util.getMillis() / 500) % 2 == 0) {
-				color = 0xF0D01010;
-			}
-
-			graphics.fill(x, top, x + MOODLE_SIZE, top + MOODLE_SIZE, color);
-			graphics.outline(x, top, MOODLE_SIZE, MOODLE_SIZE, HudStyle.BORDER);
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, moodleSprite(moodle), x + 2, top + 2, 16, 16);
+			int tile = level == 4 && (Util.getMillis() / 500) % 2 == 0 ? 3 : level;
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, Outbreak.id("hud/moodle_" + tile), x, top, MOODLE_SIZE, MOODLE_SIZE);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, moodleSprite(moodle), x + 2, top + 1, 16, 16);
 			drawn++;
 		}
 
@@ -228,11 +223,12 @@ final class OutbreakHud {
 			return;
 		}
 
-		int width = 9 * SLOT;
-		int left = graphics.guiWidth() / 2 - width / 2;
-		int y = graphics.guiHeight() - SLOT - 11;
-		graphics.fill(left - 2, y, left + width + 2, y + 3, HudStyle.PANEL);
-		graphics.fill(left - 2, y, left - 2 + Math.round((width + 4) * Math.max(0, air) / (float) max), y + 3, HudStyle.WATER);
+		int left = graphics.guiWidth() / 2 - HOTBAR_WIDTH / 2 + 4;
+		int width = HOTBAR_WIDTH - 8;
+		int y = graphics.guiHeight() - HOTBAR_HEIGHT - 7;
+		graphics.fill(left - 1, y - 1, left + width + 1, y + 3, PaperStyle.INK);
+		graphics.fill(left, y, left + width, y + 2, 0xFF5A4A36);
+		graphics.fill(left, y, left + Math.round(width * Math.max(0, air) / (float) max), y + 2, 0xFF4A8FD8);
 	}
 
 	// --- Crosshair ---

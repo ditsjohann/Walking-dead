@@ -1,0 +1,8 @@
+{
+	"parent": "minecraft:block/orientable",
+	"textures": {
+		"top": "outbreak:block/fridge_top",
+		"front": "outbreak:block/fridge_front",
+		"side": "outbreak:block/fridge_side"
+	}
+}

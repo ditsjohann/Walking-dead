@@ -53,6 +53,8 @@ public class ScavengingClientTest implements FabricClientGameTest {
 			context.waitTicks(20);
 			context.getInput().pressKey(InputConstants.KEY_B);
 			context.waitTicks(20);
+			context.getInput().setCursorPos(2, 2);
+			context.waitTicks(2);
 			context.takeScreenshot("phase3-worn-bag");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 			context.waitTicks(10);
@@ -66,6 +68,8 @@ public class ScavengingClientTest implements FabricClientGameTest {
 			context.waitTicks(10);
 			context.getInput().pressKey(options -> options.keyUse);
 			context.waitTicks(20);
+			context.getInput().setCursorPos(2, 2);
+			context.waitTicks(2);
 			context.takeScreenshot("phase3-kitchen-loot");
 		}
 	}

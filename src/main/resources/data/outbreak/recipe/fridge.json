@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"G": "minecraft:glass_pane"
+	},
+	"pattern": [
+		"III",
+		"IGI",
+		"III"
+	],
+	"result": {
+		"id": "outbreak:fridge"
+	}
+}

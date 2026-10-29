@@ -1,0 +1,19 @@
+{
+	"variants": {
+		"facing=north": {
+			"model": "outbreak:block/kitchen_cupboard"
+		},
+		"facing=east": {
+			"model": "outbreak:block/kitchen_cupboard",
+			"y": 90
+		},
+		"facing=south": {
+			"model": "outbreak:block/kitchen_cupboard",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "outbreak:block/kitchen_cupboard",
+			"y": 270
+		}
+	}
+}

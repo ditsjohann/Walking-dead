@@ -3,14 +3,14 @@ package io.github.ditsjohann.outbreak.item;
 import java.util.function.Supplier;
 
 import io.github.ditsjohann.outbreak.inventory.BagContainer;
-import io.github.ditsjohann.outbreak.inventory.BagMenu;
+import io.github.ditsjohann.outbreak.inventory.ContainerKind;
+import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,12 +22,12 @@ import net.minecraft.world.level.Level;
  * less (by {@link #weightReduction()}); open a worn bag with its key (B by default).
  */
 public class BagItem extends Item {
-	private final int rows;
+	private final ContainerKind kind;
 	private final float weightReduction;
 
-	public BagItem(int rows, float weightReduction, Properties properties) {
+	public BagItem(ContainerKind kind, float weightReduction, Properties properties) {
 		super(properties);
-		this.rows = rows;
+		this.kind = kind;
 		this.weightReduction = weightReduction;
 	}
 
@@ -59,11 +59,8 @@ public class BagItem extends Item {
 	}
 
 	private static void open(ServerPlayer player, ItemStack bag, Supplier<ItemStack> location) {
-		BagItem item = (BagItem) bag.getItem();
-		int size = item.rows * 9;
-		player.openMenu(new SimpleMenuProvider(
-			(id, inventory, p) -> new BagMenu(id, inventory, new BagContainer(bag, size, location), item.rows),
-			bag.getHoverName()));
+		ContainerKind kind = ((BagItem) bag.getItem()).kind;
+		OutbreakMenus.open(player, kind, new BagContainer(bag, kind.size(), location), bag.getHoverName());
 		player.level().playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.PLAYERS, 0.6F, 1.2F);
 	}
 }

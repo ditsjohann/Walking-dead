@@ -28,6 +28,10 @@
 		"fabric-api": "*"
 	},
 	"mixins": [
-		"outbreak.mixins.json"
+		"outbreak.mixins.json",
+		{
+			"config": "outbreak.client.mixins.json",
+			"environment": "client"
+		}
 	]
 }

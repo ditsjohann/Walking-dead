@@ -6,7 +6,7 @@
 ## The HUD
 - **Removed:** vanilla hearts, hunger bar, armour bar and XP bar.
 - **Moodles (top right):** an icon appears when something is wrong. The tile colour shows how bad it is:
-  yellow, orange, red, then flashing red at level 4.
+  grey, brown, red, then flickering red at level 4.
 
   | Moodle | From | Levels |
   |---|---|---|

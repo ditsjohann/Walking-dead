@@ -12,8 +12,8 @@ final class BodyDoll {
 	static final int WIDTH = 16;
 	static final int HEIGHT = 32;
 
-	private static final int HEALTHY = 0xFFD8D8D0;
-	private static final int OUTLINE = 0xFF1E1A18;
+	private static final int HEALTHY = 0xFF948666;
+	private static final int OUTLINE = 0xFF26201A;
 
 	private BodyDoll() {
 	}

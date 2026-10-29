@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.inventory.ContainerKind;
+import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
 import io.github.ditsjohann.outbreak.network.OpenBagPayload;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -12,6 +14,7 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ZombieRenderer;
 
@@ -27,6 +30,11 @@ public class OutbreakClient implements ClientModInitializer {
 
 		// The vanilla HUD is replaced entirely by our own.
 		OutbreakHud.register();
+
+		// Every container kind gets its own screen.
+		for (ContainerKind kind : ContainerKind.values()) {
+			MenuScreens.register(OutbreakMenus.type(kind), OutbreakContainerScreen::new);
+		}
 
 		KeyMappingHelper.registerKeyMapping(HEALTH_KEY);
 		KeyMappingHelper.registerKeyMapping(BAG_KEY);

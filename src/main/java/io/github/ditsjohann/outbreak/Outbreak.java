@@ -3,6 +3,8 @@ package io.github.ditsjohann.outbreak;
 import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
 import io.github.ditsjohann.outbreak.command.OutbreakCommand;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
+import io.github.ditsjohann.outbreak.inventory.Pockets;
 import io.github.ditsjohann.outbreak.item.OutbreakItems;
 import io.github.ditsjohann.outbreak.loot.ContainerLoot;
 import io.github.ditsjohann.outbreak.network.OpenBagPayload;
@@ -37,7 +39,9 @@ public class Outbreak implements ModInitializer {
 		BodySimulation.register();
 		OutbreakCommand.register();
 		ContainerLoot.register();
+		OutbreakMenus.register();
 		OpenBagPayload.register();
+		Pockets.register();
 		LOGGER.info("Outbreak loaded. Good luck out there.");
 	}
 

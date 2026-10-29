@@ -3,6 +3,8 @@ package io.github.ditsjohann.outbreak.item;
 import java.util.function.Function;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
+import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.survivor.Treatment;
 
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
@@ -15,6 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemUseAnimation;
@@ -22,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.equipment.Equippable;
 
@@ -48,10 +52,19 @@ public final class OutbreakItems {
 	public static final Item NAILS = register("nails", Item::new, new Item.Properties());
 
 	// Bags: rows of storage, and how much lighter their contents are while worn.
-	public static final Item SCHOOL_BAG = register("school_bag", p -> new BagItem(2, 0.3F, p), bag());
-	public static final Item HIKING_BAG = register("hiking_bag", p -> new BagItem(3, 0.6F, p), bag());
+	public static final Item SCHOOL_BAG = register("school_bag", p -> new BagItem(ContainerKind.SCHOOL_BAG, 0.3F, p), bag());
+	public static final Item HIKING_BAG = register("hiking_bag", p -> new BagItem(ContainerKind.HIKING_BAG, 0.6F, p), bag());
+
+	public static final Item FRIDGE = block("fridge", OutbreakBlocks.FRIDGE);
+	public static final Item KITCHEN_CUPBOARD = block("kitchen_cupboard", OutbreakBlocks.KITCHEN_CUPBOARD);
+	public static final Item TOOLBOX = block("toolbox", OutbreakBlocks.TOOLBOX);
+	public static final Item METAL_CABINET = block("metal_cabinet", OutbreakBlocks.METAL_CABINET);
 
 	private OutbreakItems() {
+	}
+
+	private static Item block(String name, Block block) {
+		return register(name, p -> new BlockItem(block, p), new Item.Properties().useBlockDescriptionPrefix());
 	}
 
 	public static void register() {
@@ -66,6 +79,12 @@ public final class OutbreakItems {
 			output.accept(NAILS);
 			output.accept(SCHOOL_BAG);
 			output.accept(HIKING_BAG);
+		});
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> {
+			output.accept(FRIDGE);
+			output.accept(KITCHEN_CUPBOARD);
+			output.accept(TOOLBOX);
+			output.accept(METAL_CABINET);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(output -> {
 			output.accept(RAG);
