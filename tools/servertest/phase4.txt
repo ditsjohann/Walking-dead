@@ -1,0 +1,118 @@
+# Phase 4 checks: vehicles, fuel, keys, locks, hotwiring, windows, the road spawner, bicycles.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+clear Bot
+== a new hatchback: full parts, half a tank
+execute positioned 10 -57 0 rotated 0 0 run outbreak vehicle spawn hatchback new
+wait 1
+execute positioned 10 -57 0 run outbreak vehicle info
+== pour a full jerrycan in (20 L)
+item replace entity Bot weapon.mainhand with outbreak:jerrycan[outbreak:fuel=20.0f]
+tp Bot 7 -57 0
+player Bot look at 10 -56.5 0
+player Bot use once
+wait 1
+execute positioned 10 -57 0 run outbreak vehicle info
+data get entity Bot SelectedItem.components
+== siphon it back out with a hose (into the now empty jerrycan in the inventory)
+item replace entity Bot inventory.0 with outbreak:jerrycan
+item replace entity Bot weapon.mainhand with outbreak:hose
+player Bot use once
+wait 1
+execute positioned 10 -57 0 run outbreak vehicle info
+data get entity Bot Inventory[{Slot:9b}].components
+== get in without a key and try to start it: no key (expect "Test passed": Bot is in)
+clear Bot
+player Bot use once
+wait 1
+execute as @e[type=outbreak:hatchback,limit=1] on passengers if entity @s[type=player]
+execute as Bot run outbreak vehicle engine
+== hotwire it with a screwdriver (40% a try; expect RUNNING, hotwired by the end)
+item replace entity Bot weapon.mainhand with outbreak:screwdriver
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+execute as Bot run outbreak vehicle start
+wait 1
+wait 2
+execute positioned 10 -57 0 run outbreak vehicle info
+== the running engine burns fuel and is loud: a walker 12 blocks away comes to look
+summon outbreak:walker 10 -57 12 {Tags:["listener"],PersistenceRequired:1b}
+wait 8
+data get entity @e[tag=listener,limit=1] Pos
+== the walker claws at the car: first the windows take the hits (expect health 20, windows below 100)...
+execute positioned 10 -57 0 run outbreak vehicle set windows 100
+data modify entity Bot Health set value 20.0f
+wait 5
+data get entity Bot Health
+execute positioned 10 -57 0 run outbreak vehicle info
+== ...then they break and it reaches the driver (expect windows 0, health below 20)
+wait 8
+data get entity Bot Health
+execute positioned 10 -57 0 run outbreak vehicle info
+kill @e[type=outbreak:walker]
+== a locked car won't let you in (expect no output) until a window is broken (then "Test passed")
+player Bot dismount
+wait 1
+execute positioned 30 -57 0 rotated 0 0 run outbreak vehicle spawn sedan abandoned
+execute positioned 30 -57 0 run outbreak vehicle set locked 1
+tp Bot 27 -57 0
+player Bot look at 30 -56.5 0
+clear Bot
+player Bot use once
+wait 1
+execute as @e[type=outbreak:sedan,limit=1] on passengers if entity @s[type=player]
+player Bot attack once
+wait 0.6
+player Bot attack once
+wait 0.6
+player Bot attack once
+wait 0.6
+execute positioned 30 -57 0 run outbreak vehicle info
+player Bot use once
+wait 1
+execute as @e[type=outbreak:sedan,limit=1] on passengers if entity @s[type=player]
+player Bot dismount
+== a wreck
+execute positioned 50 -57 0 rotated 90 0 run outbreak vehicle spawn van wreck
+execute positioned 50 -57 0 run outbreak vehicle info
+== the road spawner: a chunk of Arnis asphalt gets a car, a red cycle path a bicycle
+fill 64 -58 64 79 -58 79 minecraft:gray_concrete_powder
+fill 64 -58 70 79 -58 71 minecraft:cyan_terracotta
+fill 64 -58 66 79 -58 67 minecraft:red_terracotta
+tp Cam 72 -40 72
+wait 3
+execute positioned 72 -57 72 run outbreak vehicle populate 0
+execute positioned 72 -57 72 run outbreak vehicle info
+execute if entity @e[type=outbreak:bicycle,x=64,y=-60,z=64,dx=16,dy=10,dz=16]
+== a bicycle: put it down, punch it to pick it back up (expect it gone from the ground and in the inventory)
+clear Bot
+item replace entity Bot weapon.mainhand with outbreak:bicycle
+tp Bot 0 -57 30
+player Bot look at 0 -57.5 32
+player Bot use once
+wait 1
+execute positioned 0 -57 32 run outbreak vehicle info
+player Bot look at 0.5 -56.5 32.5
+player Bot attack once
+wait 1
+execute unless entity @e[type=outbreak:bicycle,x=0,y=-60,z=30,dx=2,dy=5,dz=4]
+execute if entity @a[name=Bot,nbt={Inventory:[{id:"outbreak:bicycle"}]}]

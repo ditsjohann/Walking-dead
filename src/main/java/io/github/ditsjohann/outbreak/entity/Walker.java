@@ -6,6 +6,8 @@ import java.util.UUID;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
+import io.github.ditsjohann.outbreak.survivor.OutbreakDamageTypes;
+import io.github.ditsjohann.outbreak.vehicle.Vehicle;
 
 import org.jspecify.annotations.Nullable;
 
@@ -56,6 +58,7 @@ import net.minecraft.tags.DamageTypeTags;
 public class Walker extends Zombie {
 	/** Fraction of the walker's height above which a hit counts as a headshot. */
 	public static final double HEAD_START = 0.78;
+	private static final double VEHICLE_REACH = 0.6;
 	private static final float HEADSHOT_MULTIPLIER = 4.0F;
 	private static final float BODY_MULTIPLIER = 0.5F;
 	/** Cosine of the half-angle of a walker's field of view (~65 degrees). */
@@ -137,7 +140,8 @@ public class Walker extends Zombie {
 	public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
 		Entity direct = source.getDirectEntity();
 		boolean isAttack = direct != null && direct != this && !source.is(DamageTypeTags.IS_EXPLOSION);
-		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+		// Run over by a vehicle: crushed, head or not.
+		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !source.is(OutbreakDamageTypes.RUN_OVER)) {
 			if (this.isHeadshot(direct)) {
 				damage *= HEADSHOT_MULTIPLIER;
 			} else {
@@ -230,6 +234,16 @@ public class Walker extends Zombie {
 			this.setLeader(other);
 			return;
 		}
+	}
+
+	/** Someone sitting in a vehicle is reached through it: the walker claws at the windows first (see Vehicle#absorbHit). */
+	@Override
+	public boolean isWithinMeleeAttackRange(LivingEntity target) {
+		if (target.getVehicle() instanceof Vehicle vehicle) {
+			return this.getAttackBoundingBox(VEHICLE_REACH).intersects(vehicle.getBoundingBox());
+		}
+
+		return super.isWithinMeleeAttackRange(target);
 	}
 
 	// --- Vanilla zombie behaviour we don't want ---

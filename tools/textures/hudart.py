@@ -771,10 +771,31 @@ def mat_gray_steel(w, h, seed, rows):
     return img, shade(ScavengedSteel.base, 34)
 
 
+def mat_felt(w, h, seed):
+    """Trunk carpet: dark grey felt inside a rubber seal."""
+    base = (64, 62, 60, 255)
+    img = Image.new("RGBA", (w, h), base)
+    noise(img, 7, seed)
+    frame(img, 0, 0, w, h, (22, 22, 24, 255))
+    frame(img, 1, 1, w - 1, h - 1, (36, 36, 38, 255))
+    return img, base
+
+
+def mat_cargo(w, h, seed):
+    """A van's load floor: plywood with steel tie-down rails."""
+    img, base = mat_wood(w, h, seed, base=(178, 146, 102, 255), plank=24, vertical=True)
+    for y in (3, h - 4):
+        rect(img, 2, y, w - 2, y + 1, (150, 152, 156, 255))
+        for x in range(4, w - 4, 6):
+            img.putpixel((x, y), (60, 60, 64, 255))
+    return img, base
+
+
 # Container screen layout: must match ContainerKind.java.
 KINDS = {
     "school_bag": (9, 2), "hiking_bag": (9, 3), "cupboard": (9, 3), "wardrobe": (9, 6), "crate": (9, 3),
     "fridge": (6, 3), "kitchen_cupboard": (6, 2), "toolbox": (5, 2), "metal_cabinet": (9, 3),
+    "trunk": (9, 2), "large_trunk": (9, 3), "van_cargo": (9, 6),
 }
 
 
@@ -790,6 +811,9 @@ def material(kind, w, h, rows):
         "kitchen_cupboard": lambda: mat_painted(w, h, seed),
         "toolbox": lambda: mat_red_steel(w, h, seed),
         "metal_cabinet": lambda: mat_gray_steel(w, h, seed, rows),
+        "trunk": lambda: mat_felt(w, h, seed),
+        "large_trunk": lambda: mat_felt(w, h, seed),
+        "van_cargo": lambda: mat_cargo(w, h, seed),
     }[kind]()
 
 
@@ -818,6 +842,55 @@ def container_screen(style, kind):
     for x in range(8, 168, 2):
         page.putpixel((x, hotbar - 4), shade(style.pencil, 60))
     save(page, f"gui/container/{kind}.png")
+
+
+# Mechanics pages: part slots as in MechanicsMenu.slotPositions (front of the vehicle at the top).
+MECHANICS = {
+    "car": [(18, 34), (66, 34), (18, 92), (66, 92), (42, 22)],
+    "bicycle": [(42, 20), (42, 98)],
+    "scooter": [(42, 20), (42, 98), (42, 59)],
+}
+MECHANICS_POCKETS = 124
+
+
+def mechanics_page(style, layout):
+    height = MECHANICS_POCKETS + 22 + 26
+    page = style.panel(176, height, seed=sum(map(ord, layout)) + 5)
+    d = ImageDraw.Draw(page)
+    pencil = style.pencil
+    light = shade(pencil, 50)
+    # A sketch of the vehicle from above, in pencil.
+    if layout == "car":
+        d.rounded_rectangle([30, 18, 72, 118], radius=8, outline=pencil)
+        d.rounded_rectangle([34, 52, 68, 96], radius=3, outline=light)   # roof
+        d.line([33, 46, 69, 46], fill=pencil)                            # windshield
+        d.line([33, 102, 69, 102], fill=pencil)                          # rear window
+        for y in (64, 84):                                               # seats
+            d.rectangle([36, y, 48, y + 8], outline=light)
+            d.rectangle([54, y, 66, y + 8], outline=light)
+    else:
+        d.line([51, 28, 51, 108], fill=pencil, width=2)                  # frame
+        d.line([38, 30, 64, 30], fill=pencil, width=2)                   # handlebar
+        if layout == "scooter":
+            d.rounded_rectangle([40, 42, 62, 112], radius=6, outline=pencil)
+        else:
+            d.rectangle([47, 84, 55, 92], outline=pencil)                # saddle
+    for i, (x, y) in enumerate(MECHANICS[layout]):
+        rect(page, x - 1, y - 1, x + 17, y + 17, shade(style.paper, -14))
+        pencil_box(page, x - 1, y - 1, style.text, seed=40 + i)
+    # The front, marked with an arrow.
+    for i in range(5):
+        page.putpixel((51, 9 + i), pencil)
+    for dd in range(3):
+        page.putpixel((51 - dd, 9 + dd), pencil)
+        page.putpixel((51 + dd, 9 + dd), pencil)
+    hotbar = MECHANICS_POCKETS + 22
+    for i in range(9):
+        pencil_box(page, 7 + i * 18, MECHANICS_POCKETS - 1, pencil, seed=i)
+        pencil_box(page, 7 + i * 18, hotbar - 1, pencil, seed=i + 9)
+    for x in range(8, 168, 2):
+        page.putpixel((x, hotbar - 4), shade(pencil, 60))
+    save(page, f"gui/container/mechanics_{layout}.png")
 
 
 def inventory_page(style):
@@ -936,12 +1009,15 @@ def hud_sprites(style):
     for level in range(1, 5):
         save(style.moodle(level), f"gui/sprites/hud/moodle_{level}.png")
     save(style.panel(330, 210, seed=31), "gui/health_panel.png")
+    save(style.panel(128, 44, seed=41), "gui/sprites/hud/dashboard.png")
 
 
 def export(style):
     for kind in KINDS:
         container_screen(style, kind)
     inventory_page(style)
+    for layout in MECHANICS:
+        mechanics_page(style, layout)
     block_textures()
     hud_sprites(style)
 

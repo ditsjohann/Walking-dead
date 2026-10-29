@@ -4,6 +4,8 @@ import java.util.Map;
 
 import io.github.ditsjohann.outbreak.item.BagItem;
 import io.github.ditsjohann.outbreak.item.OutbreakItems;
+import io.github.ditsjohann.outbreak.vehicle.JerrycanItem;
+import io.github.ditsjohann.outbreak.vehicle.VehicleItems;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -41,14 +43,31 @@ public final class CarryWeight {
 		Map.entry(Items.WATER_BUCKET, 1.8F),
 		Map.entry(Items.MILK_BUCKET, 1.8F),
 		Map.entry(Items.TORCH, 0.05F),
-		Map.entry(Items.STICK, 0.05F)
+		Map.entry(Items.STICK, 0.05F),
+		Map.entry(VehicleItems.TIRE, 6.0F),
+		Map.entry(VehicleItems.BIKE_TIRE, 0.8F),
+		Map.entry(VehicleItems.CAR_BATTERY, 8.0F),
+		Map.entry(VehicleItems.ENGINE_PARTS, 1.0F),
+		Map.entry(VehicleItems.HOSE, 0.5F),
+		Map.entry(VehicleItems.WRENCH, 1.0F),
+		Map.entry(VehicleItems.SCREWDRIVER, 0.2F),
+		Map.entry(VehicleItems.JACK, 3.0F),
+		Map.entry(VehicleItems.CAR_KEY, 0.02F),
+		Map.entry(VehicleItems.BICYCLE, 10.0F)
 	);
+	/** Petrol is heavy: a full jerrycan is about 9 kg. */
+	private static final float JERRYCAN_EMPTY = 1.0F;
+	private static final float FUEL_PER_LITRE = 0.4F;
 
 	private CarryWeight() {
 	}
 
 	/** Weight of one item, not counting anything inside it. */
 	public static float itemWeight(ItemStack stack) {
+		if (stack.getItem() instanceof JerrycanItem) {
+			return JERRYCAN_EMPTY + JerrycanItem.fuel(stack) * FUEL_PER_LITRE;
+		}
+
 		Float weight = WEIGHTS.get(stack.getItem());
 		if (weight != null) {
 			return weight;

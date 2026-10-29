@@ -3,11 +3,13 @@ package io.github.ditsjohann.outbreak.client;
 import java.util.Locale;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.client.vehicle.Dashboard;
 import io.github.ditsjohann.outbreak.entity.Walker;
 import io.github.ditsjohann.outbreak.inventory.CarryWeight;
 import io.github.ditsjohann.outbreak.survivor.Moodle;
 import io.github.ditsjohann.outbreak.survivor.SurvivorState;
 import io.github.ditsjohann.outbreak.survivor.Survivors;
+import io.github.ditsjohann.outbreak.vehicle.Vehicle;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -63,6 +65,7 @@ final class OutbreakHud {
 		}
 
 		extractHotbar(graphics, minecraft, player);
+		Dashboard.extract(graphics, minecraft.font, player);
 		if (player.isCreative()) {
 			return;
 		}
@@ -175,8 +178,20 @@ final class OutbreakHud {
 			weight > CarryWeight.CAPACITY ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
 	}
 
-	/** How much noise your movement makes right now: 0 still, 1 sneaking, 2 walking, 3 running. */
+	/**
+	 * How much noise your movement makes right now: 0 still, 1 sneaking, 2 walking, 3 running. In a
+	 * vehicle it's the vehicle: a running engine is loud, a bicycle is quiet.
+	 */
 	static int noiseLevel(LocalPlayer player) {
+		if (player.getVehicle() instanceof Vehicle vehicle) {
+			boolean moving = Math.hypot(vehicle.getX() - vehicle.xo, vehicle.getZ() - vehicle.zo) > 0.02;
+			if (vehicle.vehicleType().hasEngine) {
+				return vehicle.isRunning() ? 3 : moving ? 1 : 0;
+			}
+
+			return moving ? 1 : 0;
+		}
+
 		double speed = player.getDeltaMovement().horizontalDistanceSqr();
 		if (speed < 1.0E-4 && player.onGround()) {
 			return 0;

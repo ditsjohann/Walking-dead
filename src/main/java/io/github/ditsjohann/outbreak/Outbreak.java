@@ -14,6 +14,7 @@ import io.github.ditsjohann.outbreak.survivor.StarterKit;
 import io.github.ditsjohann.outbreak.survivor.Survivors;
 import io.github.ditsjohann.outbreak.survivor.Turning;
 import io.github.ditsjohann.outbreak.vanilla.VanillaRules;
+import io.github.ditsjohann.outbreak.vehicle.Vehicles;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -42,6 +43,7 @@ public class Outbreak implements ModInitializer {
 		OutbreakMenus.register();
 		OpenBagPayload.register();
 		Pockets.register();
+		Vehicles.register();
 		LOGGER.info("Outbreak loaded. Good luck out there.");
 	}
 

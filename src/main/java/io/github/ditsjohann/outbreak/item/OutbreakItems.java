@@ -102,7 +102,7 @@ public final class OutbreakItems {
 	}
 
 	/** A melee weapon that wears out. Material only sets durability; damage and speed are per weapon. */
-	private static Item.Properties weapon(int durability, float attackDamage, float attackSpeed) {
+	public static Item.Properties weapon(int durability, float attackDamage, float attackSpeed) {
 		ToolMaterial material = new ToolMaterial(BlockTags.INCORRECT_FOR_IRON_TOOL, durability, 6.0F, 0.0F, 1, ItemTags.IRON_TOOL_MATERIALS);
 		return new Item.Properties().sword(material, attackDamage, attackSpeed);
 	}

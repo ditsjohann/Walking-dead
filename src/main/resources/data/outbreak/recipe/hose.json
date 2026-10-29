@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"key": {
+		"K": "minecraft:dried_kelp",
+		"S": "minecraft:string"
+	},
+	"pattern": [
+		"KSK",
+		"K K",
+		"KSK"
+	],
+	"result": {
+		"id": "outbreak:hose"
+	}
+}

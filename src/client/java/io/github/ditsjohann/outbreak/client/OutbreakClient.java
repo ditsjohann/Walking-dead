@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.client;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
@@ -35,6 +36,9 @@ public class OutbreakClient implements ClientModInitializer {
 		for (ContainerKind kind : ContainerKind.values()) {
 			MenuScreens.register(OutbreakMenus.type(kind), OutbreakContainerScreen::new);
 		}
+
+		// Vehicles: models, driving controls, engine sounds, the mechanics screen.
+		VehicleClient.register(CATEGORY);
 
 		KeyMappingHelper.registerKeyMapping(HEALTH_KEY);
 		KeyMappingHelper.registerKeyMapping(BAG_KEY);

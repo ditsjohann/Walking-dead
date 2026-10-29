@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"T": "outbreak:bike_tire",
+		"L": "minecraft:leather"
+	},
+	"pattern": [
+		" L ",
+		"III",
+		"T T"
+	],
+	"result": {
+		"id": "outbreak:bicycle"
+	}
+}

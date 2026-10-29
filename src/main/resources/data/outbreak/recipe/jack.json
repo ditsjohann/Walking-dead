@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "equipment",
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"N": "minecraft:iron_nugget"
+	},
+	"pattern": [
+		" N ",
+		"N N",
+		"III"
+	],
+	"result": {
+		"id": "outbreak:jack"
+	}
+}

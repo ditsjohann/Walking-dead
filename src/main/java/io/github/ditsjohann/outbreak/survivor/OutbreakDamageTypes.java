@@ -12,6 +12,8 @@ public final class OutbreakDamageTypes {
 	public static final ResourceKey<DamageType> BLEEDING = key("bleeding");
 	public static final ResourceKey<DamageType> INFECTION = key("infection");
 	public static final ResourceKey<DamageType> DEHYDRATION = key("dehydration");
+	/** Hit by a vehicle: the one body hit that can finish a walker. */
+	public static final ResourceKey<DamageType> RUN_OVER = key("run_over");
 
 	private OutbreakDamageTypes() {
 	}

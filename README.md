@@ -12,8 +12,9 @@ played on a real 1:1 copy of Groningen generated with
 - [Phase 1](docs/PHASE1.md) — walkers, noise, vanilla removed
 - [Phase 2](docs/PHASE2.md) — wounds, infection, needs, moodle HUD
 - [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags
+- [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads
 
-Status: phase 3 done (loot, barricades, weapons, bags), UI overhaul done. Next: phase 4, vehicles.
+Status: phase 4 done (vehicles). Next: phase 5, character and menus.
 
 ## Development
 
@@ -32,6 +33,7 @@ python3 tools/servertest/driver.py . tools/servertest/phase1.txt run/phase1.log
 python3 tools/servertest/driver.py . tools/servertest/phase2.txt run/phase2.log
 python3 tools/servertest/driver.py . tools/servertest/phase3.txt run/phase3.log
 python3 tools/servertest/driver.py . tools/servertest/ui.txt run/ui.log
+python3 tools/servertest/driver.py . tools/servertest/phase4.txt run/phase4.log
 ```
 
 Client test with screenshots (real game window; on a headless Linux box use a virtual display):
@@ -40,4 +42,4 @@ Client test with screenshots (real game window; on a headless Linux box use a vi
 SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest   # build/run/clientGameTest/screenshots/
 ```
 
-Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).
+Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; vehicle models and textures by `python3 tools/vehicles/make_vehicles.py`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).

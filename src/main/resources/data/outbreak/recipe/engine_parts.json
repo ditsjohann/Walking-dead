@@ -1,0 +1,17 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"category": "misc",
+	"key": {
+		"I": "minecraft:iron_ingot",
+		"N": "minecraft:iron_nugget",
+		"R": "minecraft:redstone"
+	},
+	"pattern": [
+		"NIN",
+		"IRI",
+		"NIN"
+	],
+	"result": {
+		"id": "outbreak:engine_parts"
+	}
+}

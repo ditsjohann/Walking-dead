@@ -2,7 +2,7 @@
 
 Run from the repo root:  python3 tools/data/make_loot_tables.py
 Each entry is (item, weight, min, max), or (item, weight, min, max, extra) where extra is "worn"
-(random durability) or "water" (a water bottle). "empty" is a roll that finds nothing: scarcity.
+(random durability), "water" (a water bottle), "fuel:<litres>" (a jerrycan) or "charge:<0-1>" (a battery). "empty" is a roll that finds nothing: scarcity.
 """
 import json
 from pathlib import Path
@@ -43,7 +43,10 @@ CONTAINERS = {
         ("minecraft:iron_nugget", 4, 2, 6), ("outbreak:crowbar", 2, 1, 1, "worn"), ("outbreak:machete", 1, 1, 1, "worn"),
         ("minecraft:iron_axe", 1, 1, 1, "worn"), ("minecraft:stone_pickaxe", 1, 1, 1, "worn"), ("minecraft:stick", 4, 2, 6),
         ("minecraft:oak_planks", 4, 2, 6), ("minecraft:string", 3, 1, 4), ("minecraft:iron_chain", 2, 1, 2),
-        ("minecraft:torch", 3, 2, 6), ("minecraft:leather", 1, 1, 2), ("empty", 10),
+        ("minecraft:torch", 3, 2, 6), ("minecraft:leather", 1, 1, 2), ("outbreak:wrench", 2, 1, 1, "worn"),
+        ("outbreak:screwdriver", 2, 1, 1, "worn"), ("outbreak:jack", 1, 1, 1), ("outbreak:hose", 1, 1, 1, "worn"),
+        ("outbreak:jerrycan", 2, 1, 1), ("outbreak:jerrycan", 1, 1, 1, "fuel:8"), ("outbreak:engine_parts", 1, 1, 2),
+        ("outbreak:car_battery", 1, 1, 1, "charge:0.5"), ("outbreak:bike_tire", 1, 1, 1, "worn"), ("empty", 10),
     ]),
     # Near bookshelves and lecterns.
     "study": ((1, 3), [
@@ -67,6 +70,7 @@ CONTAINERS = {
     "toolbox": ((2, 4), [
         ("outbreak:hammer", 4, 1, 1, "worn"), ("outbreak:nails", 8, 4, 16), ("outbreak:crowbar", 2, 1, 1, "worn"),
         ("minecraft:iron_nugget", 5, 2, 8), ("minecraft:iron_ingot", 2, 1, 2), ("minecraft:string", 3, 1, 4),
+        ("outbreak:wrench", 3, 1, 1, "worn"), ("outbreak:screwdriver", 3, 1, 1, "worn"), ("outbreak:engine_parts", 2, 1, 2),
         ("empty", 6),
     ]),
     "metal_cabinet": ((1, 4), [
@@ -74,6 +78,14 @@ CONTAINERS = {
         ("minecraft:book", 3, 1, 2), ("outbreak:bandage", 2, 1, 2), ("outbreak:disinfectant", 2, 1, 1),
         ("minecraft:torch", 3, 2, 6), ("outbreak:machete", 1, 1, 1, "worn"), ("outbreak:hiking_bag", 1, 1, 1),
         ("empty", 10),
+    ]),
+    # The trunk of an abandoned car: whatever someone packed to get out of town.
+    "trunk": ((1, 4), [
+        ("outbreak:jerrycan", 3, 1, 1), ("outbreak:jerrycan", 2, 1, 1, "fuel:6"), ("outbreak:tire", 2, 1, 1, "worn"),
+        ("outbreak:jack", 2, 1, 1), ("outbreak:wrench", 1, 1, 1, "worn"), ("outbreak:engine_parts", 1, 1, 1),
+        ("outbreak:bandage", 2, 1, 2), ("outbreak:rag", 3, 1, 3), ("minecraft:potion", 3, 1, 2, "water"),
+        ("minecraft:bread", 2, 1, 2), ("minecraft:white_wool", 2, 1, 2), ("outbreak:hiking_bag", 1, 1, 1),
+        ("outbreak:school_bag", 1, 1, 1), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("empty", 12),
     ]),
 }
 
@@ -94,6 +106,10 @@ def entry(spec):
         modifiers.append({"type": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": lo, "max": hi}})
     if "worn" in extra:
         modifiers.append({"type": "minecraft:set_damage", "damage": {"type": "minecraft:uniform", "min": 0.25, "max": 0.8}})
+    for e in extra:
+        if e.startswith("fuel:") or e.startswith("charge:"):
+            key, value = e.split(":")
+            modifiers.append({"type": "minecraft:set_components", "components": {f"outbreak:{key}": float(value)}})
     if "water" in extra:
         modifiers.append({"type": "minecraft:set_potion", "id": "minecraft:water"})
     result = {"type": "minecraft:item", "name": name, "weight": weight}

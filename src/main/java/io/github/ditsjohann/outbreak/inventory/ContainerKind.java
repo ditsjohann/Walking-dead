@@ -20,7 +20,13 @@ public enum ContainerKind {
 	FRIDGE(6, 3),
 	KITCHEN_CUPBOARD(6, 2),
 	TOOLBOX(5, 2),
-	METAL_CABINET(9, 3);
+	METAL_CABINET(9, 3),
+	/** A hatchback's trunk. */
+	TRUNK(9, 2),
+	/** A sedan's trunk. */
+	LARGE_TRUNK(9, 3),
+	/** The back of a van. */
+	VAN_CARGO(9, 6);
 
 	public static final int SCREEN_WIDTH = 176;
 	private static final int CONTAINER_TOP = 18;

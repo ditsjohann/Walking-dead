@@ -1,6 +1,6 @@
 # Design — Walking Dead × Project Zomboid in Groningen
 
-Status: **draft v0.5.** Phases 0–3 are built; see `docs/PHASE1.md`, `docs/PHASE2.md` and `docs/PHASE3.md` for what's in the game now.
+Status: **draft v0.6.** Phases 0–4 are built; see `docs/PHASE1.md` to `docs/PHASE4.md` for what's in the game now.
 
 ## 1. Pitch
 
@@ -226,7 +226,7 @@ anywhere from TWD-heroic to PZ-brutal:
 | 1 ✅ | **Strip vanilla:** remove mobs, non-building recipes, the Nether portal, XP, advancements; tools needed for wood and stone. **Walker basics:** slow walkers, headshots, hearing and sight, noise system, herds, everyone turns | Groningen with walkers, and nothing vanilla left to see |
 | 2 ✅ | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
 | 3 ✅ | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades, melee weapons | Scavenge and fortify |
-| 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat | Travel Groningen |
+| 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat. *Built, except the boat (later).* | Travel Groningen |
 | 5 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
 | 6 | **World winds down:** day counter, power and water shutoff (gas pumps die), broadcasts, meta events, migrating herds, guns, guts camouflage | Full loop |
 | 7 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |

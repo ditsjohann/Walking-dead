@@ -6,6 +6,8 @@ itself still has to be generated with Arnis.
 
 | | |
 |---|---|
+| ![](screenshots/phase4/1-lineup.png) Bicycle, scooter, hatchback, sedan, van and a wreck. | ![](screenshots/phase4/3-driving.png) Driving: the dashboard bottom right. |
+| ![](screenshots/phase4/4-mechanics.png) Working on a car: tires and battery, repairs. | ![](screenshots/phase4/6-bicycle.png) On a bicycle. |
 | ![](screenshots/ui/hud.png) The dark-paper HUD, with the four new containers behind it. | ![](screenshots/ui/inventory.png) The 18-slot inventory: 9 pockets and the hotbar. |
 | ![](screenshots/ui/fridge.png) A fridge, looted on first open. | ![](screenshots/ui/toolbox.png) A toolbox. |
 | ![](screenshots/ui/wardrobe.png) A double chest is a wardrobe. | ![](screenshots/ui/school-bag.png) A school bag. |
