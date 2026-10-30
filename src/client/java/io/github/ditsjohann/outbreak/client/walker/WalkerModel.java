@@ -223,8 +223,7 @@ public class WalkerModel extends EntityModel<WalkerRenderState> {
 		this.leftArm.zRot = Mth.lerp(lunge, this.leftArm.zRot, 0.35F);
 		this.rightForearm.xRot -= lunge * 0.3F;
 		this.leftForearm.xRot -= lunge * 0.3F;
-		this.head.xRot += lunge * 0.2F;
-		this.head.z -= lunge * 1.5F;
+		this.head.xRot += lunge * 0.25F;
 	}
 
 	private void applySprings(float[] s) {

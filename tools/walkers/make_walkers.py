@@ -54,13 +54,17 @@ def limb(name, pivot, lower_name, x0):
 
 def model():
     # Absolute heights: feet 0, knees 6, hips 12, belly 15, shoulders 24, head top 32.
+    # The neck sits inside the top of the chest, out of sight until the head lolls or snaps round
+    # (then it fills the gap under the head instead of the head floating).
     head = Part("head", (0, 9, 0), [Box((-4, 0, -4), (8, 8, 8))],
-                [Part("hat", (0, 0, 0), [Box((-4, 0, -4), (8, 8, 8), inflate=0.5)])])
+                [Part("hat", (0, 0, 0), [Box((-4, 0, -4), (8, 8, 8), inflate=0.5)]),
+                 Part("neck", (0, 0, 0), [Box((-2, -2, -2), (4, 2, 4))])])
     right_arm = Part("right_arm", (-5, 7, 0), [Box((-3, -4, -2), (4, 6, 4))],
                      [Part("right_forearm", (-1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))])])
     left_arm = Part("left_arm", (5, 7, 0), [Box((-1, -4, -2), (4, 6, 4))],
                     [Part("left_forearm", (1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))])])
-    chest = Part("chest", (0, 3, 0), [Box((-4, 0, -2), (8, 9, 4))], [head, right_arm, left_arm])
+    # The chest reaches a pixel down into the pelvis, so bending and twisting at the waist never opens a gap.
+    chest = Part("chest", (0, 3, 0), [Box((-4, -1, -2), (8, 10, 4))], [head, right_arm, left_arm])
     right_leg = limb("right_leg", (-2, 0, 0), "right_shin", -2)
     left_leg = limb("left_leg", (2, 0, 0), "left_shin", -2)
     return [Part("waist", (0, 12, 0), [Box((-4, 0, -2), (8, 3, 4))], [chest, right_leg, left_leg])]
@@ -174,6 +178,8 @@ def color(look, part, face, x, y, fw, fh):
     r = look.rnd
     if part == "hat":
         return hair_pixel(look, face, x, y, fw, fh)
+    if part == "neck":
+        return skin(look, x, y)
     if part == "head":
         if face == "front":
             # Eyes: pale and dead, in dark sockets. Mouth: open, dark, teeth.

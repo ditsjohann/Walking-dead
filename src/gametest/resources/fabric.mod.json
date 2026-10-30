@@ -15,6 +15,7 @@
 			"io.github.ditsjohann.outbreak.test.WalkerClientTest",
 			"io.github.ditsjohann.outbreak.test.CombatClientTest",
 			"io.github.ditsjohann.outbreak.test.CharacterClientTest",
+			"io.github.ditsjohann.outbreak.test.AnimationClientTest",
 			"io.github.ditsjohann.outbreak.test.BackdropClientTest"
 		]
 	},

@@ -60,17 +60,18 @@ public final class SwingAnimations {
 				pose.rotateDegrees(Axis.XP, 25.0F * wind);
 			}
 			case CHOP -> {
-				// Raised a little back, then brought down hard.
+				// Tipped back, then brought down and forward: the head of the hammer stays in sight.
 				float raise = bump(t, 0.0F, 0.1F, 0.25F);
 				float strike = bump(t, 0.08F, 0.3F, 1.0F);
-				pose.translate(invert * -0.12F * strike, 0.15F * raise - 0.25F * strike, -0.25F * strike);
-				pose.rotateDegrees(Axis.XP, 20.0F * raise - 70.0F * strike);
-				pose.rotateDegrees(Axis.ZP, invert * 15.0F * strike);
+				pose.translate(invert * -0.16F * strike, 0.1F * raise + 0.04F * strike, -0.04F * strike);
+				pose.rotateDegrees(Axis.XP, 25.0F * raise - 35.0F * strike);
+				pose.rotateDegrees(Axis.ZP, invert * 18.0F * strike);
 			}
 			case STAB -> {
+				// A short jab forward, the point dipping towards the target.
 				float thrust = bump(t, 0.0F, 0.3F, 1.0F);
-				pose.translate(invert * -0.1F * thrust, 0.08F * thrust, -0.5F * thrust);
-				pose.rotateDegrees(Axis.XP, -55.0F * thrust);
+				pose.translate(invert * -0.06F * thrust, 0.03F * thrust, -0.22F * thrust);
+				pose.rotateDegrees(Axis.XP, -28.0F * thrust);
 			}
 			default -> {
 				return false;
@@ -80,12 +81,22 @@ public final class SwingAnimations {
 		return true;
 	}
 
-	/** A punch: the fist drives forward and in, then comes back. Applied before vanilla's arm placement (at rest). */
-	public static void punch(float t, PoseStack pose, HumanoidArm arm) {
-		int invert = arm == HumanoidArm.RIGHT ? 1 : -1;
-		float p = t < 0.3F ? ease(t / 0.3F) : 1.0F - ease((t - 0.3F) / 0.7F);
-		pose.translate(-invert * 0.42F * p, 0.34F * p, -0.6F * p);
-		pose.rotateDegrees(Axis.YP, -invert * 12.0F * p);
+	/**
+	 * A punched arm, first person: vanilla's arm placement (shoulder bottom right, hand pointing up
+	 * and in), with the fist driven in towards the crosshair and the arm turned to point ahead.
+	 * Ends where vanilla's would, ready for the hand to be drawn.
+	 */
+	public static void punchArm(float t, float inverseArmHeight, PoseStack pose, HumanoidArm arm) {
+		float invert = arm == HumanoidArm.RIGHT ? 1.0F : -1.0F;
+		float p = t < 0.25F ? ease(t / 0.25F) : 1.0F - ease((t - 0.25F) / 0.75F);
+		pose.translate(invert * (0.64F - 0.5F * p), -0.6F + inverseArmHeight * -0.6F + 0.4F * p, -0.72F - 0.14F * p);
+		pose.rotateDegrees(Axis.YP, invert * (45.0F - 32.0F * p));
+		pose.rotateDegrees(Axis.XP, 22.0F * p);
+		pose.translate(invert * -1.0F, 3.6F, 3.5F);
+		pose.rotateDegrees(Axis.ZP, invert * 120.0F);
+		pose.rotateDegrees(Axis.XP, 200.0F);
+		pose.rotateDegrees(Axis.YP, invert * -135.0F);
+		pose.translate(invert * 5.6F, 0.0F, 0.0F);
 	}
 
 	// --- Third person ---
@@ -108,29 +119,31 @@ public final class SwingAnimations {
 		ModelPart offArm = model.getArm(main.getOpposite());
 		switch (style) {
 			case SWING -> {
-				// Two hands on the bat: ready over the shoulder, then the sweep turns the whole body.
+				// Both hands on the handle in front of the chest, the bat up by the shoulder; the
+				// sweep turns the whole upper body and the arms go round with it.
 				float wind = bump(t, 0.0F, 0.08F, 0.2F);
 				float sweep = bump(t, 0.05F, 0.3F, 1.0F);
 				float turn = side * (0.5F * wind - 1.1F * sweep);
 				model.body.yRot = turn * 0.6F;
 				placeArms(model, state);
-				mainArm.xRot = -0.55F - 1.1F * wind - 0.85F * sweep;
-				mainArm.yRot = -0.25F * side + turn;
-				offArm.xRot = -0.85F - 0.9F * wind - 0.65F * sweep;
-				offArm.yRot = 0.55F * side + turn;
+				mainArm.xRot = -0.95F - 0.9F * wind - 0.6F * sweep;
+				mainArm.yRot = side * -0.45F + turn * 0.6F;
+				offArm.xRot = -1.15F - 0.7F * wind - 0.45F * sweep;
+				offArm.yRot = side * 0.85F + turn * 0.6F;
 			}
 			case CHOP -> {
 				if (!swinging) {
 					return false;
 				}
 
+				// Raised high, then brought down, the shoulders turning into it (the body doesn't
+				// bend: that would pull the torso off the legs).
 				float raise = bump(t, 0.0F, 0.1F, 0.25F);
 				float strike = bump(t, 0.08F, 0.3F, 1.0F);
-				mainArm.xRot = -0.3F - 2.6F * raise - 0.9F * strike;
-				mainArm.zRot = side * 0.15F * raise;
-				model.body.xRot = 0.25F * strike;
 				model.body.yRot = side * -0.2F * strike;
 				placeArms(model, state);
+				mainArm.xRot = -0.3F - 2.6F * raise - 0.9F * strike;
+				mainArm.zRot = side * 0.15F * raise;
 			}
 			case STAB -> {
 				if (!swinging) {
@@ -138,25 +151,23 @@ public final class SwingAnimations {
 				}
 
 				float thrust = bump(t, 0.0F, 0.3F, 1.0F);
-				mainArm.xRot = -0.4F - 1.2F * thrust;
-				mainArm.z -= 3.0F * thrust;
 				model.body.yRot = side * -0.25F * thrust;
 				placeArms(model, state);
+				mainArm.xRot = -0.4F - 1.2F * thrust;
 			}
 			case FIST -> {
 				if (!swinging) {
 					return false;
 				}
 
-				// Straight from the shoulder, the body turning into it.
-				float p = t < 0.3F ? ease(t / 0.3F) : 1.0F - ease((t - 0.3F) / 0.7F);
+				// Straight from the shoulder, the body turning into it, the other fist up on guard.
+				float p = t < 0.25F ? ease(t / 0.25F) : 1.0F - ease((t - 0.25F) / 0.75F);
 				model.body.yRot = side * -0.35F * p;
 				placeArms(model, state);
 				mainArm.xRot = -1.55F * p + mainArm.xRot * (1.0F - p);
-				mainArm.yRot = side * 0.25F * p;
-				mainArm.z -= 2.5F * p;
-				offArm.xRot = -0.9F;
-				offArm.yRot = -side * 0.3F;
+				mainArm.yRot = side * 0.2F * p;
+				offArm.xRot = Mth.lerp(p, offArm.xRot, -0.9F);
+				offArm.yRot = Mth.lerp(p, offArm.yRot, side * 0.4F);
 			}
 			default -> {
 				return false;

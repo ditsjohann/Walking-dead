@@ -104,7 +104,10 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
   the corpse stays 5 seconds, fists shove, a crawler is low).
 - Client: `WalkerClientTest` (skins, a herd, a head hit frame by frame, a shove, falling each way,
   down, getting up, a crawler, a kill and the corpse) and `CombatClientTest` (the bat to the body
-  and the head, punches, each swing in first person, the bat and hammer in third person).
+  and the head, punches, each swing in first person, the bat and hammer in third person), and
+  `AnimationClientTest`: every animation frame by frame, to check things line up (each swing and
+  punch in first person and from the front and back in third person, and a walker walking, biting,
+  hit, falling, down, getting up and crawling, side-on).
 
 ## Not yet
 Stomping, grabbing and shoving with a key, limbs coming off, blood on the ground, sounds for each

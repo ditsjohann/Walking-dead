@@ -29,9 +29,8 @@ import net.minecraft.world.item.ItemStack;
  */
 @Mixin(FirstPersonHandsAndItemsRenderer.class)
 abstract class FirstPersonHandsMixin {
-	@Invoker("renderPlayerArm")
-	abstract void outbreak$renderPlayerArm(PoseStack poseStack, SubmitNodeCollector collector, int light, float inverseArmHeight, float attack,
-		HumanoidArm arm, PlayerRenderState playerState);
+	@Invoker("renderPlayerHand")
+	abstract void outbreak$renderPlayerHand(PoseStack poseStack, SubmitNodeCollector collector, int light, HumanoidArm arm, PlayerRenderState playerState);
 
 	@Inject(method = "submitArmWithItem", at = @At("HEAD"))
 	private void outbreak$rememberItem(PlayerRenderState playerState, FirstPersonHandsAndItemsRenderState state, float partialTicks, float xRot,
@@ -64,7 +63,9 @@ abstract class FirstPersonHandsMixin {
 	private void outbreak$punchMain(FirstPersonHandsAndItemsRenderer renderer, PoseStack poseStack, SubmitNodeCollector collector, int light,
 		float inverseArmHeight, float attack, HumanoidArm arm, PlayerRenderState playerState, Operation<Void> original) {
 		if (attack > 0.0F && !Punches.isLeft()) {
-			SwingAnimations.punch(attack, poseStack, arm);
+			SwingAnimations.punchArm(attack, inverseArmHeight, poseStack, arm);
+			this.outbreak$renderPlayerHand(poseStack, collector, light, arm, playerState);
+			return;
 		}
 
 		original.call(renderer, poseStack, collector, light, inverseArmHeight, 0.0F, arm, playerState);
@@ -82,8 +83,8 @@ abstract class FirstPersonHandsMixin {
 
 		HumanoidArm off = avatar.mainArm.getOpposite();
 		poseStack.pushPose();
-		SwingAnimations.punch(avatar.swingAnimation, poseStack, off);
-		this.outbreak$renderPlayerArm(poseStack, collector, avatar.lightCoords, 0.0F, 0.0F, off, playerState);
+		SwingAnimations.punchArm(avatar.swingAnimation, 0.0F, poseStack, off);
+		this.outbreak$renderPlayerHand(poseStack, collector, avatar.lightCoords, off, playerState);
 		poseStack.popPose();
 	}
 }
