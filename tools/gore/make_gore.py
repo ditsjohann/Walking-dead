@@ -97,12 +97,15 @@ def puddle(rnd, mask, age):
     return img
 
 
+WALL_SHAPES = 4
+
+
 def wall_mask(rnd, size):
     """Blood thrown against a wall: a splash, and runs dripping down from it."""
     mask = Image.new("L", (SIZE, SIZE), 0)
     px = mask.load()
     lobes = []
-    cx, cy = rnd.uniform(11, 21), rnd.uniform(8, 13)
+    cx, cy = rnd.uniform(9, 23), rnd.uniform(5, 15)
     for _ in range(5 + size * 4):
         lobes.append((cx + rnd.uniform(-5, 5) * (1 + size * 0.6), cy + rnd.uniform(-3, 3), rnd.uniform(1.5, 3.5 + size)))
     for _ in range(8 + size * 6):
@@ -123,8 +126,8 @@ def wall_mask(rnd, size):
     return mask.filter(ImageFilter.GaussianBlur(0.5))
 
 
-def wall_model(size, age):
-    tex = f"outbreak:block/wall_blood_{size}_{age}"
+def wall_model(name):
+    tex = f"outbreak:block/{name}"
     return {
         "ambientocclusion": False,
         "textures": {"particle": "outbreak:block/blood_particle", "blood": tex},
@@ -173,14 +176,22 @@ def main():
                 variants[f"age={age},facing={facing},size={size}"] = {"model": f"outbreak:block/blood_{size}_{age}", "y": y}
     (ROOT / "blockstates/blood.json").write_text(json.dumps({"variants": variants}, indent="\t") + "\n")
     # Blood on walls: against the north side of the block, facing south (turned by the block state).
+    # A few shapes for each size, picked at random per block, so a wall doesn't look tiled.
+    for old in list(textures.glob("wall_blood_*.png")) + list(models.glob("wall_blood_*.json")):
+        old.unlink()
     variants = {}
     for size in range(2):
-        mask = wall_mask(random.Random(50 + size), size)
         for age in range(4):
-            puddle(random.Random(60 + size * 10 + age), mask, age).save(textures / f"wall_blood_{size}_{age}.png")
-            (models / f"wall_blood_{size}_{age}.json").write_text(json.dumps(wall_model(size, age), indent="\t") + "\n")
             for facing, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
-                variants[f"age={age},facing={facing},size={size}"] = {"model": f"outbreak:block/wall_blood_{size}_{age}", "y": y}
+                variants[f"age={age},facing={facing},size={size}"] = []
+        for shape in range(WALL_SHAPES):
+            mask = wall_mask(random.Random(50 + size + shape * 7), size)
+            for age in range(4):
+                name = f"wall_blood_{size}_{shape}_{age}"
+                puddle(random.Random(60 + size * 10 + age + shape * 100), mask, age).save(textures / f"{name}.png")
+                (models / f"{name}.json").write_text(json.dumps(wall_model(name), indent="\t") + "\n")
+                for facing, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
+                    variants[f"age={age},facing={facing},size={size}"].append({"model": f"outbreak:block/{name}", "y": y})
     (ROOT / "blockstates/wall_blood.json").write_text(json.dumps({"variants": variants}, indent="\t") + "\n")
     print("wrote the blood textures, models and blockstates (floor and walls)")
 

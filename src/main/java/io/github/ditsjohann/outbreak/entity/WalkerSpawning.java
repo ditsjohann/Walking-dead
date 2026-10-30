@@ -40,14 +40,15 @@ public final class WalkerSpawning {
 	private static final double SIGHT = 96.0;
 	/** Packs a survivor's surroundings can gain at once, and how fast that comes back (ticks per pack). */
 	private static final float BUDGET = 4.0F;
-	private static final float REFILL_TICKS = 80.0F;
+	private static final float REFILL_TICKS = 160.0F;
 	private static final int ROOF_HEIGHT = 4;
 	private static final double PACK_SPREAD = 16.0;
 
 	/** A survivor's spawn budget: how much is left and when it was last topped up. */
 	private static final class Budget {
-		float left = BUDGET;
-		long at;
+		/** A new arrival starts with one pack's worth: the rest comes in over the next minutes. */
+		float left = 1.0F;
+		long at = -1;
 		/** The last walker let through, so the rest of its pack can follow it (same tick, close by). */
 		long packTick = -1;
 		@Nullable BlockPos packPos;
@@ -98,7 +99,10 @@ public final class WalkerSpawning {
 			return false;
 		}
 
-		budget.left = Math.min(BUDGET, budget.left + (now - budget.at) / REFILL_TICKS);
+		if (budget.at >= 0) {
+			budget.left = Math.min(BUDGET, budget.left + (now - budget.at) / REFILL_TICKS);
+		}
+
 		budget.at = now;
 		if (!pack && budget.left < 1.0F || onRoof(level, pos) || seen(level, players, at)) {
 			return false;

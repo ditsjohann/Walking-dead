@@ -8,6 +8,7 @@ gamemode survival Bot
 clear Bot
 == a car with its key in the ignition, 12 L of fuel; a walker missing an arm, a crawler, on the move
 execute positioned 6 -57 0 rotated 0 0 run outbreak vehicle spawn hatchback new
+wait 1
 execute positioned 6 -57 0 run outbreak vehicle set fuel 12
 summon outbreak:walker 0 -57 8 {PersistenceRequired:1b,NoAI:1b,Tags:["keep"]}
 outbreak walker sever @e[tag=keep] left_arm

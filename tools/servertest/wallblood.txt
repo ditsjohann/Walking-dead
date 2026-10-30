@@ -31,3 +31,6 @@ wait 1
 data get entity @e[tag=w,limit=1] Health
 == wall blood in front of the wall (count)
 execute positioned 0 -57 0 run fill ~-3 ~ ~3 ~3 ~3 ~3 outbreak:wall_blood[size=1] replace outbreak:wall_blood
+== the walker dies
+kill @e[tag=w]
+wait 3

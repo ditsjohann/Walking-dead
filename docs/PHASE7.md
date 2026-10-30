@@ -71,7 +71,7 @@ Walkers spawn naturally (see [phase 1](PHASE1.md)), but now:
 - The loot lists are `containers/place_<kind>` tables, written from compact lists by
   `python3 tools/data/make_loot_tables.py`.
 - `WalkerSpawning` checks each natural spawn: distance, sight lines (two rays from every survivor's
-  eyes within 96 blocks), the survivor's budget (4 herds, one back every 4 seconds), roofs, and the
+  eyes within 96 blocks), the survivor's budget (one herd to start with, then one more every 8 seconds, at most 4 waiting), roofs, and the
   density.
 
 ## Tests

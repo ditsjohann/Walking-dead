@@ -97,7 +97,7 @@ player Bot attack once
 wait 0.3
 outbreak walker info @e[tag=down]
 execute positioned 0 -57 0 run outbreak walker corpses 8
-== ...and the corpse stays (2-3 minutes: expect 1 corpse after 2 seconds and still 1 after 6 more)
+== ...and the corpse stays (2-3 minutes, the earlier ones too: expect the same count after 2 seconds and after 6 more)
 wait 2
 execute positioned 0 -57 0 run outbreak walker corpses 8
 wait 6

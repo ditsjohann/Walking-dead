@@ -91,29 +91,36 @@ public class GoreClientTest implements FabricClientGameTest {
 			context.waitTicks(110);
 
 			// 6. Aim at its left arm and keep hacking: that arm comes off (and the wall behind it gets blood on it).
-			server.runCommand("execute as @p at @s run fill ~-3 ~ ~5 ~3 ~3 ~5 minecraft:white_concrete");
-			server.runCommand("execute as @p at @s run summon outbreak:walker ~ ~ ~3.2 {NoAI:1b,PersistenceRequired:1b,Rotation:[180f,0f],Tags:[\"arm\"],Health:400f}");
+			server.runCommand("execute as @p at @s run fill ~-3 ~ ~4 ~3 ~3 ~4 minecraft:white_concrete");
+			server.runCommand("execute as @p at @s run summon outbreak:walker ~ ~ ~2.4 {NoAI:1b,PersistenceRequired:1b,Rotation:[180f,0f],Tags:[\"arm\"]}");
 			server.runCommand("attribute @e[tag=arm,limit=1] minecraft:max_health base set 400");
 			server.runCommand("outbreak walker crawler @e[tag=arm] false");
 			server.runCommand("item replace entity @p weapon.mainhand with outbreak:machete");
 			context.waitTicks(10);
 			// The walker faces us: its left arm is on our right.
-			server.runCommand("execute as @p at @s anchored eyes run tp @s ~ ~ ~ facing ~0.4 ~-0.35 ~3.2");
 			for (int i = 0; i < 12; i++) {
-				context.getInput().pressKey(options -> options.keyAttack);
-				context.waitTicks(14);
+				// Back in reach (each hit knocks it back towards the wall).
+				server.runCommand("execute as @p at @s run tp @e[tag=arm] ~ ~ ~2.4 180 0");
+				// Eyes 1.62 up: aim a little below them, at its left arm.
+				server.runCommand("execute as @p at @s run tp @s ~ ~ ~ facing ~0.4 ~1.27 ~2.4");
+				context.waitTicks(2);
+				// A machete hit from us, along our aim (the same path as a swing).
+				server.runCommand("damage @e[tag=arm,limit=1] 4 minecraft:player_attack by @p");
+				context.waitTicks(12);
 				server.runCommand("outbreak walker stand @e[tag=arm]");
 			}
 
 			server.runCommand("execute as @p at @s run tp @s ~ ~ ~ 0 20");
 			context.waitTicks(20);
 			context.takeScreenshot("gore-7-aimed-arm");
+			// Out of the way (its corpse would hide the wall), then put down.
+			server.runCommand("execute as @p at @s run tp @e[tag=arm] ~ ~ ~-30");
 			server.runCommand("kill @e[tag=arm]");
 			server.runCommand("kill @e[type=outbreak:body_part]");
 			server.runCommand("execute as @p at @s run tp @s ~ ~ ~ 0 0");
 			context.waitTicks(40);
 			context.takeScreenshot("gore-7-wall");
-			server.runCommand("execute as @p at @s run fill ~-3 ~ ~5 ~3 ~3 ~5 minecraft:air");
+			server.runCommand("execute as @p at @s run fill ~-3 ~ ~4 ~3 ~3 ~4 minecraft:air");
 			context.waitTicks(10);
 
 			// 7. A machete to the body: the spray.

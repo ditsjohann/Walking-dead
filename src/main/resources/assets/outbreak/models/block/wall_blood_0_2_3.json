@@ -1,0 +1,32 @@
+{
+	"ambientocclusion": false,
+	"textures": {
+		"particle": "outbreak:block/blood_particle",
+		"blood": "outbreak:block/wall_blood_0_2_3"
+	},
+	"elements": [
+		{
+			"from": [
+				0,
+				0,
+				0.05
+			],
+			"to": [
+				16,
+				16,
+				0.15
+			],
+			"faces": {
+				"south": {
+					"uv": [
+						0,
+						0,
+						16,
+						16
+					],
+					"texture": "#blood"
+				}
+			}
+		}
+	]
+}
