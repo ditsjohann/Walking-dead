@@ -1,0 +1,132 @@
+{
+	"variants": {
+		"age=0,facing=south,size=0": {
+			"model": "outbreak:block/wall_blood_0_0",
+			"y": 0
+		},
+		"age=0,facing=west,size=0": {
+			"model": "outbreak:block/wall_blood_0_0",
+			"y": 90
+		},
+		"age=0,facing=north,size=0": {
+			"model": "outbreak:block/wall_blood_0_0",
+			"y": 180
+		},
+		"age=0,facing=east,size=0": {
+			"model": "outbreak:block/wall_blood_0_0",
+			"y": 270
+		},
+		"age=1,facing=south,size=0": {
+			"model": "outbreak:block/wall_blood_0_1",
+			"y": 0
+		},
+		"age=1,facing=west,size=0": {
+			"model": "outbreak:block/wall_blood_0_1",
+			"y": 90
+		},
+		"age=1,facing=north,size=0": {
+			"model": "outbreak:block/wall_blood_0_1",
+			"y": 180
+		},
+		"age=1,facing=east,size=0": {
+			"model": "outbreak:block/wall_blood_0_1",
+			"y": 270
+		},
+		"age=2,facing=south,size=0": {
+			"model": "outbreak:block/wall_blood_0_2",
+			"y": 0
+		},
+		"age=2,facing=west,size=0": {
+			"model": "outbreak:block/wall_blood_0_2",
+			"y": 90
+		},
+		"age=2,facing=north,size=0": {
+			"model": "outbreak:block/wall_blood_0_2",
+			"y": 180
+		},
+		"age=2,facing=east,size=0": {
+			"model": "outbreak:block/wall_blood_0_2",
+			"y": 270
+		},
+		"age=3,facing=south,size=0": {
+			"model": "outbreak:block/wall_blood_0_3",
+			"y": 0
+		},
+		"age=3,facing=west,size=0": {
+			"model": "outbreak:block/wall_blood_0_3",
+			"y": 90
+		},
+		"age=3,facing=north,size=0": {
+			"model": "outbreak:block/wall_blood_0_3",
+			"y": 180
+		},
+		"age=3,facing=east,size=0": {
+			"model": "outbreak:block/wall_blood_0_3",
+			"y": 270
+		},
+		"age=0,facing=south,size=1": {
+			"model": "outbreak:block/wall_blood_1_0",
+			"y": 0
+		},
+		"age=0,facing=west,size=1": {
+			"model": "outbreak:block/wall_blood_1_0",
+			"y": 90
+		},
+		"age=0,facing=north,size=1": {
+			"model": "outbreak:block/wall_blood_1_0",
+			"y": 180
+		},
+		"age=0,facing=east,size=1": {
+			"model": "outbreak:block/wall_blood_1_0",
+			"y": 270
+		},
+		"age=1,facing=south,size=1": {
+			"model": "outbreak:block/wall_blood_1_1",
+			"y": 0
+		},
+		"age=1,facing=west,size=1": {
+			"model": "outbreak:block/wall_blood_1_1",
+			"y": 90
+		},
+		"age=1,facing=north,size=1": {
+			"model": "outbreak:block/wall_blood_1_1",
+			"y": 180
+		},
+		"age=1,facing=east,size=1": {
+			"model": "outbreak:block/wall_blood_1_1",
+			"y": 270
+		},
+		"age=2,facing=south,size=1": {
+			"model": "outbreak:block/wall_blood_1_2",
+			"y": 0
+		},
+		"age=2,facing=west,size=1": {
+			"model": "outbreak:block/wall_blood_1_2",
+			"y": 90
+		},
+		"age=2,facing=north,size=1": {
+			"model": "outbreak:block/wall_blood_1_2",
+			"y": 180
+		},
+		"age=2,facing=east,size=1": {
+			"model": "outbreak:block/wall_blood_1_2",
+			"y": 270
+		},
+		"age=3,facing=south,size=1": {
+			"model": "outbreak:block/wall_blood_1_3",
+			"y": 0
+		},
+		"age=3,facing=west,size=1": {
+			"model": "outbreak:block/wall_blood_1_3",
+			"y": 90
+		},
+		"age=3,facing=north,size=1": {
+			"model": "outbreak:block/wall_blood_1_3",
+			"y": 180
+		},
+		"age=3,facing=east,size=1": {
+			"model": "outbreak:block/wall_blood_1_3",
+			"y": 270
+		}
+	}
+}

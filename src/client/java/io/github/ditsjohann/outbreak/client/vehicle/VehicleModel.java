@@ -41,6 +41,7 @@ public class VehicleModel extends EntityModel<VehicleRenderState> {
 	private final @Nullable ModelPart speedNeedle;
 	private final @Nullable ModelPart fuelNeedle;
 	private final @Nullable ModelPart key;
+	private final @Nullable ModelPart ignition;
 	private final @Nullable ModelPart crank;
 	/** From the root down to the part, for working out where it is. */
 	private final Map<String, List<ModelPart>> chains;
@@ -68,6 +69,7 @@ public class VehicleModel extends EntityModel<VehicleRenderState> {
 		this.speedNeedle = parts.get("needle_speed");
 		this.fuelNeedle = parts.get("needle_fuel");
 		this.key = parts.get("key");
+		this.ignition = parts.get("ignition");
 		this.crank = parts.get("crank");
 		JsonArray tints = json.getAsJsonArray("tints");
 		this.tints = new int[tints.size()];
@@ -96,8 +98,9 @@ public class VehicleModel extends EntityModel<VehicleRenderState> {
 			}
 		}
 
+		// A positive yaw in the model turns the front to the vehicle's right: steering left is negative.
 		for (ModelPart part : this.steering) {
-			part.yRot = state.steer;
+			part.yRot = -state.steer;
 		}
 
 		if (this.steeringWheel != null) {
@@ -119,6 +122,14 @@ public class VehicleModel extends EntityModel<VehicleRenderState> {
 		if (this.key != null) {
 			this.key.visible = state.keyInside;
 			this.key.zRot = state.running ? -1.1F : 0.0F;
+		}
+
+		if (this.ignition != null && state.ignitionFocus > 0.0F) {
+			// Looked at: the ignition (and the key in it) swells a little, pulsing, so you see what you'll click.
+			float scale = 1.3F * state.ignitionFocus;
+			this.ignition.xScale = scale;
+			this.ignition.yScale = scale;
+			this.ignition.zScale = scale;
 		}
 
 		if (this.glassOnly) {

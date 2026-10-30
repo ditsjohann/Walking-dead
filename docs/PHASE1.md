@@ -20,7 +20,9 @@
   follow it around. A hit on one walker alerts the walkers around it.
 - **Doors:** they bash doors down on every difficulty.
 - **Spawning:** walkers are the only monster that spawns naturally, by day and night, indoors and
-  outdoors, in any world. The density is vanilla's monster cap for now.
+  outdoors, in any world, but never in sight of a survivor or closer than 32 blocks, a herd at a time
+  (the area round you fills up over a couple of minutes instead of all at once), and never on
+  rooftops. See [phase 7](PHASE7.md) for where they're thickest.
 - **Model:** the vanilla zombie model is a stand-in until they get their own.
 
 ## Noise (radius in blocks)

@@ -25,7 +25,9 @@ public final class Barricades {
 	private static final int HITS_PER_PLANK = 6;
 	/** Walker hits needed to smash a window. */
 	private static final int HITS_PER_WINDOW = 3;
-	private static final Map<Long, Integer> HITS = new HashMap<>();
+	/** Blows a spot has taken (and when the last one came): forgotten after a while without any. */
+	private static final Map<Long, long[]> HITS = new HashMap<>();
+	private static final long FORGET_TICKS = 20 * 30;
 
 	private Barricades() {
 	}
@@ -49,7 +51,19 @@ public final class Barricades {
 		}
 
 		long key = pos.asLong();
-		int hits = HITS.merge(key, 1, Integer::sum);
+		long now = level.getGameTime();
+		if (HITS.size() > 256) {
+			HITS.values().removeIf(hit -> now - hit[1] > FORGET_TICKS);
+		}
+
+		long[] hit = HITS.computeIfAbsent(key, k -> new long[2]);
+		if (now - hit[1] > FORGET_TICKS) {
+			hit[0] = 0;
+		}
+
+		hit[0]++;
+		hit[1] = now;
+		int hits = (int) hit[0];
 		Vec3 center = Vec3.atCenterOf(pos);
 		if (state.is(OutbreakBlocks.BARRICADE)) {
 			level.playSound(null, pos, SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR, SoundSource.HOSTILE, 1.0F, 0.9F + level.getRandom().nextFloat() * 0.2F);

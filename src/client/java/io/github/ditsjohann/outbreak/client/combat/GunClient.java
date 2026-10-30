@@ -9,6 +9,7 @@ import io.github.ditsjohann.outbreak.combat.GunType;
 import io.github.ditsjohann.outbreak.combat.Guns;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import net.minecraft.client.Minecraft;
@@ -39,6 +40,13 @@ public final class GunClient {
 
 	public static void register() {
 		ClientTickEvents.START_CLIENT_TICK.register(GunClient::tick);
+		// Times are the world's game time: a new world starts its clock again.
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, minecraft) -> {
+			lastShot = -100;
+			readyAt = 0;
+			aim = 0.0F;
+			aimO = 0.0F;
+		});
 	}
 
 	public static GunType held(LocalPlayer player) {
@@ -116,7 +124,7 @@ public final class GunClient {
 		// Down the sights: the gun comes to the middle, its top just under your eye line.
 		poseStack.translate(-invert * 0.56F * a, 0.05F * a, 0.16F * a);
 		float since = minecraft.player.level().getGameTime() - lastShot + partialTicks;
-		if (since < KICK_TICKS) {
+		if (since >= 0.0F && since < KICK_TICKS) {
 			float kick = 1.0F - since / KICK_TICKS;
 			poseStack.translate(0.0F, 0.02F * kick, 0.14F * kick);
 			poseStack.rotateDegrees(Axis.XP, 9.0F * kick);

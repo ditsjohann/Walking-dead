@@ -76,13 +76,46 @@ public final class WalkerCommand {
 				walker.getX(), walker.getY(), walker.getZ())), false))));
 		var corpses = Commands.literal("corpses").then(Commands.argument("radius", IntegerArgumentType.integer(1, 128))
 			.executes(ctx -> corpses(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius"))));
+		var census = Commands.literal("census").then(Commands.argument("radius", IntegerArgumentType.integer(1, 512))
+			.executes(ctx -> census(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius"))));
 		dispatcher.register(Commands.literal("outbreak")
 			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-			.then(Commands.literal("walker").then(hit).then(knockdown).then(stand).then(sever).then(crawler).then(skin).then(info).then(corpses)));
+			.then(Commands.literal("walker").then(hit).then(knockdown).then(stand).then(sever).then(crawler).then(skin).then(info).then(corpses)
+				.then(census)));
 	}
 
 	private static RequiredArgumentBuilder<CommandSourceStack, ?> walkers() {
 		return Commands.argument("walkers", EntityArgument.entities());
+	}
+
+	/** How many walkers are about: by distance, how many lead a herd, how many are in the open. */
+	private static int census(CommandSourceStack source, int radius) {
+		AABB area = AABB.ofSize(source.getPosition(), radius * 2, 512, radius * 2);
+		int[] bands = new int[4];
+		int leaders = 0;
+		int outside = 0;
+		int total = 0;
+		for (Walker walker : source.getLevel().getEntitiesOfClass(Walker.class, area, Walker::isAlive)) {
+			double distance = Math.sqrt(walker.distanceToSqr(source.getPosition()));
+			if (distance > radius) {
+				continue;
+			}
+
+			total++;
+			bands[distance < 24 ? 0 : distance < 48 ? 1 : distance < 96 ? 2 : 3]++;
+			if (walker.getLeader() == null) {
+				leaders++;
+			}
+
+			if (walker.level().canSeeSky(walker.blockPosition())) {
+				outside++;
+			}
+		}
+
+		String text = String.format(java.util.Locale.ROOT, "%d walkers within %d blocks (<24: %d, 24-48: %d, 48-96: %d, 96+: %d), %d herds/loners, %d in the open",
+			total, radius, bands[0], bands[1], bands[2], bands[3], leaders, outside);
+		source.sendSuccess(() -> Component.literal(text), false);
+		return total;
 	}
 
 	private static int corpses(CommandSourceStack source, int radius) {

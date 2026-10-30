@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.loot;
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.block.StorageBlockEntity;
 import io.github.ditsjohann.outbreak.sandbox.Sandbox;
+import io.github.ditsjohann.outbreak.world.Places;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
@@ -38,8 +39,9 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Scavenging. The first time anyone opens a container that a player didn't place, it gets loot:
- * chests and barrels by the room they're in (judged from the blocks around them), our own containers
- * by what they are (a fridge has food). Loot never comes back.
+ * chests and barrels by the building they're in (on the Groningen map: see Places) or else the room
+ * (judged from the blocks around them), our own containers by what they are (a fridge has food).
+ * Loot never comes back.
  */
 public final class ContainerLoot {
 	/** Set on containers a player placed: those are never filled. */
@@ -97,9 +99,11 @@ public final class ContainerLoot {
 		boolean vanillaLoot = current != null && !current.identifier().getNamespace().equals(Outbreak.MOD_ID);
 		if (vanillaLoot || (current == null && container.isEmpty())) {
 			// Our own containers have their own loot (a fridge has food); chests and barrels go by the room.
+			// The building it's in (on the Groningen map) comes before the room: a cupboard in a pharmacy has medicine.
+			Places.Kind place = Places.at(pos);
 			ResourceKey<LootTable> table = blockEntity instanceof StorageBlockEntity storage
 				? ResourceKey.create(Registries.LOOT_TABLE, Outbreak.id("containers/" + storage.kind().id()))
-				: roomAt(level, pos).lootTable();
+				: place != null ? ResourceKey.create(Registries.LOOT_TABLE, Outbreak.id(place.lootTable())) : roomAt(level, pos).lootTable();
 			container.setLootTable(table, level.getRandom().nextLong());
 			container.unpackLootTable(player);
 			scale(level, pos, container, table, player, Sandbox.current().lootMultiplier() * lootLuck.applyAsDouble(player));

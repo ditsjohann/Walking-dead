@@ -1,0 +1,33 @@
+# Blood on the walls: hacking at a walker standing in front of a wall splashes it.
+== setup
+time set noon
+gamerule spawn_mobs false
+player Bot spawn at 0 -57 0 facing 0 0
+wait 3
+gamemode survival Bot
+execute positioned 0 -57 0 run fill ~-3 ~ ~4 ~3 ~3 ~4 minecraft:white_concrete
+summon outbreak:walker 0 -57 2.2 {NoAI:1b,PersistenceRequired:1b,Rotation:[180f,0f],Tags:["w"],Health:400f}
+attribute @e[tag=w,limit=1] minecraft:max_health base set 400
+item replace entity Bot weapon.mainhand with outbreak:machete
+wait 1
+player Bot look at 0 -55.8 2.2
+== eight hits
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+player Bot attack once
+wait 1
+data get entity @e[tag=w,limit=1] Health
+== wall blood in front of the wall (count)
+execute positioned 0 -57 0 run fill ~-3 ~ ~3 ~3 ~3 ~3 outbreak:wall_blood[size=1] replace outbreak:wall_blood

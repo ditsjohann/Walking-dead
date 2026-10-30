@@ -5,6 +5,7 @@ import java.util.Locale;
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.PaperStyle;
 import io.github.ditsjohann.outbreak.vehicle.Vehicle;
+import io.github.ditsjohann.outbreak.vehicle.VehicleItems;
 import io.github.ditsjohann.outbreak.vehicle.VehicleType;
 
 import net.minecraft.client.gui.Font;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * While you're in a vehicle: a note in the bottom right with your speed, the fuel gauge, the engine
@@ -25,6 +27,8 @@ public final class Dashboard {
 	private static final int HEIGHT = 44;
 	/** km/h per block per tick. */
 	private static final float KMH = 72.0F;
+
+	private static final ItemStack KEY = new ItemStack(VehicleItems.CAR_KEY);
 
 	private static float shownSpeed;
 
@@ -77,6 +81,10 @@ public final class Dashboard {
 		graphics.text(font, String.format(Locale.ROOT, "%.0f L", vehicle.fuel()), gx + 56, gy - 1, PaperStyle.INK, false);
 
 		Component engine = Component.translatable(vehicle.isRunning() ? "outbreak.dashboard.engine_on" : "outbreak.dashboard.engine_off");
+		if (vehicle.isKeyInside()) {
+			// The key's in the ignition.
+			graphics.item(KEY, gx + 82, gy - 5);
+		}
 		graphics.text(font, engine, left + 7, top + 30, vehicle.isRunning() ? PaperStyle.INK : PaperStyle.PENCIL, false);
 		float charge = vehicle.batteryCharge();
 		Component battery = charge < 0.0F ? Component.translatable("outbreak.dashboard.no_battery")

@@ -17,7 +17,8 @@ public final class Punches {
 	 * (ours, then the server's echo), so only count swings a few ticks apart.
 	 */
 	public static void next(long gameTime) {
-		if (gameTime - lastSwing >= 3) {
+		// (Or a new world, whose clock started again.)
+		if (gameTime - lastSwing >= 3 || gameTime < lastSwing) {
 			left = !left;
 		}
 

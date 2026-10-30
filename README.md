@@ -15,9 +15,10 @@ played on a real 1:1 copy of Groningen generated with
 - [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads; detailed cars with round wheels, a real cabin, hands on the wheel and a clickable ignition
 - [Phase 5](docs/PHASE5.md) — title screen, new survivor (scenarios, sandbox settings), professions, traits, skills
 - [Phase 6](docs/PHASE6.md) — the world winds down: water and power going off, the city going dark, fuel pumps, taps, NL-Alerts and the radio, the helicopter, flares, herds on the move, guts camouflage, guns
+- [Phase 7](docs/PHASE7.md) — Groningen's own data: every shop, pharmacy, hospital, police station... from OpenStreetMap, loot and walkers by building, walkers spawning out of sight and thickest in the centre
 - [Combat](docs/COMBAT.md) — walkers that react to every hit, 24 walker skins, crawlers, 3D weapons, swings and punches, gore (limbs coming off, blood and puddles)
 
-Status: phases 1-6 done (6: the world winding down), plus the combat overhaul, gore and the vehicle upgrade. Next: phase 7, Groningen's own data (building-aware loot and spawns from OpenStreetMap).
+Status: phases 1-7 done (7: Groningen's own data), plus the combat overhaul, gore and the vehicle upgrade. Next: the modpack release with the world.
 
 ## Development
 
@@ -39,6 +40,12 @@ python3 tools/servertest/driver.py . tools/servertest/ui.txt run/ui.log
 python3 tools/servertest/driver.py . tools/servertest/phase4.txt run/phase4.log
 python3 tools/servertest/driver.py . tools/servertest/combat.txt run/combat.log
 python3 tools/servertest/driver.py . tools/servertest/phase5.txt run/phase5.log
+python3 tools/servertest/driver.py . tools/servertest/phase6.txt run/phase6.log
+python3 tools/servertest/driver.py . tools/servertest/guns.txt run/guns.log
+python3 tools/servertest/driver.py . tools/servertest/spawning.txt run/spawning.log
+python3 tools/servertest/driver.py . tools/servertest/wallblood.txt run/wallblood.log
+python3 tools/servertest/driver.py . tools/servertest/persist_a.txt run/persist_a.log
+KEEP_WORLD=1 python3 tools/servertest/driver.py . tools/servertest/persist_b.txt run/persist_b.log
 ```
 
 Client test with screenshots (real game window; on a headless Linux box use a virtual display):
@@ -47,4 +54,4 @@ Client test with screenshots (real game window; on a headless Linux box use a vi
 SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest   # build/run/clientGameTest/screenshots/
 ```
 
-Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; vehicle models and textures by `python3 tools/vehicles/make_vehicles.py`; the walker model and skins by `python3 tools/walkers/make_walkers.py`; blood puddles by `python3 tools/gore/make_gore.py`; the phase 6 blocks, items and sounds by `python3 tools/world/make_world.py`; the 3D weapons by `python3 tools/weapons/make_weapons.py`; the title panorama, logo, widget skins and menu pages by `python3 tools/menu/make_menu.py`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).
+Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; vehicle models and textures by `python3 tools/vehicles/make_vehicles.py`; the walker model and skins by `python3 tools/walkers/make_walkers.py`; blood puddles by `python3 tools/gore/make_gore.py`; the phase 6 blocks, items and sounds by `python3 tools/world/make_world.py`; the 3D weapons by `python3 tools/weapons/make_weapons.py`; the title panorama, logo, widget skins and menu pages by `python3 tools/menu/make_menu.py`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`); the map of Groningen's buildings from OpenStreetMap by `python3 tools/data/make_places.py`.

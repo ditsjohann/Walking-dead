@@ -230,7 +230,7 @@ anywhere from TWD-heroic to PZ-brutal:
 | 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat. *Built, except the boat (later).* | Travel Groningen |
 | 5 ✅ | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
 | 6 ✅ | **World winds down:** day counter, power and water shutoff (gas pumps die), broadcasts, meta events, migrating herds, guns, guts camouflage | Full loop |
-| 7 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |
+| 7 | **Groningen data:** building-aware loot and spawns from OSM; walkers spawning out of sight and thickest in the centre; modpack release with the world. *Built, except the modpack release.* | Groningen feels real |
 | 8 | **People:** survivor NPCs, factions, community | The TWD heart |
 
 ## 13. Open questions

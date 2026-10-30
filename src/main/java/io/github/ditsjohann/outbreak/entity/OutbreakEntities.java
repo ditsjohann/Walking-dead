@@ -61,6 +61,7 @@ public final class OutbreakEntities {
 
 	public static void register() {
 		WalkerCommand.register();
+		WalkerSpawning.register();
 		FabricDefaultAttributeRegistry.register(WALKER, Walker.createAttributes());
 		SpawnPlacements.register(WALKER, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Walker::checkWalkerSpawnRules);
 	}

@@ -23,6 +23,8 @@ public class VehicleRenderState extends EntityRenderState {
 	public int color;
 	public boolean wreck;
 	public boolean keyInside;
+	/** You're looking at the ignition: it and the key stand out. */
+	public float ignitionFocus;
 	public boolean running;
 	public float speedFraction;
 	public float fuelFraction;

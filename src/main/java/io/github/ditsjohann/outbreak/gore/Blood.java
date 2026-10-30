@@ -11,7 +11,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 /**
  * Blood, server side: a spray of it flying off a hit (dark red chunks with real gravity, seen by
@@ -60,6 +64,41 @@ public final class Blood {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * Blood thrown against a wall: if there's one within reach blocks of from, the way dir goes
+	 * (level), it gets a splash on the face that was hit (bigger close up).
+	 */
+	public static void wall(ServerLevel level, Vec3 from, Vec3 dir, double reach) {
+		Vec3 flat = new Vec3(dir.x, 0.0, dir.z);
+		if (flat.lengthSqr() < 1.0E-6) {
+			return;
+		}
+
+		RandomSource random = level.getRandom();
+		Vec3 aim = flat.normalize().add(random.nextGaussian() * 0.45, (random.nextDouble() - 0.35) * 0.6, random.nextGaussian() * 0.45).normalize();
+		BlockHitResult hit = level.clip(new ClipContext(from, from.add(aim.scale(reach)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,
+			CollisionContext.empty()));
+		if (hit.getType() != HitResult.Type.BLOCK || !hit.getDirection().getAxis().isHorizontal()) {
+			return;
+		}
+
+		Direction face = hit.getDirection();
+		BlockPos wall = hit.getBlockPos();
+		BlockPos at = wall.relative(face);
+		BlockState there = level.getBlockState(at);
+		if (!(there.isAir() || WallBloodBlock.isWallBlood(there)) || !level.getBlockState(wall).isFaceSturdy(level, wall, face)) {
+			return;
+		}
+
+		int size = hit.getLocation().distanceTo(from) < reach * 0.5 ? 1 : 0;
+		if (WallBloodBlock.isWallBlood(there)) {
+			size = Math.max(size, there.getValue(WallBloodBlock.SIZE));
+		}
+
+		level.setBlock(at, OutbreakBlocks.WALL_BLOOD.defaultBlockState().setValue(WallBloodBlock.FACING, face).setValue(WallBloodBlock.SIZE, size),
+			Block.UPDATE_ALL);
 	}
 
 	/** A pool spreading out where a body lies: a big puddle in the middle, splatter round it. */

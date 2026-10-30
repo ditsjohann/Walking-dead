@@ -21,6 +21,7 @@ public class BodyPart extends Entity {
 	private static final EntityDataAccessor<Integer> DATA_LIMB = SynchedEntityData.defineId(BodyPart.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> DATA_SKIN = SynchedEntityData.defineId(BodyPart.class, EntityDataSerializers.INT);
 	private static final int LIFETIME = 20 * 60 * 5;
+	private static final double GRAVITY = 0.045;
 
 	private int age;
 	private boolean landed;
@@ -62,13 +63,19 @@ public class BodyPart extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
+		// Gravity goes into the velocity (not just this tick's move), so a flung piece arcs down.
 		Vec3 motion = this.getDeltaMovement();
 		if (!this.onGround()) {
-			motion = motion.add(0.0, -0.045, 0.0);
+			motion = motion.add(0.0, -GRAVITY, 0.0);
 		}
 
+		this.setDeltaMovement(motion);
 		this.move(MoverType.SELF, motion);
-		motion = this.getDeltaMovement();
+		if (this.verticalCollision && motion.y > 0.0) {
+			// Hit a ceiling.
+			motion = new Vec3(motion.x, 0.0, motion.z);
+		}
+
 		if (this.onGround()) {
 			motion = motion.multiply(0.55, 0.0, 0.55);
 			if (!this.landed && this.level() instanceof ServerLevel level) {

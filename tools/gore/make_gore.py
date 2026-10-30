@@ -2,7 +2,8 @@
 
 Run from the repo root:  python3 tools/gore/make_gore.py
 
-A puddle (outbreak:blood) is a thin layer lying on the ground, in three sizes (a few drops, a
+Blood on walls (outbreak:wall_blood) is a thin layer against a wall: a splash with runs dripping
+down, in two sizes and the same four ages. A puddle (outbreak:blood) is a thin layer lying on the ground, in three sizes (a few drops, a
 splatter, a pool) and four ages: fresh and glossy, wet, dark and clotting, dried brown. Each size has
 its own irregular shape (32x32 textures, soft edges, so it renders translucent); the block state
 turns it four ways so neighbouring puddles don't repeat.
@@ -96,6 +97,44 @@ def puddle(rnd, mask, age):
     return img
 
 
+def wall_mask(rnd, size):
+    """Blood thrown against a wall: a splash, and runs dripping down from it."""
+    mask = Image.new("L", (SIZE, SIZE), 0)
+    px = mask.load()
+    lobes = []
+    cx, cy = rnd.uniform(11, 21), rnd.uniform(8, 13)
+    for _ in range(5 + size * 4):
+        lobes.append((cx + rnd.uniform(-5, 5) * (1 + size * 0.6), cy + rnd.uniform(-3, 3), rnd.uniform(1.5, 3.5 + size)))
+    for _ in range(8 + size * 6):
+        a = rnd.uniform(0, 2 * math.pi)
+        d = rnd.uniform(6, 12 + size * 2)
+        lobes.append((cx + math.cos(a) * d, cy + math.sin(a) * d * 0.7, rnd.uniform(0.5, 1.2)))
+    runs = [(cx + rnd.uniform(-6, 6) * (1 + size * 0.5), cy + 1, rnd.uniform(8, 18 + size * 6), rnd.uniform(0.6, 1.1)) for _ in range(2 + size * 2)]
+    for y in range(SIZE):
+        for x in range(SIZE):
+            v = 0.0
+            for lx, ly, r in lobes:
+                v += max(0.0, 1.0 - math.hypot(x - lx, y - ly) / r) ** 1.5 * 1.6
+            for rx, ry, length, width in runs:
+                if ry <= y <= ry + length:
+                    t = (y - ry) / length
+                    v += max(0.0, 1.0 - abs(x - rx) / (width * (1.0 - t * 0.5))) * (1.2 if y < ry + length - 1 else 2.0)
+            px[x, y] = max(0, min(255, int(v * 255)))
+    return mask.filter(ImageFilter.GaussianBlur(0.5))
+
+
+def wall_model(size, age):
+    tex = f"outbreak:block/wall_blood_{size}_{age}"
+    return {
+        "ambientocclusion": False,
+        "textures": {"particle": "outbreak:block/blood_particle", "blood": tex},
+        "elements": [{
+            "from": [0, 0, 0.05], "to": [16, 16, 0.15],
+            "faces": {"south": {"uv": [0, 0, 16, 16], "texture": "#blood"}},
+        }],
+    }
+
+
 def model(size, age):
     tex = f"outbreak:block/blood_{size}_{age}"
     return {
@@ -133,7 +172,17 @@ def main():
             for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
                 variants[f"age={age},facing={facing},size={size}"] = {"model": f"outbreak:block/blood_{size}_{age}", "y": y}
     (ROOT / "blockstates/blood.json").write_text(json.dumps({"variants": variants}, indent="\t") + "\n")
-    print("wrote 12 blood textures, models and blockstates/blood.json")
+    # Blood on walls: against the north side of the block, facing south (turned by the block state).
+    variants = {}
+    for size in range(2):
+        mask = wall_mask(random.Random(50 + size), size)
+        for age in range(4):
+            puddle(random.Random(60 + size * 10 + age), mask, age).save(textures / f"wall_blood_{size}_{age}.png")
+            (models / f"wall_blood_{size}_{age}.json").write_text(json.dumps(wall_model(size, age), indent="\t") + "\n")
+            for facing, y in (("south", 0), ("west", 90), ("north", 180), ("east", 270)):
+                variants[f"age={age},facing={facing},size={size}"] = {"model": f"outbreak:block/wall_blood_{size}_{age}", "y": y}
+    (ROOT / "blockstates/wall_blood.json").write_text(json.dumps({"variants": variants}, indent="\t") + "\n")
+    print("wrote the blood textures, models and blockstates (floor and walls)")
 
 
 if __name__ == "__main__":

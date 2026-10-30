@@ -1,0 +1,12 @@
+# Saving and loading, part 2: everything from persist_a.txt still there after a restart.
+== after loading (keep the area loaded; give Bot time to log in)
+forceload add -16 -16 16 16
+player Bot spawn at 0 -57 0
+wait 10
+execute positioned 6 -57 0 run outbreak vehicle info
+outbreak walker info @e[tag=keep,limit=1]
+data get entity @e[tag=keep,limit=1] Pos
+data get entity Bot "fabric:attachments"
+data get entity Bot SelectedItem.components
+outbreak timeline
+execute if block 2 -56 -3 outbreak:dead_light run say the dead light is still dead

@@ -96,6 +96,126 @@ CONTAINERS = {
     ]),
 }
 
+# By building (phase 7, on the Groningen map: see Places.java): "place_<kind>".
+FOOD = [("minecraft:bread", 5, 1, 3), ("minecraft:apple", 4, 1, 3), ("minecraft:cookie", 3, 1, 4), ("minecraft:potato", 3, 1, 3)]
+PLACES = {
+    "military": ((2, 5), [
+        ("outbreak:rifle_rounds", 6, 3, 10), ("outbreak:ammo_9mm", 6, 5, 15), ("outbreak:hunting_rifle", 1, 1, 1, "worn", "rounds:2"),
+        ("outbreak:pistol", 2, 1, 1, "worn", "rounds:5"), ("outbreak:shotgun_shells", 3, 2, 8), ("outbreak:bandage", 5, 1, 3),
+        ("outbreak:disinfectant", 3, 1, 2), ("outbreak:hiking_bag", 2, 1, 1), ("outbreak:machete", 2, 1, 1, "worn"),
+        ("outbreak:portable_radio", 2, 1, 1, "worn"), ("outbreak:batteries", 3, 1, 3), ("outbreak:jerrycan", 2, 1, 1, "fuel:12"),
+        ("minecraft:cooked_beef", 3, 1, 3), ("empty", 6),
+    ]),
+    "hospital": ((2, 5), [
+        ("outbreak:bandage", 8, 1, 4), ("outbreak:disinfectant", 6, 1, 2), ("outbreak:rag", 5, 2, 5),
+        ("outbreak:boiled_water", 3, 1, 2), ("minecraft:glass_bottle", 3, 1, 3), ("minecraft:paper", 3, 1, 4),
+        ("minecraft:honey_bottle", 1, 1, 1), ("outbreak:kitchen_knife", 1, 1, 1, "worn"), ("empty", 8),
+    ]),
+    "clinic": ((1, 4), [
+        ("outbreak:bandage", 6, 1, 3), ("outbreak:disinfectant", 5, 1, 2), ("outbreak:rag", 4, 1, 4),
+        ("minecraft:paper", 4, 1, 4), ("minecraft:book", 1, 1, 1), ("empty", 10),
+    ]),
+    "pharmacy": ((2, 5), [
+        ("outbreak:disinfectant", 8, 1, 3), ("outbreak:bandage", 8, 1, 4), ("outbreak:rag", 3, 1, 3),
+        ("minecraft:honey_bottle", 2, 1, 2), ("outbreak:boiled_water", 2, 1, 2), ("outbreak:batteries", 2, 1, 2), ("empty", 6),
+    ]),
+    "police": ((2, 4), [
+        ("outbreak:ammo_9mm", 7, 4, 12), ("outbreak:pistol", 2, 1, 1, "worn", "rounds:8"), ("outbreak:baton", 4, 1, 1, "worn"),
+        ("outbreak:shotgun", 1, 1, 1, "worn", "rounds:3"), ("outbreak:shotgun_shells", 3, 2, 8), ("outbreak:bandage", 3, 1, 2),
+        ("outbreak:portable_radio", 3, 1, 1, "worn"), ("outbreak:batteries", 3, 1, 3), ("minecraft:paper", 3, 1, 4), ("empty", 8),
+    ]),
+    "fire_station": ((2, 4), [
+        ("outbreak:crowbar", 3, 1, 1, "worn"), ("minecraft:iron_axe", 3, 1, 1, "worn"), ("outbreak:bandage", 4, 1, 3),
+        ("outbreak:disinfectant", 2, 1, 1), ("outbreak:jerrycan", 2, 1, 1, "fuel:10"), ("outbreak:hose", 2, 1, 1),
+        ("outbreak:portable_radio", 2, 1, 1, "worn"), ("outbreak:hiking_bag", 1, 1, 1), ("empty", 8),
+    ]),
+    "fuel": ((2, 5), [
+        ("outbreak:jerrycan", 4, 1, 1), ("outbreak:jerrycan", 2, 1, 1, "fuel:15"), ("outbreak:car_battery", 2, 1, 1, "charge:0.9"),
+        ("outbreak:batteries", 3, 1, 3), ("minecraft:cookie", 5, 1, 6), ("minecraft:bread", 4, 1, 2),
+        ("minecraft:potion", 5, 1, 2, "water"), ("outbreak:hose", 2, 1, 1), ("outbreak:tire", 1, 1, 1), ("empty", 6),
+    ]),
+    "supermarket": ((3, 6), FOOD + [
+        ("minecraft:carrot", 4, 1, 4), ("minecraft:beetroot", 3, 1, 4), ("minecraft:melon_slice", 3, 1, 4),
+        ("minecraft:sugar", 3, 1, 3), ("minecraft:potion", 5, 1, 3, "water"), ("minecraft:cooked_chicken", 2, 1, 2),
+        ("minecraft:cooked_porkchop", 1, 1, 2), ("minecraft:baked_potato", 3, 1, 3), ("minecraft:milk_bucket", 1, 1, 1),
+        ("outbreak:batteries", 2, 1, 2), ("outbreak:rag", 2, 1, 3), ("minecraft:rotten_flesh", 3, 1, 3), ("empty", 6),
+    ]),
+    "grocery": ((2, 5), FOOD + [
+        ("minecraft:carrot", 3, 1, 3), ("minecraft:cake", 1, 1, 1), ("minecraft:pumpkin_pie", 2, 1, 2),
+        ("minecraft:potion", 3, 1, 2, "water"), ("minecraft:rotten_flesh", 3, 1, 3), ("empty", 6),
+    ]),
+    "hardware": ((2, 5), [
+        ("outbreak:hammer", 4, 1, 1), ("outbreak:nails", 8, 6, 20), ("outbreak:crowbar", 3, 1, 1), ("minecraft:iron_axe", 2, 1, 1),
+        ("outbreak:wrench", 3, 1, 1), ("outbreak:screwdriver", 3, 1, 1), ("minecraft:oak_planks", 5, 4, 12),
+        ("outbreak:jerrycan", 2, 1, 1), ("outbreak:batteries", 3, 1, 4), ("minecraft:iron_chain", 2, 1, 3),
+        ("outbreak:hose", 2, 1, 1), ("minecraft:torch", 3, 2, 6), ("empty", 5),
+    ]),
+    "bike_shop": ((2, 4), [
+        ("outbreak:bike_tire", 6, 1, 2), ("outbreak:bicycle", 1, 1, 1), ("outbreak:wrench", 3, 1, 1),
+        ("outbreak:screwdriver", 2, 1, 1), ("outbreak:batteries", 2, 1, 2), ("empty", 6),
+    ]),
+    "car_shop": ((2, 4), [
+        ("outbreak:tire", 5, 1, 1), ("outbreak:car_battery", 3, 1, 1, "charge:0.8"), ("outbreak:engine_parts", 5, 1, 3),
+        ("outbreak:jack", 3, 1, 1), ("outbreak:wrench", 3, 1, 1), ("outbreak:jerrycan", 3, 1, 1), ("outbreak:hose", 2, 1, 1),
+        ("empty", 5),
+    ]),
+    "clothes": ((1, 4), [
+        ("minecraft:white_wool", 4, 1, 3), ("minecraft:black_wool", 3, 1, 3), ("minecraft:leather", 4, 1, 3),
+        ("outbreak:rag", 6, 2, 5), ("outbreak:school_bag", 2, 1, 1), ("outbreak:hiking_bag", 2, 1, 1),
+        ("minecraft:leather_boots", 2, 1, 1), ("minecraft:leather_chestplate", 1, 1, 1), ("empty", 8),
+    ]),
+    "electronics": ((1, 4), [
+        ("outbreak:batteries", 7, 2, 6), ("outbreak:portable_radio", 4, 1, 1), ("minecraft:redstone", 3, 1, 4),
+        ("minecraft:copper_ingot", 2, 1, 2), ("empty", 8),
+    ]),
+    "books": ((1, 4), [
+        ("minecraft:book", 8, 1, 4), ("minecraft:paper", 6, 2, 8), ("minecraft:writable_book", 2, 1, 1),
+        ("minecraft:map", 2, 1, 1), ("minecraft:candle", 2, 1, 2), ("empty", 8),
+    ]),
+    "restaurant": ((2, 5), [
+        ("minecraft:bread", 4, 1, 3), ("minecraft:cooked_chicken", 3, 1, 3), ("minecraft:cooked_beef", 2, 1, 2),
+        ("minecraft:baked_potato", 4, 1, 4), ("minecraft:mushroom_stew", 2, 1, 1), ("minecraft:potion", 4, 1, 2, "water"),
+        ("outbreak:kitchen_knife", 4, 1, 1, "worn"), ("outbreak:machete", 1, 1, 1, "worn"), ("minecraft:bowl", 3, 1, 3),
+        ("minecraft:rotten_flesh", 3, 1, 3), ("empty", 6),
+    ]),
+    "bar": ((1, 4), [
+        ("minecraft:potion", 6, 1, 3, "water"), ("minecraft:honey_bottle", 2, 1, 2), ("minecraft:glass_bottle", 6, 1, 4),
+        ("minecraft:cookie", 3, 1, 4), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("empty", 8),
+    ]),
+    "school": ((1, 4), [
+        ("minecraft:paper", 6, 2, 8), ("minecraft:book", 5, 1, 3), ("outbreak:school_bag", 4, 1, 1), ("minecraft:apple", 3, 1, 2),
+        ("minecraft:cookie", 3, 1, 3), ("outbreak:bandage", 2, 1, 1), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("empty", 8),
+    ]),
+    "church": ((1, 3), [
+        ("minecraft:candle", 8, 1, 4), ("minecraft:book", 4, 1, 2), ("minecraft:paper", 3, 1, 3),
+        ("minecraft:bread", 2, 1, 2), ("outbreak:rag", 3, 1, 3), ("empty", 10),
+    ]),
+    "hotel": ((1, 4), [
+        ("minecraft:white_wool", 5, 1, 3), ("outbreak:rag", 4, 1, 3), ("minecraft:cookie", 3, 1, 3),
+        ("minecraft:potion", 3, 1, 2, "water"), ("outbreak:hiking_bag", 2, 1, 1), ("outbreak:school_bag", 2, 1, 1),
+        ("minecraft:paper", 3, 1, 3), ("empty", 10),
+    ]),
+    "gym": ((1, 4), [
+        ("minecraft:potion", 6, 1, 3, "water"), ("outbreak:baseball_bat", 4, 1, 1, "worn"), ("outbreak:rag", 4, 1, 3),
+        ("minecraft:apple", 3, 1, 2), ("outbreak:hiking_bag", 1, 1, 1), ("empty", 8),
+    ]),
+    "office": ((1, 4), [
+        ("minecraft:paper", 8, 2, 8), ("minecraft:book", 3, 1, 2), ("outbreak:batteries", 3, 1, 2), ("minecraft:cookie", 3, 1, 4),
+        ("minecraft:potion", 3, 1, 1, "water"), ("outbreak:screwdriver", 1, 1, 1, "worn"), ("outbreak:portable_radio", 1, 1, 1, "worn"),
+        ("empty", 10),
+    ]),
+    "industrial": ((2, 5), [
+        ("outbreak:nails", 6, 4, 16), ("minecraft:iron_ingot", 4, 1, 3), ("minecraft:iron_nugget", 4, 2, 8),
+        ("outbreak:hammer", 2, 1, 1, "worn"), ("outbreak:crowbar", 2, 1, 1, "worn"), ("outbreak:wrench", 3, 1, 1, "worn"),
+        ("outbreak:jerrycan", 2, 1, 1, "fuel:6"), ("outbreak:engine_parts", 2, 1, 2), ("outbreak:car_battery", 1, 1, 1, "charge:0.4"),
+        ("minecraft:oak_planks", 4, 2, 8), ("empty", 6),
+    ]),
+    "store": ((1, 4), [
+        ("minecraft:cookie", 4, 1, 4), ("minecraft:paper", 3, 1, 3), ("outbreak:batteries", 3, 1, 3), ("minecraft:candle", 3, 1, 2),
+        ("outbreak:rag", 3, 1, 3), ("outbreak:school_bag", 1, 1, 1), ("minecraft:potion", 2, 1, 1, "water"), ("empty", 10),
+    ]),
+}
+
 # What walkers have in their pockets.
 WALKER = [
     ("outbreak:rag", 15, 1, 2), ("minecraft:bread", 4, 1, 1), ("minecraft:potion", 3, 1, 1, "water"),
@@ -136,6 +256,9 @@ def write(path, table):
 def main():
     for name, ((lo, hi), entries) in CONTAINERS.items():
         write(OUT / "containers" / f"{name}.json", {"type": "minecraft:chest", "pools": [
+            {"rolls": {"type": "minecraft:uniform", "min": lo, "max": hi}, "entries": [entry(e) for e in entries]}]})
+    for name, ((lo, hi), entries) in PLACES.items():
+        write(OUT / "containers" / f"place_{name}.json", {"type": "minecraft:chest", "pools": [
             {"rolls": {"type": "minecraft:uniform", "min": lo, "max": hi}, "entries": [entry(e) for e in entries]}]})
     write(OUT / "entities" / "walker.json", {"type": "minecraft:entity", "pools": [
         {"rolls": 1, "entries": [entry(e) for e in WALKER]}]})

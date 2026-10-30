@@ -39,7 +39,8 @@ from your right sends the walker reeling to your left. The strength comes from t
   it survives (it usually doesn't).
 - **Crawlers** have their head at your knees: every hit on one counts as a head hit.
 - **Death:** a killed walker falls the way the killing blow pushed it, bounces once, and lies there
-  for 5 seconds, sinking into the ground in the last second. It no longer flashes red.
+  for two to three minutes (each body its own time), sinking into the ground in the last second. It
+  no longer flashes red.
 - The rules from [phase 1](PHASE1.md) still hold: only the head kills (×4 damage), body hits do half
   damage and never take a walker below 1 health.
 
@@ -76,27 +77,32 @@ from your right sends the walker reeling to your left. The strength comes from t
 
 ## Gore
 - **Blood flies off every hit:** dark red chunks with real weight, thrown the way the blow went,
-  more from the head. Hits splatter the ground under the walker.
-- **Limbs come off.** A sharp weapon (machete, axe, sword) to the body has a 22% chance to take
-  something: mostly an arm (just the forearm, or the whole arm at the shoulder), sometimes a leg (the
-  shin or the whole leg). The limb flies off in the walker's own skin, tumbles, lands with a splat and
-  lies there for five minutes (hit it and it skids away). What's left is a ragged stump of meat and
-  bone.
+  more from the head. Every hit splatters the ground under the walker and leaves drops further along
+  where the spray comes down; a badly hurt walker drips as it walks.
+- **Blood on the walls:** a walker hit in front of a wall splashes it (a splash with runs dripping
+  down, two sizes), mostly straight on from the blow. Wall blood dries like the puddles.
+- **Limbs come off where you hit.** A sharp weapon (machete, axe, sword) to the body takes off the
+  limb you were aiming at: 35% for an arm, 28% for a leg. Aim at the forearm or the shin and that
+  comes off; higher up, the whole arm at the shoulder or the leg at the hip, on the side you hit.
+  The limb flies off in the walker's own skin, tumbles, falls, lands with a splat and lies there for
+  five minutes (hit it and it skids away). What's left is a ragged stump of meat and bone.
 - **A walker without a leg is a crawler:** it goes down and drags itself after you, leaving a smear
   on the ground behind it. A walker with no forearms can't break doors or barricades any more.
-- **Heads:** a sharp blow to the head that kills has a 40% chance to take the head clean off. The
+- **Heads:** a sharp blow to the head that kills has a 45% chance to take the head clean off. The
   body pumps blood from the neck as it drops and lies in a bigger pool.
 - **Run over by a car:** 45% to lose a leg, sometimes both. **Explosions** can take any limb.
 - **Puddles:** wherever blood lands there's drops, a splatter or a pool, only on bare ground (never
   through blocks). They dry from glossy red to a brown stain and are gone after about twenty minutes,
-  sooner in the rain. A corpse leaves a pool spreading out from where it fell. A bleeding survivor
-  leaves drops too.
+  sooner in the rain. A corpse leaves a big pool spreading out from where it fell (bigger without
+  its head). A bleeding survivor leaves drops too.
 
 ![Limbs flying](screenshots/gore/1-flying.png)
 ![The pieces](screenshots/gore/3-pieces.png)
 ![Headless, in its pool](screenshots/gore/4-corpse.png)
 ![Puddles, fresh to dried](screenshots/gore/5-ages.png)
 ![A crawler's trail](screenshots/gore/6-trail.png)
+![Aimed at the arm](screenshots/gore/7-aimed-arm.png)
+![Blood on the wall](screenshots/gore/7-wall.png)
 ![A machete hit](screenshots/gore/7-spray.png)
 
 ## Admin and testing commands (operators only)
@@ -126,12 +132,14 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
 - **Gore:** the walker model has a stump and a cut end for every joint (`make_walkers.py`); a lost
   limb hides its part and shows the stump, and the severed piece is drawn from the same model, cut end
   showing. Blood puddles are a block (`outbreak:blood`, size × age × facing) made by
-  `python3 tools/gore/make_gore.py`; the flying blood is that block's break particles.
+  `python3 tools/gore/make_gore.py`, as is the wall blood (`outbreak:wall_blood`, facing × size ×
+  age, thrown with a ray from the wound); the flying blood is the puddle block's break particles.
 
 ## Tests
 - Server: `python3 tools/servertest/driver.py . tools/servertest/combat.txt run/combat.log`
   (body hits never kill, a bat floors a walker and it gets back up, a downed walker dies to one hit,
-  the corpse stays 5 seconds, fists shove, a crawler is low).
+  the corpse stays, fists shove, a crawler is low) and `wallblood.txt` (hacking at a walker in front
+  of a wall splashes it).
 - Client: `WalkerClientTest` (skins, a herd, a head hit frame by frame, a shove, falling each way,
   down, getting up, a crawler, a kill and the corpse) and `CombatClientTest` (the bat to the body
   and the head, punches, each swing in first person, the bat and hammer in third person), and
@@ -139,8 +147,8 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
   punch in first person and from the front and back in third person, and a walker walking, biting,
   hit, falling, down, getting up and crawling, side-on), and `GoreClientTest` (blood particles, five
   walkers each losing something, the pieces, a headless corpse in its pool, puddles drying, a
-  crawler's trail, a machete hit).
+  crawler's trail, an arm taken off by aiming at it, the wall behind it, a machete hit).
 
 ## Not yet
-Stomping, grabbing and shoving with a key, sounds for each weapon, blood on walls. (Guns came in
+Stomping, grabbing and shoving with a key, sounds for each weapon. (Guns came in
 phase 6: see [PHASE6.md](PHASE6.md).)

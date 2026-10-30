@@ -114,6 +114,7 @@ public class VehicleRenderer extends EntityRenderer<Vehicle, VehicleRenderState>
 		state.color = vehicle.color();
 		state.wreck = vehicle.isWreck();
 		state.keyInside = vehicle.isKeyInside();
+		state.ignitionFocus = Ignition.isLookingAt(vehicle) ? 1.0F + 0.12F * Mth.sin((vehicle.tickCount + partialTicks) * 0.4F) : 0.0F;
 		state.running = vehicle.isRunning();
 		state.speedFraction = moving * 72.0F / SPEEDO_KMH;
 		state.fuelFraction = type.hasEngine ? vehicle.fuel() / type.tankSize : 0.0F;
@@ -182,6 +183,11 @@ public class VehicleRenderer extends EntityRenderer<Vehicle, VehicleRenderState>
 		arms.rightSleeve.visible = state.driverSleeves;
 		arms.leftSleeve.visible = state.driverSleeves;
 		for (int side = -1; side <= 1; side += 2) {
+			if (side > 0 && state.ignitionFocus > 0.0F) {
+				// Reaching for the key: the right hand is off the wheel (and out of the way).
+				continue;
+			}
+
 			Vector3f grip = model.locate(state, side < 0 ? "grip_left" : "grip_right");
 			if (grip == null) {
 				return;

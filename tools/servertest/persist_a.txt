@@ -1,0 +1,31 @@
+# Saving and loading, part 1 (then persist_b.txt with KEEP_WORLD=1): set things up, then stop.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+clear Bot
+== a car with its key in the ignition, 12 L of fuel; a walker missing an arm, a crawler, on the move
+execute positioned 6 -57 0 rotated 0 0 run outbreak vehicle spawn hatchback new
+execute positioned 6 -57 0 run outbreak vehicle set fuel 12
+summon outbreak:walker 0 -57 8 {PersistenceRequired:1b,NoAI:1b,Tags:["keep"]}
+outbreak walker sever @e[tag=keep] left_arm
+outbreak walker sever @e[tag=keep] right_leg
+outbreak walker skin @e[tag=keep] 7
+== the power and the water go off; Bot smears guts on; a gun with 4 rounds
+outbreak timeline power off
+outbreak timeline water off
+item replace entity Bot weapon.mainhand with outbreak:walker_guts
+player Bot use continuous
+wait 3
+player Bot stop
+item replace entity Bot weapon.mainhand with outbreak:pistol[outbreak:rounds=4]
+setblock 2 -56 -3 minecraft:glowstone
+wait 2
+outbreak timeline darken 2
+== before saving
+execute positioned 6 -57 0 run outbreak vehicle info
+outbreak walker info @e[tag=keep,limit=1]
+data get entity Bot "fabric:attachments"
+outbreak timeline

@@ -58,7 +58,7 @@ FIXED = {
     "seat": (54, 52, 56), "rubber": (28, 28, 30), "chrome": (186, 188, 194), "metal": (112, 116, 122),
     "glass": (38, 52, 62), "headliner": (124, 120, 112), "leather": (40, 34, 32), "saddle": (78, 52, 34),
     "dirt": (96, 86, 70), "well": (14, 14, 15), "needle": (236, 84, 30), "key": (168, 170, 174),
-    "fob": (24, 24, 26), "mirror": (150, 168, 182), "exhaust": (70, 68, 66), "visor": (112, 108, 100),
+    "fob": (150, 26, 22), "mirror": (150, 168, 182), "exhaust": (70, 68, 66), "visor": (112, 108, 100),
 }
 
 # Dutch number plates: yellow, black letters, the blue EU band on the left.
@@ -222,10 +222,10 @@ def car(length, front_axle, rear_axle, windshield_base, roof_front, roof_rear, r
         # The ignition, right of the column; the key with its fob when it's in.
         Part("ignition", pivot=(driver_x + 2.4, dash_top - 4.4, dash_z - 0.1), boxes=[
             box(-0.55, -0.55, -0.3, 0.55, 0.55, 0.1, {"all": "chrome", "back": "ignition"})], children=[
-            Part("key", boxes=[box(-0.12, -0.32, -0.75, 0.12, 0.32, -0.3, "key"),
-                               box(-0.5, -0.45, -1.35, 0.5, 0.75, -0.75, {"all": "fob", "back": "fob_face"}),
-                               box(-0.08, -1.4, -1.1, 0.08, -0.45, -0.95, "key"),
-                               box(-0.45, -2.3, -1.2, 0.45, -1.4, -0.85, {"all": "fob", "back": "fob_face"})])]),
+            Part("key", boxes=[box(-0.15, -0.4, -0.8, 0.15, 0.4, -0.3, "key"),
+                               box(-0.75, -0.6, -1.5, 0.75, 1.0, -0.8, {"all": "key", "back": "key_head"}),
+                               box(-0.1, -1.6, -1.25, 0.1, -0.6, -1.05, "key"),
+                               box(-0.6, -2.9, -1.4, 0.6, -1.6, -0.9, {"all": "fob", "back": "fob_face"})])]),
     ]))
 
     # The steering wheel: tilted, top away from you, turning with the front wheels.
@@ -363,7 +363,8 @@ def bicycle():
             Part("crank_arm_l", boxes=[box(-1.4, -0.3, -2.5, -1.0, 0.3, 0.3, "metal"), box(-3.0, -0.35, -2.9, -1.4, 0.35, -1.9, "rubber")]),
         ]),
         Part("steer", pivot=(0, 0, 9), children=[
-            Part("fork", boxes=[box(-1, r, -0.5, 1, 17, 0.5, frame), box(-0.4, 15.2, 0.5, 0.4, 16.6, 1.6, {"all": "chrome", "front": "lamp"})]),
+            Part("fork", boxes=[box(-1, r, -0.5, 1, 11.5, 0.5, frame), box(-0.45, 11.5, -0.45, 0.45, 17.8, 0.45, "chrome"),
+                                box(-0.4, 15.2, 1.0, 0.4, 16.6, 2.1, {"all": "chrome", "front": "lamp"})]),
             Part("handlebar", boxes=[
                 box(-0.4, 17, -0.4, 0.4, 18.4, 0.4, "chrome"),
                 box(-5.5, 17.8, -0.3, 5.5, 18.4, 0.3, "chrome"),
@@ -776,9 +777,13 @@ class Painter:
             return (70, 40, 30, 150)                    # demister lines
         # A soft sheen, lighter towards the top.
         sheen = clamp(1 - p.v / max(p.h, 0.1), 0, 1)
-        if sheen > 0.7:
-            return mix(FIXED["glass"], (150, 170, 182), (sheen - 0.7) / 0.3)[:3] + (int(96 + 40 * (sheen - 0.7) / 0.3),)
-        return FIXED["glass"] + (96,)
+        if sheen > 0.65:
+            return mix(FIXED["glass"], (170, 190, 202), (sheen - 0.65) / 0.35)[:3] + (int(140 + 50 * (sheen - 0.65) / 0.35),)
+        # A glint across the pane, so it reads as glass (by position on the car, so both faces line up).
+        along = p.z if p.face in ("left", "right") else p.x
+        if 0.0 < (along * 1.2 + p.y) % 11 < 0.7:
+            return (190, 206, 216, 150)
+        return FIXED["glass"] + (135,)
 
     def m_mirror_glass(self, p):
         t = clamp(p.v / max(p.h, 0.1), 0, 1)
@@ -1036,11 +1041,18 @@ class Painter:
     def m_key(self, p):
         return tone(FIXED["key"], 1.0 + 0.15 * (p.v < 0.2) + p.n * 0.03)
 
+    def m_key_head(self, p):
+        # The key's bright head, with its hole.
+        d, _ = disc(p, p.w / 2, p.h * 0.3)
+        if d < 0.2:
+            return (30, 30, 34)
+        return tone(FIXED["key"], 1.25 - p.v / max(p.h, 0.1) * 0.25)
+
     def m_fob_face(self, p):
         d, _ = disc(p, p.w / 2, p.h * 0.45)
         if d < 0.22:
-            return (190, 40, 36)
-        return tone(FIXED["fob"], 1.2)
+            return (236, 236, 232)
+        return tone(FIXED["fob"], 1.15)
 
     def m_chainring(self, p):
         d, a = disc(p, p.w / 2, p.h / 2)

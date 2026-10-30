@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.gore.BloodBlock;
+import io.github.ditsjohann.outbreak.gore.WallBloodBlock;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -38,6 +39,16 @@ public final class OutbreakBlocks {
 		.strength(0.3F)
 		.sound(SoundType.GLASS));
 	public static final Block BLOOD = register("blood", BloodBlock::new, BlockBehaviour.Properties.of()
+		.mapColor(MapColor.COLOR_RED)
+		.noCollision()
+		.instabreak()
+		.sound(SoundType.HONEY_BLOCK)
+		.replaceable()
+		.noLootTable()
+		.noOcclusion()
+		.pushReaction(PushReaction.POPPED));
+	/** Blood thrown against a wall. */
+	public static final Block WALL_BLOOD = register("wall_blood", WallBloodBlock::new, BlockBehaviour.Properties.of()
 		.mapColor(MapColor.COLOR_RED)
 		.noCollision()
 		.instabreak()

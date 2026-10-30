@@ -126,7 +126,7 @@ final class OutbreakHud {
 	private static void extractItemName(GuiGraphicsExtractor graphics, Font font, LocalPlayer player, Inventory inventory, int hotbarTop) {
 		ItemStack stack = inventory.getSelectedItem();
 		long now = player.level().getGameTime();
-		if (inventory.getSelectedSlot() != lastSelectedSlot || !ItemStack.isSameItem(stack, lastSelectedStack)) {
+		if (inventory.getSelectedSlot() != lastSelectedSlot || !ItemStack.isSameItem(stack, lastSelectedStack) || now < itemNameShownAt) {
 			lastSelectedSlot = inventory.getSelectedSlot();
 			lastSelectedStack = stack.copy();
 			itemNameShownAt = now;

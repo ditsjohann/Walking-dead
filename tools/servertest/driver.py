@@ -4,14 +4,16 @@ Usage: python3 tools/servertest/driver.py <repo dir> <scenario.txt> <output.log>
 
 Scenario lines: a console command, `wait <seconds>`, `== label` (written into the log) or `# comment`.
 Uses Carpet's fake players (`player <name> spawn`) as test players. WARNING: deletes run/world and
-overwrites run/server.properties with a flat test world every time.
+overwrites run/server.properties with a flat test world every time (unless KEEP_WORLD=1 is set, to
+play a second scenario in the world the first one left: saving and loading).
 """
 import os, subprocess, sys, time, threading, glob, shutil
 
 repo, script, logpath = sys.argv[1], sys.argv[2], sys.argv[3]
 run = os.path.join(repo, "run")
 os.makedirs(run, exist_ok=True)
-shutil.rmtree(os.path.join(run, "world"), ignore_errors=True)
+if os.environ.get("KEEP_WORLD") != "1":
+    shutil.rmtree(os.path.join(run, "world"), ignore_errors=True)
 open(os.path.join(run, "eula.txt"), "w").write("eula=true\n")
 open(os.path.join(run, "server.properties"), "w").write(
     "online-mode=false\nview-distance=4\nsimulation-distance=4\ndifficulty=normal\nspawn-protection=0\n"

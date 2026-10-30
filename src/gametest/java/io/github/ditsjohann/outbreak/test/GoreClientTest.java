@@ -90,7 +90,33 @@ public class GoreClientTest implements FabricClientGameTest {
 			server.runCommand("kill @e[tag=drag]");
 			context.waitTicks(110);
 
-			// 6. A machete to the body: the spray.
+			// 6. Aim at its left arm and keep hacking: that arm comes off (and the wall behind it gets blood on it).
+			server.runCommand("execute as @p at @s run fill ~-3 ~ ~5 ~3 ~3 ~5 minecraft:white_concrete");
+			server.runCommand("execute as @p at @s run summon outbreak:walker ~ ~ ~3.2 {NoAI:1b,PersistenceRequired:1b,Rotation:[180f,0f],Tags:[\"arm\"],Health:400f}");
+			server.runCommand("attribute @e[tag=arm,limit=1] minecraft:max_health base set 400");
+			server.runCommand("outbreak walker crawler @e[tag=arm] false");
+			server.runCommand("item replace entity @p weapon.mainhand with outbreak:machete");
+			context.waitTicks(10);
+			// The walker faces us: its left arm is on our right.
+			server.runCommand("execute as @p at @s anchored eyes run tp @s ~ ~ ~ facing ~0.4 ~-0.35 ~3.2");
+			for (int i = 0; i < 12; i++) {
+				context.getInput().pressKey(options -> options.keyAttack);
+				context.waitTicks(14);
+				server.runCommand("outbreak walker stand @e[tag=arm]");
+			}
+
+			server.runCommand("execute as @p at @s run tp @s ~ ~ ~ 0 20");
+			context.waitTicks(20);
+			context.takeScreenshot("gore-7-aimed-arm");
+			server.runCommand("kill @e[tag=arm]");
+			server.runCommand("kill @e[type=outbreak:body_part]");
+			server.runCommand("execute as @p at @s run tp @s ~ ~ ~ 0 0");
+			context.waitTicks(40);
+			context.takeScreenshot("gore-7-wall");
+			server.runCommand("execute as @p at @s run fill ~-3 ~ ~5 ~3 ~3 ~5 minecraft:air");
+			context.waitTicks(10);
+
+			// 7. A machete to the body: the spray.
 			server.runCommand("execute as @p at @s run tp @s ~ ~ ~ 0 10");
 			server.runCommand("item replace entity @p weapon.mainhand with outbreak:machete");
 			server.runCommand("execute as @p at @s run summon outbreak:walker ~ ~ ~2.2 {PersistenceRequired:1b,Rotation:[180f,0f],Tags:[\"hit\"]}");
@@ -99,7 +125,7 @@ public class GoreClientTest implements FabricClientGameTest {
 			context.waitTicks(20);
 			context.getInput().pressKey(options -> options.keyAttack);
 			context.waitTicks(2);
-			context.takeScreenshot("gore-7-spray");
+			context.takeScreenshot("gore-8-spray");
 			context.waitTicks(30);
 		}
 	}

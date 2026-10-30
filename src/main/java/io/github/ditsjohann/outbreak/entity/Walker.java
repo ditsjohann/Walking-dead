@@ -21,6 +21,7 @@ import io.github.ditsjohann.outbreak.sandbox.SandboxSettings;
 import io.github.ditsjohann.outbreak.survivor.OutbreakDamageTypes;
 import io.github.ditsjohann.outbreak.vehicle.Vehicle;
 import io.github.ditsjohann.outbreak.world.Camouflage;
+import io.github.ditsjohann.outbreak.world.Places;
 
 import org.jspecify.annotations.Nullable;
 
@@ -87,6 +88,15 @@ public class Walker extends Zombie {
 	/** A crawler's hitbox: as wide as a standing walker (so changing to it never pushes anything up), but low. */
 	private static final EntityDimensions CRAWLING = EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.4F);
 	private static final float HEADSHOT_MULTIPLIER = 4.0F;
+	/** Skins cycle through the outfits (tools/walkers/make_walkers.py): which outfit is which. */
+	private static final int OUTFITS = 16;
+	private static final int OUTFIT_POLICE = 3;
+	private static final int OUTFIT_NURSE = 4;
+	private static final int OUTFIT_DOCTOR = 5;
+	private static final int OUTFIT_CONSTRUCTION = 6;
+	private static final int OUTFIT_STUDENT = 7;
+	private static final int OUTFIT_SOLDIER = 11;
+	private static final int OUTFIT_CHEF = 15;
 	/** Chance a walker killed with a blade leaves its guts behind. */
 	private static final float GUTS_CHANCE = 0.4F;
 	private static final float BODY_MULTIPLIER = 0.5F;
@@ -98,8 +108,9 @@ public class Walker extends Zombie {
 	/** How many skins there are (tools/walkers/make_walkers.py). */
 	public static final int SKINS = 24;
 	public static final float CRAWLER_CHANCE = 0.08F;
-	/** A corpse lies there this long before it's gone. */
-	public static final int CORPSE_TICKS = 20 * 5;
+	/** A corpse lies where it fell for two to three minutes, then it's gone. */
+	public static final int CORPSE_TICKS = 20 * 120;
+	private static final int CORPSE_EXTRA_TICKS = 20 * 60;
 	public static final int FALL_TICKS = 10;
 	public static final int GET_UP_TICKS = 24;
 
@@ -188,7 +199,12 @@ public class Walker extends Zombie {
 			return false;
 		}
 
-		return level.getDifficulty() != Difficulty.PEACEFUL && Mob.checkMobSpawnRules(type, level, reason, pos, random);
+		if (level.getDifficulty() == Difficulty.PEACEFUL || !Mob.checkMobSpawnRules(type, level, reason, pos, random)) {
+			return false;
+		}
+
+		// Natural spawns: out of sight, a few at a time, not on roofs, thicker where it matters.
+		return reason != EntitySpawnReason.NATURAL || !(level instanceof ServerLevel server) || WalkerSpawning.allow(server, pos, random);
 	}
 
 	@Override
@@ -323,7 +339,7 @@ public class Walker extends Zombie {
 		this.hitSequence++;
 		this.entityData.set(DATA_HIT, Hit.pack(this.hitSequence, yaw, Math.round(strength * 8.0F), head));
 		ItemStack weapon = attacker instanceof LivingEntity living && direct == attacker ? living.getMainHandItem() : ItemStack.EMPTY;
-		this.bleed(level, yaw, strength, head, runOver, WeaponStyle.isSharp(weapon));
+		this.bleed(level, yaw, strength, head, runOver, WeaponStyle.isSharp(weapon), runOver ? null : this.hitPoint(direct), away);
 		if (this.isDeadOrDying()) {
 			this.entityData.set(DATA_FALL_YAW, yaw);
 			return;
@@ -369,15 +385,30 @@ public class Walker extends Zombie {
 		return !(this.hasLost(Limb.RIGHT_FOREARM) && this.hasLost(Limb.LEFT_FOREARM));
 	}
 
-	/** What a hit does besides hurt: blood flying the way of the blow, on the ground, and with a blade or a car, limbs coming off. */
-	private void bleed(ServerLevel level, float yaw, float strength, boolean head, boolean runOver, boolean sharp) {
+	/**
+	 * A hit draws blood: a spray the way the blow went, splatter on the ground under and behind it (lots:
+	 * a head hit more), and drops where the spray comes down. A sharp blade can take off the limb it
+	 * hit (see {@link #limbAt}); under a car, legs. Walls behind it get splashed, mostly straight on
+	 * from the blow ({@code blow}: from the attacker through the walker), sometimes the way the swing went.
+	 */
+	private void bleed(ServerLevel level, float yaw, float strength, boolean head, boolean runOver, boolean sharp, @Nullable Vec3 hit, Vec3 blow) {
 		Vec3 fling = new Vec3(-Mth.sin(yaw * Mth.DEG_TO_RAD), 0.35, Mth.cos(yaw * Mth.DEG_TO_RAD));
-		Vec3 wound = head ? this.getEyePosition() : this.position().add(0.0, this.getBbHeight() * 0.55, 0.0);
-		Blood.spray(level, wound, fling, head ? 12 : 7, 0.2F + 0.2F * strength);
-		if (this.random.nextFloat() < (head ? 0.6F : 0.3F)) {
-			Blood.splat(level, this.position().add(fling.x * (0.6 + strength), 0.0, fling.z * (0.6 + strength)), 0);
+		Vec3 wound = hit != null ? hit : head ? this.getEyePosition() : this.position().add(0.0, this.getBbHeight() * 0.55, 0.0);
+		Blood.spray(level, wound, fling, head ? 16 : 10, 0.2F + 0.2F * strength);
+		// Splatter right under the wound, and where the spray lands behind it.
+		Blood.splat(level, this.position(), this.random.nextFloat() < (head ? 0.5F : 0.25F) ? 1 : 0);
+		int drops = (head ? 3 : 2) + this.random.nextInt(2) + (sharp ? 1 : 0);
+		for (int i = 0; i < drops; i++) {
+			double reach = 0.6 + this.random.nextDouble() * (1.0 + strength * 1.5);
+			double spread = (this.random.nextDouble() - 0.5) * 1.2;
+			Vec3 at = this.position().add(fling.x * reach - fling.z * spread, 0.0, fling.z * reach + fling.x * spread);
+			Blood.splat(level, at, this.random.nextFloat() < 0.2F ? 1 : 0);
 		}
 
+		Blood.wall(level, wound, fling, head ? 3.5 : 3.0);
+		for (int i = 0; i < (head ? 3 : 2); i++) {
+			Blood.wall(level, wound, blow, head ? 3.5 : 3.0);
+		}
 		if (runOver) {
 			// Under the wheels: legs crushed off, sometimes both.
 			if (this.random.nextFloat() < 0.45F) {
@@ -387,6 +418,7 @@ public class Walker extends Zombie {
 				}
 			}
 
+			Blood.pool(level, this.position(), 3);
 			return;
 		}
 
@@ -396,20 +428,80 @@ public class Walker extends Zombie {
 
 		if (head) {
 			// A blade through the neck of one that's already finished: the head comes off.
-			if (this.isDeadOrDying() && this.random.nextFloat() < 0.4F) {
+			if (this.isDeadOrDying() && this.random.nextFloat() < 0.45F) {
 				this.sever(level, Limb.HEAD, fling);
 			}
 
 			return;
 		}
 
-		if (this.random.nextFloat() < 0.22F) {
-			boolean right = this.random.nextBoolean();
-			Limb limb = this.random.nextFloat() < 0.75F
-				? (this.random.nextFloat() < 0.6F ? (right ? Limb.RIGHT_FOREARM : Limb.LEFT_FOREARM) : (right ? Limb.RIGHT_ARM : Limb.LEFT_ARM))
-				: (this.random.nextFloat() < 0.6F ? (right ? Limb.RIGHT_SHIN : Limb.LEFT_SHIN) : (right ? Limb.RIGHT_LEG : Limb.LEFT_LEG));
+		Limb limb = this.limbAt(hit);
+		if (limb != null && this.random.nextFloat() < (limb.isArm() ? 0.35F : 0.28F)) {
 			this.sever(level, limb, fling);
 		}
+	}
+
+	/**
+	 * Where on the body a blow landed: where the attacker's line of sight meets the walker (or the
+	 * projectile's path), or null if it can't be worked out.
+	 */
+	private @Nullable Vec3 hitPoint(Entity direct) {
+		Vec3 from;
+		Vec3 to;
+		if (direct instanceof LivingEntity attacker) {
+			from = attacker.getEyePosition();
+			to = from.add(attacker.getViewVector(1.0F).scale(8.0));
+		} else {
+			from = direct.position();
+			to = from.add(direct.getDeltaMovement().scale(4.0));
+		}
+
+		return this.getBoundingBox().inflate(0.15).clip(from, to).orElse(null);
+	}
+
+	/**
+	 * The limb at a point on the body (standing): below the knee a shin, the hips to the knee a leg,
+	 * an arm from the shoulder (its forearm below the elbow), by which side of the body it's on. A
+	 * limb already gone leaves what's above it (the arm, once the forearm is off).
+	 */
+	private @Nullable Limb limbAt(@Nullable Vec3 hit) {
+		if (hit == null || this.isCrawler() || this.posture() != Posture.STANDING) {
+			// Lying or crawling: whatever's nearest the blade.
+			return this.random.nextFloat() < 0.6F ? (this.random.nextBoolean() ? Limb.RIGHT_FOREARM : Limb.LEFT_FOREARM) : this.randomLeg();
+		}
+
+		float yaw = this.yBodyRot * Mth.DEG_TO_RAD;
+		Vec3 left = new Vec3(Mth.cos(yaw), 0.0, Mth.sin(yaw));
+		Vec3 local = hit.subtract(this.position());
+		double side = local.dot(left);
+		double up = local.y;
+		// Right in the middle of the chest: the nearer arm (the attacker's side), at random.
+		boolean onLeft = Math.abs(side) > 0.08 ? side > 0.0 : this.random.nextBoolean();
+		Limb limb;
+		if (up < 0.4) {
+			limb = onLeft ? Limb.LEFT_SHIN : Limb.RIGHT_SHIN;
+		} else if (up < 0.78) {
+			limb = onLeft ? Limb.LEFT_LEG : Limb.RIGHT_LEG;
+		} else if (up < 1.1) {
+			limb = onLeft ? Limb.LEFT_FOREARM : Limb.RIGHT_FOREARM;
+		} else if (up < 1.52) {
+			limb = onLeft ? Limb.LEFT_ARM : Limb.RIGHT_ARM;
+		} else {
+			return null;
+		}
+
+		// The forearm is gone already: the rest of that arm (and the same for a shin).
+		if (this.hasLost(limb)) {
+			for (Limb whole : Limb.values()) {
+				if (whole.lower == limb) {
+					return this.hasLost(whole) ? null : whole;
+				}
+			}
+
+			return null;
+		}
+
+		return limb;
 	}
 
 	private Limb randomLeg() {
@@ -474,12 +566,14 @@ public class Walker extends Zombie {
 
 	/** Crawlers smear a trail behind them, and stumps drip. */
 	private void trail(ServerLevel level) {
-		if (!this.isCrawler() && this.lostLimbs() == 0) {
+		// Crawlers, stumps and the badly hurt leave blood behind them.
+		boolean hurt = this.getHealth() < this.getMaxHealth() * 0.6F;
+		if (!this.isCrawler() && this.lostLimbs() == 0 && !hurt) {
 			return;
 		}
 
 		this.trailDistance += (float) Math.hypot(this.getX() - this.xo, this.getZ() - this.zo);
-		if (this.trailDistance > (this.isCrawler() ? 1.1F : 2.5F)) {
+		if (this.trailDistance > (this.isCrawler() ? 1.1F : this.lostLimbs() != 0 ? 2.5F : 3.5F)) {
 			this.trailDistance = 0.0F;
 			if (this.random.nextFloat() < 0.6F) {
 				Blood.splat(level, this.position(), 0);
@@ -648,6 +742,11 @@ public class Walker extends Zombie {
 		}
 	}
 
+	/** How long this corpse lies there (the same on the server and every client: it goes by its UUID). */
+	public int corpseTicks() {
+		return CORPSE_TICKS + Math.floorMod(this.getUUID().hashCode(), CORPSE_EXTRA_TICKS);
+	}
+
 	/** Corpses stay a while instead of vanishing in a puff. */
 	@Override
 	protected void tickDeath() {
@@ -656,14 +755,14 @@ public class Walker extends Zombie {
 			if (this.deathTime == 14) {
 				// The pool spreads out from where the body came down.
 				float yaw = this.entityData.get(DATA_FALL_YAW) * Mth.DEG_TO_RAD;
-				Blood.pool(level, this.position().add(-Mth.sin(yaw) * 0.8, 0.0, Mth.cos(yaw) * 0.8), this.hasLost(Limb.HEAD) ? 4 : 2);
+				Blood.pool(level, this.position().add(-Mth.sin(yaw) * 0.8, 0.0, Mth.cos(yaw) * 0.8), this.hasLost(Limb.HEAD) ? 6 : 4);
 			} else if (this.hasLost(Limb.HEAD) && this.deathTime < 12 && this.deathTime % 3 == 0) {
 				// Pumping out of the neck as it goes down.
 				Blood.spray(level, this.getEyePosition().subtract(0.0, 0.3, 0.0), new Vec3(0.0, 1.0, 0.0), 3, 0.15F);
 			}
 		}
 
-		if (this.deathTime >= CORPSE_TICKS && !this.level().isClientSide() && !this.isRemoved()) {
+		if (this.deathTime >= this.corpseTicks() && !this.level().isClientSide() && !this.isRemoved()) {
 			this.level().broadcastEntityEvent(this, (byte) 60);
 			this.remove(RemovalReason.KILLED);
 		}
@@ -788,6 +887,13 @@ public class Walker extends Zombie {
 			this.setCrawler(true);
 		}
 
+		// Dressed for where they were when it happened: scrubs in the hospital, uniforms at the police station.
+		Places.Kind place = Places.at(this.blockPosition());
+		if ((spawnReason == EntitySpawnReason.NATURAL || spawnReason == EntitySpawnReason.CHUNK_GENERATION)
+			&& place != null && place.skins.length > 0 && this.random.nextFloat() < 0.65F) {
+			this.setSkin(place.skins[this.random.nextInt(place.skins.length)]);
+		}
+
 		if (herd.leader == null) {
 			herd.leader = this;
 			if (spawnReason != EntitySpawnReason.NATURAL && spawnReason != EntitySpawnReason.CHUNK_GENERATION) {
@@ -798,6 +904,47 @@ public class Walker extends Zombie {
 		}
 
 		return herd;
+	}
+
+	/** What they had on them, by what they were: a police officer's ammunition, a nurse's bandages. */
+	@Override
+	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
+		super.dropCustomDeathLoot(level, source, killedByPlayer);
+		switch (Math.floorMod(this.skin(), OUTFITS)) {
+			case OUTFIT_POLICE -> {
+				this.maybeDrop(level, OutbreakItems.AMMO_9MM, 0.3F, 2, 8);
+				this.maybeDrop(level, OutbreakItems.BATON, 0.06F, 1, 1);
+				if (this.random.nextFloat() < 0.02F) {
+					ItemStack pistol = new ItemStack(OutbreakItems.PISTOL);
+					GunItem.setRounds(pistol, this.random.nextInt(8));
+					pistol.setDamageValue(this.random.nextInt(pistol.getMaxDamage() / 2));
+					this.spawnAtLocation(level, pistol);
+				}
+			}
+			case OUTFIT_SOLDIER -> {
+				this.maybeDrop(level, OutbreakItems.RIFLE_ROUNDS, 0.3F, 2, 6);
+				this.maybeDrop(level, OutbreakItems.AMMO_9MM, 0.15F, 3, 10);
+				this.maybeDrop(level, OutbreakItems.BANDAGE, 0.2F, 1, 2);
+			}
+			case OUTFIT_NURSE, OUTFIT_DOCTOR -> {
+				this.maybeDrop(level, OutbreakItems.BANDAGE, 0.35F, 1, 2);
+				this.maybeDrop(level, OutbreakItems.DISINFECTANT, 0.15F, 1, 1);
+			}
+			case OUTFIT_CONSTRUCTION -> {
+				this.maybeDrop(level, OutbreakItems.NAILS, 0.3F, 2, 6);
+				this.maybeDrop(level, OutbreakItems.HAMMER, 0.04F, 1, 1);
+			}
+			case OUTFIT_CHEF -> this.maybeDrop(level, OutbreakItems.KITCHEN_KNIFE, 0.1F, 1, 1);
+			case OUTFIT_STUDENT -> this.maybeDrop(level, OutbreakItems.SCHOOL_BAG, 0.05F, 1, 1);
+			default -> {
+			}
+		}
+	}
+
+	private void maybeDrop(ServerLevel level, net.minecraft.world.item.Item item, float chance, int min, int max) {
+		if (this.random.nextFloat() < chance) {
+			this.spawnAtLocation(level, new ItemStack(item, min + this.random.nextInt(max - min + 1)));
+		}
 	}
 
 	@Override

@@ -82,6 +82,11 @@ public final class Ignition {
 		return looking != null;
 	}
 
+	/** Whether you're looking at this vehicle's ignition. */
+	public static boolean isLookingAt(Vehicle vehicle) {
+		return looking == vehicle;
+	}
+
 	/** The note under the crosshair. */
 	public static void extract(GuiGraphicsExtractor graphics, Font font, LocalPlayer player) {
 		Vehicle vehicle = looking;

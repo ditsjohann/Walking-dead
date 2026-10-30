@@ -441,5 +441,6 @@
 	"subtitles.outbreak.rifle_shot": "Rifle shot",
 	"subtitles.outbreak.gun_dry": "Gun clicks",
 	"subtitles.outbreak.gun_reload": "Gun reloaded",
-	"subtitles.outbreak.shotgun_pump": "Shotgun pumped"
+	"subtitles.outbreak.shotgun_pump": "Shotgun pumped",
+	"block.outbreak.wall_blood": "Blood"
 }

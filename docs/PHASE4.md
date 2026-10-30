@@ -26,8 +26,11 @@ before they'll drive.
 - **Round wheels:** twelve-sided tires with tread, a tire wall with lettering, five-spoke alloys with
   the brake disc and caliper showing through, set in dark wheel wells. Bikes have spoked wheels;
   the moped has steel rims.
-- **Tinted glass** you can see through (and see who's inside).
-- **The bicycle** is a Dutch city bike: swept-back handlebars, a bell, mudguards, a chain guard, a
+- **Tinted glass** you can see through (and see who's inside), with a sheen along the top and a
+  glint that moves as you walk round the car, so you can tell where the windows are (and which are
+  broken).
+- **The bicycle** is a Dutch city bike: a head tube and fork from the frame down to the front wheel,
+  swept-back handlebars on a chrome stem that turn the way you steer, a bell, mudguards, a chain guard, a
   rack, a front lamp and rear reflector, a sprung saddle, and pedals that go round as you ride. **The
   moped** has a round headlight, a speedometer and its ignition on the headset, mirrors and a blue
   moped plate.
@@ -55,7 +58,9 @@ Look at the ignition (right of the steering column; on a moped, on the headset) 
 what a click does:
 - **Right-click** turns the key: starts the engine, or switches it off. If the key isn't in the
   ignition but it's in your pocket, it goes in first, and then **stays in the ignition** (you see it
-  hanging there, turned while the engine runs), so anyone can drive off with it.
+  hanging there, turned while the engine runs), so anyone can drive off with it. The key is big
+  enough to see, with a red fob, and while you look at the ignition it pulses and your hand moves
+  off it. The dashboard on the HUD shows a key when one is in the ignition.
 - **Left-click** takes the key out (switching the engine off) and puts it in your pocket.
 - **No key:** with a screwdriver in your hand, right-click to try to hotwire it.
 - R still works too, the same as right-clicking the ignition.

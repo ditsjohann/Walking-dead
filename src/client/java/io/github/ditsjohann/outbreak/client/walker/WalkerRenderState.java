@@ -20,6 +20,8 @@ public class WalkerRenderState extends LivingEntityRenderState {
 	public float postureTime;
 	/** Ticks since death, if dead. */
 	public float deadTime;
+	/** When this corpse goes (it sinks away just before). */
+	public int corpseTicks = 2400;
 	/** Which way it's falling, relative to where its body faces (degrees; 0 forward, 90 its right). */
 	public float fallAngle;
 	public float attack;

@@ -121,8 +121,12 @@ public class VehicleInteriorClientTest implements FabricClientGameTest {
 			context.waitTicks(10);
 			context.getInput().holdKey(options -> options.keyUp);
 			context.waitTicks(15);
-			context.runOnClient(minecraft -> minecraft.player.setXRot(30.0F));
+			// Steering left: the handlebars turn left.
+			context.getInput().holdKey(options -> options.keyLeft);
+			context.waitTicks(4);
+			context.runOnClient(minecraft -> minecraft.player.setXRot(40.0F));
 			context.takeScreenshot("interior-9-bicycle-first-person");
+			context.getInput().releaseKey(options -> options.keyLeft);
 			context.runOnClient(minecraft -> minecraft.options.setCameraType(CameraType.THIRD_PERSON_BACK));
 			context.runOnClient(minecraft -> minecraft.player.setYRot(minecraft.player.getYRot() + 90.0F));
 			context.waitTicks(3);

@@ -21,6 +21,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
  * /outbreak timeline alert &lt;0-4&gt;       - send an NL-Alert to everyone
  * /outbreak timeline radio             - what you'd hear on a radio now
  * /outbreak timeline darken &lt;radius&gt;   - put the lights out in the chunks around you now
+ * /outbreak place                      - what building you're in (Groningen's places, from OpenStreetMap)
  * </pre>
  */
 final class TimelineCommand {
@@ -73,7 +74,15 @@ final class TimelineCommand {
 			})));
 		dispatcher.register(Commands.literal("outbreak")
 			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-			.then(timeline));
+			.then(timeline)
+			.then(Commands.literal("place").executes(ctx -> {
+				// What building you're in, from the map of Groningen's places.
+				net.minecraft.core.BlockPos pos = net.minecraft.core.BlockPos.containing(ctx.getSource().getPosition());
+				Places.Kind kind = Places.at(pos);
+				String text = (kind == null ? "No known building here" : "In a " + kind.id().replace('_', ' ')) + " (" + Places.count() + " places on this map)";
+				ctx.getSource().sendSuccess(() -> Component.literal(text), false);
+				return kind == null ? 0 : 1;
+			})));
 	}
 
 	private static int set(CommandSourceStack source, boolean water, boolean on) {

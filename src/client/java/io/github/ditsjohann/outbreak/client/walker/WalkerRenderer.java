@@ -62,6 +62,7 @@ public class WalkerRenderer extends MobRenderer<Walker, WalkerRenderState, Walke
 		float now = walker.level().getGameTime() + partialTicks;
 		state.postureTime = now - walker.postureSince();
 		state.deadTime = walker.deathTime > 0 ? walker.deathTime + partialTicks : 0.0F;
+		state.corpseTicks = walker.corpseTicks();
 		state.fallAngle = Mth.wrapDegrees(walker.fallYaw() - state.bodyRot);
 		state.attack = walker.getSwingAnimation(partialTicks);
 		// No red tint on corpses: only while being hurt.
@@ -97,8 +98,8 @@ public class WalkerRenderer extends MobRenderer<Walker, WalkerRenderState, Walke
 		org.joml.Vector3f along = pose.transform(new Vector3f(0.0F, 1.0F, 0.0F));
 		// Lying, the hips are where the walker is (not the feet), and the body rests on the ground, not in it.
 		poseStack.translate(-along.x * 0.85F, 0.14F * over, -along.z * 0.85F);
-		if (state.deadTime > Walker.CORPSE_TICKS - 20) {
-			poseStack.translate(0.0F, -(state.deadTime - (Walker.CORPSE_TICKS - 20)) / 20.0F * 0.35F, 0.0F);
+		if (state.deadTime > state.corpseTicks - 20) {
+			poseStack.translate(0.0F, -(state.deadTime - (state.corpseTicks - 20)) / 20.0F * 0.35F, 0.0F);
 		}
 
 		poseStack.rotate(pose);

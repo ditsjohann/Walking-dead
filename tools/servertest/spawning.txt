@@ -1,0 +1,20 @@
+# Walker spawning: out of sight, a pack at a time, filling up over a couple of minutes.
+== setup: a survivor standing in a flat world, mobs on, midday
+time set noon
+player Bot spawn at 0 -57 0
+wait 3
+gamemode creative Bot
+gamerule spawn_mobs true
+gamerule advance_time false
+== a wall of stone around the survivor, 40 blocks out, so some places are out of sight
+execute positioned 0 -57 0 run fill ~-40 ~ ~-40 ~40 ~6 ~-40 minecraft:stone
+execute positioned 0 -57 0 run fill ~-40 ~ ~40 ~40 ~6 ~40 minecraft:stone
+== after 30 s, 60 s, 120 s, 180 s
+wait 30
+execute as Bot at @s run outbreak walker census 128
+wait 30
+execute as Bot at @s run outbreak walker census 128
+wait 60
+execute as Bot at @s run outbreak walker census 128
+wait 60
+execute as Bot at @s run outbreak walker census 128
