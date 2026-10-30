@@ -79,11 +79,11 @@ QUERIES = {
     "buildings": 'way["building"~"^(hospital|fire_station|school|university|college|kindergarten|church|chapel|cathedral|mosque|synagogue|hotel|stadium|sports_hall|office|commercial|government|industrial|warehouse|factory|manufacture|retail|supermarket)$"]({b});',
     "land": 'nwr["landuse"~"^(military|industrial)$"]({b}); nwr["military"]({b});',
 }
-WRAP = "[out:json][timeout:120];\n(\n{q}\n);\nout tags bb center qt;\n"
+WRAP = "[out:json][timeout:30];\n(\n{q}\n);\nout tags bb center qt;\n"
 
 # The buildings around point POIs, to give each its building's box.
 BUILDINGS = """
-[out:json][timeout:120];
+[out:json][timeout:30];
 (
   node["shop"]({b});
   node["amenity"~"^(pharmacy|clinic|doctors|dentist|police|fire_station|library|restaurant|fast_food|cafe|bar|pub|school|bank|post_office)$"]({b});
@@ -93,6 +93,9 @@ BUILDINGS = """
 way(around.p:12)["building"];
 out bb qt;
 """
+
+
+MISSING = []
 
 
 def fetch(name, query):
@@ -134,7 +137,10 @@ def fetch_tile(name, query, tile, depth=0):
             print("  ", name, "failed on", server, ":", e, flush=True)
             time.sleep(10 * (attempt + 1))
     if depth >= 2:
-        raise SystemExit(f"could not fetch {name}: {error}")
+        # Leave it out this time (not cached: a rerun tries again) rather than lose the rest.
+        print("  ", name, "SKIPPED:", error, flush=True)
+        MISSING.append(name)
+        return {"elements": []}
     mid_lat, mid_lng = (tile[0] + tile[2]) / 2, (tile[1] + tile[3]) / 2
     quarters = [(tile[0], tile[1], mid_lat, mid_lng), (tile[0], mid_lng, mid_lat, tile[3]),
                 (mid_lat, tile[1], tile[2], mid_lng), (mid_lat, mid_lng, tile[2], tile[3])]
@@ -199,6 +205,8 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({"bbox": list(BBOX), "places": out}, separators=(",", ":")) + "\n")
     print("wrote", OUT.relative_to(ROOT), len(out), "places")
+    if MISSING:
+        print("left out (the servers gave up on them; run again to fill them in):", " ".join(MISSING))
     for kind, n in sorted(kinds.items(), key=lambda kv: -kv[1]):
         print(f"  {kind}: {n}")
 
