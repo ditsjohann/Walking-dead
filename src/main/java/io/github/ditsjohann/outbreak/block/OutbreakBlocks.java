@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.block;
 import java.util.function.Function;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.gore.BloodBlock;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -29,6 +30,17 @@ public final class OutbreakBlocks {
 		.noOcclusion()
 		.pushReaction(PushReaction.IMMOVEABLE)
 		.ignitedByLava());
+
+	/** Blood on the ground (no item form either): left by hits, the dead, the dismembered and the bleeding. */
+	public static final Block BLOOD = register("blood", BloodBlock::new, BlockBehaviour.Properties.of()
+		.mapColor(MapColor.COLOR_RED)
+		.noCollision()
+		.instabreak()
+		.sound(SoundType.HONEY_BLOCK)
+		.replaceable()
+		.noLootTable()
+		.noOcclusion()
+		.pushReaction(PushReaction.POPPED));
 
 	// Containers with their own screens. They fill with loot on first open, like chests.
 	public static final Block FRIDGE = register("fridge", p -> new StorageBlock(ContainerKind.FRIDGE, p), metal(MapColor.SNOW));

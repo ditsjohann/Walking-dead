@@ -135,6 +135,6 @@ public final class CarryWeight {
 
 	/** 1.0 = exactly at capacity. */
 	public static float ratio(Player player) {
-		return total(player) / capacity(player);
+		return total(player) / Math.max(1.0F, capacity(player));
 	}
 }

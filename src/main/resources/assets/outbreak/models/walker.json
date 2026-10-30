@@ -1,7 +1,7 @@
 {
 	"texture": [
 		64,
-		64
+		96
 	],
 	"parts": [
 		{
@@ -29,8 +29,8 @@
 						4
 					],
 					"uv": [
-						32,
-						40
+						0,
+						50
 					],
 					"inflate": 0.0
 				}
@@ -158,7 +158,7 @@
 												4
 											],
 											"uv": [
-												0,
+												24,
 												50
 											],
 											"inflate": 0.0
@@ -231,6 +231,106 @@
 											"inflate": 0.0
 										}
 									],
+									"children": [
+										{
+											"name": "right_forearm_cut",
+											"pivot": [
+												0,
+												0,
+												0
+											],
+											"rotation": [
+												0,
+												0,
+												0
+											],
+											"boxes": [
+												{
+													"origin": [
+														-2,
+														-0.6,
+														-2
+													],
+													"size": [
+														4,
+														1,
+														4
+													],
+													"uv": [
+														40,
+														50
+													],
+													"inflate": 0.0
+												}
+											],
+											"children": []
+										}
+									]
+								},
+								{
+									"name": "right_elbow_stump",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-3,
+												-4.4,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												0,
+												57
+											],
+											"inflate": 0.0
+										}
+									],
+									"children": []
+								},
+								{
+									"name": "right_arm_cut",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-3,
+												1.4,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												16,
+												57
+											],
+											"inflate": 0.0
+										}
+									],
 									"children": []
 								}
 							]
@@ -298,9 +398,208 @@
 											"inflate": 0.0
 										}
 									],
+									"children": [
+										{
+											"name": "left_forearm_cut",
+											"pivot": [
+												0,
+												0,
+												0
+											],
+											"rotation": [
+												0,
+												0,
+												0
+											],
+											"boxes": [
+												{
+													"origin": [
+														-2,
+														-0.6,
+														-2
+													],
+													"size": [
+														4,
+														1,
+														4
+													],
+													"uv": [
+														32,
+														57
+													],
+													"inflate": 0.0
+												}
+											],
+											"children": []
+										}
+									]
+								},
+								{
+									"name": "left_elbow_stump",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-1,
+												-4.4,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												48,
+												57
+											],
+											"inflate": 0.0
+										}
+									],
+									"children": []
+								},
+								{
+									"name": "left_arm_cut",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-1,
+												1.4,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												0,
+												62
+											],
+											"inflate": 0.0
+										}
+									],
 									"children": []
 								}
 							]
+						},
+						{
+							"name": "neck_stump",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-2,
+										8.6,
+										-2
+									],
+									"size": [
+										4,
+										1,
+										4
+									],
+									"uv": [
+										16,
+										62
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": []
+						},
+						{
+							"name": "right_shoulder_stump",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-4.6,
+										4,
+										-2
+									],
+									"size": [
+										1,
+										4,
+										4
+									],
+									"uv": [
+										32,
+										40
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": []
+						},
+						{
+							"name": "left_shoulder_stump",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										3.6,
+										4,
+										-2
+									],
+									"size": [
+										1,
+										4,
+										4
+									],
+									"uv": [
+										42,
+										40
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": []
 						}
 					]
 				},
@@ -363,6 +662,106 @@
 									"uv": [
 										48,
 										30
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": [
+								{
+									"name": "right_shin_cut",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-2,
+												-0.6,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												32,
+												62
+											],
+											"inflate": 0.0
+										}
+									],
+									"children": []
+								}
+							]
+						},
+						{
+							"name": "right_knee_stump",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-2,
+										-6.4,
+										-2
+									],
+									"size": [
+										4,
+										1,
+										4
+									],
+									"uv": [
+										48,
+										62
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": []
+						},
+						{
+							"name": "right_leg_cut",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-2,
+										-0.6,
+										-2
+									],
+									"size": [
+										4,
+										1,
+										4
+									],
+									"uv": [
+										0,
+										67
 									],
 									"inflate": 0.0
 								}
@@ -434,9 +833,175 @@
 									"inflate": 0.0
 								}
 							],
+							"children": [
+								{
+									"name": "left_shin_cut",
+									"pivot": [
+										0,
+										0,
+										0
+									],
+									"rotation": [
+										0,
+										0,
+										0
+									],
+									"boxes": [
+										{
+											"origin": [
+												-2,
+												-0.6,
+												-2
+											],
+											"size": [
+												4,
+												1,
+												4
+											],
+											"uv": [
+												16,
+												67
+											],
+											"inflate": 0.0
+										}
+									],
+									"children": []
+								}
+							]
+						},
+						{
+							"name": "left_knee_stump",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-2,
+										-6.4,
+										-2
+									],
+									"size": [
+										4,
+										1,
+										4
+									],
+									"uv": [
+										32,
+										67
+									],
+									"inflate": 0.0
+								}
+							],
+							"children": []
+						},
+						{
+							"name": "left_leg_cut",
+							"pivot": [
+								0,
+								0,
+								0
+							],
+							"rotation": [
+								0,
+								0,
+								0
+							],
+							"boxes": [
+								{
+									"origin": [
+										-2,
+										-0.6,
+										-2
+									],
+									"size": [
+										4,
+										1,
+										4
+									],
+									"uv": [
+										48,
+										67
+									],
+									"inflate": 0.0
+								}
+							],
 							"children": []
 						}
 					]
+				},
+				{
+					"name": "right_hip_stump",
+					"pivot": [
+						0,
+						0,
+						0
+					],
+					"rotation": [
+						0,
+						0,
+						0
+					],
+					"boxes": [
+						{
+							"origin": [
+								-4,
+								-0.4,
+								-2
+							],
+							"size": [
+								4,
+								1,
+								4
+							],
+							"uv": [
+								0,
+								72
+							],
+							"inflate": 0.0
+						}
+					],
+					"children": []
+				},
+				{
+					"name": "left_hip_stump",
+					"pivot": [
+						0,
+						0,
+						0
+					],
+					"rotation": [
+						0,
+						0,
+						0
+					],
+					"boxes": [
+						{
+							"origin": [
+								0,
+								-0.4,
+								-2
+							],
+							"size": [
+								4,
+								1,
+								4
+							],
+							"uv": [
+								16,
+								72
+							],
+							"inflate": 0.0
+						}
+					],
+					"children": []
 				}
 			]
 		}

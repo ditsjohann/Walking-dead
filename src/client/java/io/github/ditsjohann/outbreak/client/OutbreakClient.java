@@ -6,9 +6,11 @@ import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.menu.CharacterSheetScreen;
 import io.github.ditsjohann.outbreak.client.menu.MenuClient;
 import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
+import io.github.ditsjohann.outbreak.client.walker.BodyPartRenderer;
 import io.github.ditsjohann.outbreak.client.walker.WalkerModel;
 import io.github.ditsjohann.outbreak.client.walker.WalkerRenderer;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.gore.Limb;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
 import io.github.ditsjohann.outbreak.network.OpenBagPayload;
@@ -34,6 +36,12 @@ public class OutbreakClient implements ClientModInitializer {
 		// Walkers: their own jointed model, skins and hit physics.
 		ModelLayerRegistry.registerModelLayer(WalkerRenderer.LAYER, WalkerModel::layer);
 		EntityRenderers.register(OutbreakEntities.WALKER, WalkerRenderer::new);
+		// Severed limbs and heads, built from the walker model.
+		for (Limb limb : Limb.values()) {
+			ModelLayerRegistry.registerModelLayer(BodyPartRenderer.LAYERS.get(limb), () -> WalkerModel.pieceLayer(limb));
+		}
+
+		EntityRenderers.register(OutbreakEntities.BODY_PART, BodyPartRenderer::new);
 
 		// The vanilla HUD is replaced entirely by our own.
 		OutbreakHud.register();

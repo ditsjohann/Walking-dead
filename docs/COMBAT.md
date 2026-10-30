@@ -74,6 +74,31 @@ from your right sends the walker reeling to your left. The strength comes from t
 ![Punching](screenshots/combat/punch.png)
 ![The bat, two-handed](screenshots/combat/bat-third-person.png)
 
+## Gore
+- **Blood flies off every hit:** dark red chunks with real weight, thrown the way the blow went,
+  more from the head. Hits splatter the ground under the walker.
+- **Limbs come off.** A sharp weapon (machete, axe, sword) to the body has a 22% chance to take
+  something: mostly an arm (just the forearm, or the whole arm at the shoulder), sometimes a leg (the
+  shin or the whole leg). The limb flies off in the walker's own skin, tumbles, lands with a splat and
+  lies there for five minutes (hit it and it skids away). What's left is a ragged stump of meat and
+  bone.
+- **A walker without a leg is a crawler:** it goes down and drags itself after you, leaving a smear
+  on the ground behind it. A walker with no forearms can't break doors or barricades any more.
+- **Heads:** a sharp blow to the head that kills has a 40% chance to take the head clean off. The
+  body pumps blood from the neck as it drops and lies in a bigger pool.
+- **Run over by a car:** 45% to lose a leg, sometimes both. **Explosions** can take any limb.
+- **Puddles:** wherever blood lands there's drops, a splatter or a pool, only on bare ground (never
+  through blocks). They dry from glossy red to a brown stain and are gone after about twenty minutes,
+  sooner in the rain. A corpse leaves a pool spreading out from where it fell. A bleeding survivor
+  leaves drops too.
+
+![Limbs flying](screenshots/gore/1-flying.png)
+![The pieces](screenshots/gore/3-pieces.png)
+![Headless, in its pool](screenshots/gore/4-corpse.png)
+![Puddles, fresh to dried](screenshots/gore/5-ages.png)
+![A crawler's trail](screenshots/gore/6-trail.png)
+![A machete hit](screenshots/gore/7-spray.png)
+
 ## Admin and testing commands (operators only)
 ```
 /outbreak walker hit <walkers> <yaw> <strength 0-2> [head]   — a hit pushing towards yaw (no damage)
@@ -83,6 +108,7 @@ from your right sends the walker reeling to your left. The strength comes from t
 /outbreak walker skin <walkers> <0-23>
 /outbreak walker info <walkers>                             — skin, crawler, posture, health, position
 /outbreak walker corpses <radius>                           — dead walkers still lying around
+/outbreak walker sever <walkers> <limb>                      — right_forearm, left_arm, right_leg, left_shin, head...
 ```
 Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
 
@@ -97,6 +123,10 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
   textured from (`textures/item/weapon_materials.png`: wood, steel, chrome, grip tape, blood...).
 - **Swings and punches:** `SwingAnimations` (first and third person), keyed by the weapon's style
   (`WeaponStyle`, shared with the server, so how a weapon looks matches what it does).
+- **Gore:** the walker model has a stump and a cut end for every joint (`make_walkers.py`); a lost
+  limb hides its part and shows the stump, and the severed piece is drawn from the same model, cut end
+  showing. Blood puddles are a block (`outbreak:blood`, size × age × facing) made by
+  `python3 tools/gore/make_gore.py`; the flying blood is that block's break particles.
 
 ## Tests
 - Server: `python3 tools/servertest/driver.py . tools/servertest/combat.txt run/combat.log`
@@ -107,8 +137,9 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
   and the head, punches, each swing in first person, the bat and hammer in third person), and
   `AnimationClientTest`: every animation frame by frame, to check things line up (each swing and
   punch in first person and from the front and back in third person, and a walker walking, biting,
-  hit, falling, down, getting up and crawling, side-on).
+  hit, falling, down, getting up and crawling, side-on), and `GoreClientTest` (blood particles, five
+  walkers each losing something, the pieces, a headless corpse in its pool, puddles drying, a
+  crawler's trail, a machete hit).
 
 ## Not yet
-Stomping, grabbing and shoving with a key, limbs coming off, blood on the ground, sounds for each
-weapon, guns.
+Stomping, grabbing and shoving with a key, sounds for each weapon, guns, blood on walls.

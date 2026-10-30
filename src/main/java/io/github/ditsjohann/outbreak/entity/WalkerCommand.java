@@ -1,19 +1,27 @@
 package io.github.ditsjohann.outbreak.entity;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import io.github.ditsjohann.outbreak.gore.Limb;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
@@ -23,6 +31,7 @@ import net.minecraft.world.phys.AABB;
  * /outbreak walker hit &lt;walkers&gt; &lt;yaw&gt; &lt;strength 0-2&gt; [head]  - a hit pushing towards yaw
  * /outbreak walker knockdown &lt;walkers&gt; &lt;yaw&gt;                - falls over towards yaw
  * /outbreak walker stand &lt;walkers&gt;                         - back on its feet at once
+ * /outbreak walker sever &lt;walkers&gt; &lt;limb&gt;                     - right_forearm, left_arm, right_leg, head...
  * /outbreak walker crawler &lt;walkers&gt; &lt;true|false&gt;
  * /outbreak walker skin &lt;walkers&gt; &lt;0-23&gt;
  * /outbreak walker info &lt;walkers&gt;
@@ -47,6 +56,13 @@ public final class WalkerCommand {
 			.then(Commands.argument("yaw", FloatArgumentType.floatArg())
 				.executes(ctx -> each(ctx, "knocked down", walker -> walker.knockDown(FloatArgumentType.getFloat(ctx, "yaw"), 80)))));
 		var stand = Commands.literal("stand").then(walkers().executes(ctx -> each(ctx, "stood up", Walker::standUp)));
+		var sever = Commands.literal("sever").then(walkers()
+			.then(Commands.argument("limb", StringArgumentType.word())
+				.suggests((ctx, builder) -> SharedSuggestionProvider.suggest(Arrays.stream(Limb.values()).map(l -> l.name().toLowerCase(Locale.ROOT)), builder))
+				.executes(ctx -> {
+					Limb limb = Limb.valueOf(StringArgumentType.getString(ctx, "limb").toUpperCase(Locale.ROOT));
+					return each(ctx, "cut", walker -> walker.sever((ServerLevel) walker.level(), limb, walker.getLookAngle().scale(-1.0).add(0.0, 0.3, 0.0)));
+				})));
 		var crawler = Commands.literal("crawler").then(walkers()
 			.then(Commands.argument("crawler", BoolArgumentType.bool())
 				.executes(ctx -> each(ctx, "changed", walker -> walker.setCrawler(BoolArgumentType.getBool(ctx, "crawler"))))));
@@ -62,7 +78,7 @@ public final class WalkerCommand {
 			.executes(ctx -> corpses(ctx.getSource(), IntegerArgumentType.getInteger(ctx, "radius"))));
 		dispatcher.register(Commands.literal("outbreak")
 			.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-			.then(Commands.literal("walker").then(hit).then(knockdown).then(stand).then(crawler).then(skin).then(info).then(corpses)));
+			.then(Commands.literal("walker").then(hit).then(knockdown).then(stand).then(sever).then(crawler).then(skin).then(info).then(corpses)));
 	}
 
 	private static RequiredArgumentBuilder<CommandSourceStack, ?> walkers() {

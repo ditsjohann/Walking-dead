@@ -25,7 +25,7 @@ public final class Perks {
 			capacity -= 4.0F;
 		}
 
-		return capacity;
+		return Math.max(1.0F, capacity);
 	}
 
 	/** Extra weight a worn bag takes off (on top of the bag's own). */

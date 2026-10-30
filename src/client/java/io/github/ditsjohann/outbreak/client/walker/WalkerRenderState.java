@@ -12,6 +12,8 @@ public class WalkerRenderState extends LivingEntityRenderState {
 	/** A lasting tilt of the head, different for every walker. */
 	public float headTilt;
 	public boolean crawler;
+	/** Bits of the limbs it has lost (see Limb). */
+	public int lostLimbs;
 	public boolean aggressive;
 	public Walker.Posture posture = Walker.Posture.STANDING;
 	/** Ticks since the posture changed (with the partial tick). */

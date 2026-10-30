@@ -17,7 +17,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / "src/main/resources/assets/outbreak"
 COUNT = 24
-TEX_W, TEX_H = 64, 64
+TEX_W, TEX_H = 64, 96
 
 
 class Box:
@@ -46,10 +46,18 @@ class Part:
                 "children": [c.to_json() for c in self.children]}
 
 
+def slab(name, x0, y0):
+    """A 4x1x4 slab of raw meat, for a stump or a cut end (hidden until something comes off)."""
+    return Part(name, (0, 0, 0), [Box((x0, y0, -2), (4, 1, 4))])
+
+
 def limb(name, pivot, lower_name, x0):
-    """An upper limb hanging from pivot with a lower limb from its middle (elbow or knee)."""
+    """An upper limb hanging from pivot with a lower limb from its middle (elbow or knee), with the
+    knee stump and both cut ends."""
     return Part(name, pivot, [Box((x0, -6, -2), (4, 6, 4))],
-                [Part(lower_name, (0, -6, 0), [Box((x0, -6, -2), (4, 6, 4))])])
+                [Part(lower_name, (0, -6, 0), [Box((x0, -6, -2), (4, 6, 4))], [slab(lower_name + "_cut", x0, -0.6)]),
+                 slab(name.replace("leg", "knee") + "_stump", x0, -6.4),
+                 slab(name + "_cut", x0, -0.6)])
 
 
 def model():
@@ -60,14 +68,20 @@ def model():
                 [Part("hat", (0, 0, 0), [Box((-4, 0, -4), (8, 8, 8), inflate=0.5)]),
                  Part("neck", (0, 0, 0), [Box((-2, -2, -2), (4, 2, 4))])])
     right_arm = Part("right_arm", (-5, 7, 0), [Box((-3, -4, -2), (4, 6, 4))],
-                     [Part("right_forearm", (-1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))])])
+                     [Part("right_forearm", (-1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))], [slab("right_forearm_cut", -2, -0.6)]),
+                      slab("right_elbow_stump", -3, -4.4), slab("right_arm_cut", -3, 1.4)])
     left_arm = Part("left_arm", (5, 7, 0), [Box((-1, -4, -2), (4, 6, 4))],
-                    [Part("left_forearm", (1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))])])
+                    [Part("left_forearm", (1, -4, 0), [Box((-2, -6, -2), (4, 6, 4))], [slab("left_forearm_cut", -2, -0.6)]),
+                     slab("left_elbow_stump", -1, -4.4), slab("left_arm_cut", -1, 1.4)])
     # The chest reaches a pixel down into the pelvis, so bending and twisting at the waist never opens a gap.
-    chest = Part("chest", (0, 3, 0), [Box((-4, -1, -2), (8, 10, 4))], [head, right_arm, left_arm])
+    stumps = [Part("neck_stump", (0, 0, 0), [Box((-2, 8.6, -2), (4, 1, 4))]),
+              Part("right_shoulder_stump", (0, 0, 0), [Box((-4.6, 4, -2), (1, 4, 4))]),
+              Part("left_shoulder_stump", (0, 0, 0), [Box((3.6, 4, -2), (1, 4, 4))])]
+    chest = Part("chest", (0, 3, 0), [Box((-4, -1, -2), (8, 10, 4))], [head, right_arm, left_arm] + stumps)
     right_leg = limb("right_leg", (-2, 0, 0), "right_shin", -2)
     left_leg = limb("left_leg", (2, 0, 0), "left_shin", -2)
-    return [Part("waist", (0, 12, 0), [Box((-4, 0, -2), (8, 3, 4))], [chest, right_leg, left_leg])]
+    hips = [slab("right_hip_stump", -4, -0.4), slab("left_hip_stump", 0, -0.4)]
+    return [Part("waist", (0, 12, 0), [Box((-4, 0, -2), (8, 3, 4))], [chest, right_leg, left_leg] + hips)]
 
 
 def footprint(b):
@@ -173,9 +187,30 @@ def cloth(look, base, x, y):
     return c
 
 
+# Stumps (left on the body) and cut ends (on the piece that flew off) are separate thin slabs,
+# hidden while the body is whole: painting the joint faces instead would show red at every bent
+# knee and elbow. Only the neck's underside (always inside the chest) is painted as a cut.
+GORE_PARTS = ("_stump", "_cut")
+JOINT_FACES = {("neck", "bottom")}
+
+
+def meat(look, x, y, fw, fh, bone=True):
+    """A cut: dark red at the edge, wet red inside, a knob of bone in the middle."""
+    r = look.rnd
+    cx, cy = (fw - 1) / 2, (fh - 1) / 2
+    d = max(abs(x - cx) / max(1, fw / 2), abs(y - cy) / max(1, fh / 2))
+    if bone and abs(x - cx) < 0.8 and abs(y - cy) < 0.8:
+        return shade((222, 214, 190), r.randint(-10, 6))
+    if d > 0.7:
+        return shade((86, 8, 10), r.randint(-8, 8))
+    return shade((150, 22, 20), r.randint(-14, 14)) if r.random() > 0.15 else shade((190, 60, 50), r.randint(-10, 10))
+
+
 def color(look, part, face, x, y, fw, fh):
     name, shirt, sleeves, pants, shoes, extra = look.outfit
     r = look.rnd
+    if (part, face) in JOINT_FACES or part.endswith(GORE_PARTS):
+        return meat(look, x, y, fw, fh)
     if part == "hat":
         return hair_pixel(look, face, x, y, fw, fh)
     if part == "neck":

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.entity.Walker;
+import io.github.ditsjohann.outbreak.gore.Blood;
 import io.github.ditsjohann.outbreak.survivor.body.BodyPart;
 import io.github.ditsjohann.outbreak.survivor.body.Wound;
 import io.github.ditsjohann.outbreak.survivor.body.WoundType;
@@ -14,6 +15,7 @@ import io.github.ditsjohann.outbreak.survivor.body.WoundType;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
@@ -60,6 +62,11 @@ public final class BodySimulation {
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			TIMERS.clear();
 			SLEEP_START.clear();
+		});
+		// Don't keep anything for players who've left.
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			TIMERS.remove(handler.player.getUUID());
+			SLEEP_START.remove(handler.player.getUUID());
 		});
 		EntitySleepEvents.START_SLEEPING.register((entity, pos) -> {
 			if (entity instanceof ServerPlayer player) {
@@ -118,6 +125,8 @@ public final class BodySimulation {
 				if (wound.bloodTimer >= wound.type.ticksPerBloodLoss()) {
 					wound.bloodTimer = 0;
 					OutbreakDamageTypes.hurt(player, OutbreakDamageTypes.BLEEDING, 1.0F);
+					// It drips where you stand.
+					Blood.splat(player.level(), player.position(), 0);
 				}
 
 				if (wound.bleedLeft > 0) {

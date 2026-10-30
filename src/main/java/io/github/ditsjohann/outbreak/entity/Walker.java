@@ -10,6 +10,9 @@ import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
+import io.github.ditsjohann.outbreak.gore.Blood;
+import io.github.ditsjohann.outbreak.gore.BodyPart;
+import io.github.ditsjohann.outbreak.gore.Limb;
 import io.github.ditsjohann.outbreak.sandbox.Sandbox;
 import io.github.ditsjohann.outbreak.sandbox.SandboxSettings;
 import io.github.ditsjohann.outbreak.survivor.OutbreakDamageTypes;
@@ -57,6 +60,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -103,6 +107,9 @@ public class Walker extends Zombie {
 	private static final EntityDataAccessor<Float> DATA_FALL_YAW = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.FLOAT);
 	/** The last hit, packed: see {@link Hit}. A new one has a new sequence number. */
 	private static final EntityDataAccessor<Integer> DATA_HIT = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
+	/** Bits of the {@link Limb}s it has lost. */
+	private static final EntityDataAccessor<Integer> DATA_LIMBS = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
+	private float trailDistance;
 	private static final Identifier CRAWLER_SPEED = Identifier.fromNamespaceAndPath("outbreak", "crawler");
 	/** The world's sandbox walker speed, on top of the shambler's base speed. */
 	private static final Identifier SANDBOX_SPEED = Identifier.fromNamespaceAndPath("outbreak", "sandbox_speed");
@@ -152,6 +159,7 @@ public class Walker extends Zombie {
 		builder.define(DATA_POSTURE_SINCE, 0);
 		builder.define(DATA_FALL_YAW, 0.0F);
 		builder.define(DATA_HIT, 0);
+		builder.define(DATA_LIMBS, 0);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -182,7 +190,12 @@ public class Walker extends Zombie {
 
 	@Override
 	protected void registerGoals() {
-		this.goalSelector.addGoal(1, new BreakDoorGoal(this, difficulty -> true));
+		this.goalSelector.addGoal(1, new BreakDoorGoal(this, difficulty -> true) {
+			@Override
+			public boolean canUse() {
+				return Walker.this.canBreakThings() && super.canUse();
+			}
+		});
 		this.goalSelector.addGoal(1, new BreakObstacleGoal(this));
 		this.goalSelector.addGoal(2, new ZombieAttackGoal(this, 1.15, false));
 		this.goalSelector.addGoal(4, new InvestigateNoiseGoal(this, 1.0));
@@ -251,6 +264,10 @@ public class Walker extends Zombie {
 		}
 
 		boolean hurt = super.hurtServer(level, source, damage);
+		if (hurt && source.is(DamageTypeTags.IS_EXPLOSION)) {
+			this.blownApart(level, source);
+		}
+
 		if (hurt && isAttack) {
 			this.knockAbout(level, source, direct, head, runOver);
 			if (direct instanceof ServerPlayer player && !runOver) {
@@ -284,6 +301,8 @@ public class Walker extends Zombie {
 
 		this.hitSequence++;
 		this.entityData.set(DATA_HIT, Hit.pack(this.hitSequence, yaw, Math.round(strength * 8.0F), head));
+		ItemStack weapon = attacker instanceof LivingEntity living && direct == attacker ? living.getMainHandItem() : ItemStack.EMPTY;
+		this.bleed(level, yaw, strength, head, runOver, WeaponStyle.isSharp(weapon));
 		if (this.isDeadOrDying()) {
 			this.entityData.set(DATA_FALL_YAW, yaw);
 			return;
@@ -312,6 +331,139 @@ public class Walker extends Zombie {
 
 		level.playSound(null, this.getX(), this.getY(), this.getZ(), head ? SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR : SoundEvents.PLAYER_ATTACK_KNOCKBACK,
 			SoundSource.HOSTILE, 0.6F + strength * 0.3F, head ? 0.7F : 0.9F);
+	}
+
+	// --- Gore: blood, and coming apart ---
+
+	public int lostLimbs() {
+		return this.entityData.get(DATA_LIMBS);
+	}
+
+	public boolean hasLost(Limb limb) {
+		return limb.isLost(this.lostLimbs());
+	}
+
+	/** Without hands it can still bite, but can't batter doors and barricades down. */
+	public boolean canBreakThings() {
+		return !(this.hasLost(Limb.RIGHT_FOREARM) && this.hasLost(Limb.LEFT_FOREARM));
+	}
+
+	/** What a hit does besides hurt: blood flying the way of the blow, on the ground, and with a blade or a car, limbs coming off. */
+	private void bleed(ServerLevel level, float yaw, float strength, boolean head, boolean runOver, boolean sharp) {
+		Vec3 fling = new Vec3(-Mth.sin(yaw * Mth.DEG_TO_RAD), 0.35, Mth.cos(yaw * Mth.DEG_TO_RAD));
+		Vec3 wound = head ? this.getEyePosition() : this.position().add(0.0, this.getBbHeight() * 0.55, 0.0);
+		Blood.spray(level, wound, fling, head ? 12 : 7, 0.2F + 0.2F * strength);
+		if (this.random.nextFloat() < (head ? 0.6F : 0.3F)) {
+			Blood.splat(level, this.position().add(fling.x * (0.6 + strength), 0.0, fling.z * (0.6 + strength)), 0);
+		}
+
+		if (runOver) {
+			// Under the wheels: legs crushed off, sometimes both.
+			if (this.random.nextFloat() < 0.45F) {
+				this.sever(level, this.randomLeg(), fling);
+				if (this.random.nextFloat() < 0.25F) {
+					this.sever(level, this.randomLeg(), fling);
+				}
+			}
+
+			return;
+		}
+
+		if (!sharp) {
+			return;
+		}
+
+		if (head) {
+			// A blade through the neck of one that's already finished: the head comes off.
+			if (this.isDeadOrDying() && this.random.nextFloat() < 0.4F) {
+				this.sever(level, Limb.HEAD, fling);
+			}
+
+			return;
+		}
+
+		if (this.random.nextFloat() < 0.22F) {
+			boolean right = this.random.nextBoolean();
+			Limb limb = this.random.nextFloat() < 0.75F
+				? (this.random.nextFloat() < 0.6F ? (right ? Limb.RIGHT_FOREARM : Limb.LEFT_FOREARM) : (right ? Limb.RIGHT_ARM : Limb.LEFT_ARM))
+				: (this.random.nextFloat() < 0.6F ? (right ? Limb.RIGHT_SHIN : Limb.LEFT_SHIN) : (right ? Limb.RIGHT_LEG : Limb.LEFT_LEG));
+			this.sever(level, limb, fling);
+		}
+	}
+
+	private Limb randomLeg() {
+		boolean right = this.random.nextBoolean();
+		return this.random.nextBoolean() ? (right ? Limb.RIGHT_SHIN : Limb.LEFT_SHIN) : (right ? Limb.RIGHT_LEG : Limb.LEFT_LEG);
+	}
+
+	/** Caught in a blast: limbs torn off, the head too if it's dead. */
+	private void blownApart(ServerLevel level, DamageSource source) {
+		Vec3 from = source.getSourcePosition() != null ? source.getSourcePosition() : this.position().subtract(0.0, 1.0, 0.0);
+		Vec3 fling = this.position().subtract(from).normalize().add(0.0, 0.5, 0.0);
+		for (Limb limb : new Limb[] {Limb.RIGHT_ARM, Limb.LEFT_ARM, Limb.RIGHT_LEG, Limb.LEFT_LEG}) {
+			if (this.random.nextFloat() < 0.3F) {
+				this.sever(level, limb, fling);
+			}
+		}
+
+		if (this.isDeadOrDying() && this.random.nextFloat() < 0.5F) {
+			this.sever(level, Limb.HEAD, fling);
+		}
+
+		Blood.pool(level, this.position(), 4);
+	}
+
+	/**
+	 * Takes a limb off: it flies away with the blow (as a {@link BodyPart} in this walker's skin),
+	 * blood sprays from the stump, and without a leg it can only crawl. Returns false if it's
+	 * already gone.
+	 */
+	public boolean sever(ServerLevel level, Limb limb, Vec3 fling) {
+		if (this.hasLost(limb)) {
+			return false;
+		}
+
+		this.entityData.set(DATA_LIMBS, this.lostLimbs() | limb.bit());
+		Vec3 where = this.bodyPoint(limb.offset);
+		Vec3 velocity = fling.normalize().scale(0.25 + this.random.nextDouble() * 0.15).add(0.0, 0.2, 0.0)
+			.add(this.random.nextGaussian() * 0.04, 0.0, this.random.nextGaussian() * 0.04);
+		BodyPart.spawn(level, OutbreakEntities.BODY_PART, limb, this.skin(), where, velocity, this.yBodyRot + this.random.nextFloat() * 40.0F - 20.0F);
+		Blood.spray(level, where, fling, limb == Limb.HEAD ? 26 : 16, 0.4F);
+		Blood.splat(level, this.position(), 1);
+		level.playSound(null, where.x, where.y, where.z, SoundEvents.HONEY_BLOCK_BREAK, SoundSource.HOSTILE, 1.2F, 0.55F);
+		level.playSound(null, where.x, where.y, where.z, SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR, SoundSource.HOSTILE, 0.5F, 0.5F);
+		if (limb.isLeg() && !this.isCrawler()) {
+			this.setCrawler(true);
+			if (this.isAlive() && this.posture() == Posture.STANDING) {
+				this.knockDown((float) Math.toDegrees(Math.atan2(-fling.x, fling.z)), 40 + this.random.nextInt(40));
+			}
+		}
+
+		return true;
+	}
+
+	/** A point on the standing body, x as in the model (negative is its right), y up and z forward, in blocks from the feet. */
+	private Vec3 bodyPoint(Vec3 offset) {
+		float yaw = this.yBodyRot * Mth.DEG_TO_RAD;
+		Vec3 forward = new Vec3(-Mth.sin(yaw), 0.0, Mth.cos(yaw));
+		Vec3 left = new Vec3(Mth.cos(yaw), 0.0, Mth.sin(yaw));
+		double up = this.isCrawler() || this.posture() != Posture.STANDING ? offset.y * 0.25 : offset.y;
+		return this.position().add(left.scale(offset.x)).add(forward.scale(offset.z)).add(0.0, up, 0.0);
+	}
+
+	/** Crawlers smear a trail behind them, and stumps drip. */
+	private void trail(ServerLevel level) {
+		if (!this.isCrawler() && this.lostLimbs() == 0) {
+			return;
+		}
+
+		this.trailDistance += (float) Math.hypot(this.getX() - this.xo, this.getZ() - this.zo);
+		if (this.trailDistance > (this.isCrawler() ? 1.1F : 2.5F)) {
+			this.trailDistance = 0.0F;
+			if (this.random.nextFloat() < 0.6F) {
+				Blood.splat(level, this.position(), 0);
+			}
+		}
 	}
 
 	// --- Posture: stagger, knocked down, getting up, crawling ---
@@ -411,6 +563,8 @@ public class Walker extends Zombie {
 			} else if (this.posture() == Posture.GETTING_UP && --this.downTicks <= 0) {
 				this.setPosture(Posture.STANDING);
 			}
+
+			this.trail((ServerLevel) this.level());
 		}
 
 		super.aiStep();
@@ -420,6 +574,10 @@ public class Walker extends Zombie {
 	private void applySandboxSpeed() {
 		double bonus = Sandbox.current().walkerSpeed().speed - SandboxSettings.WalkerSpeed.SHAMBLERS.speed;
 		var speed = this.getAttribute(Attributes.MOVEMENT_SPEED);
+		if (speed == null) {
+			return;
+		}
+
 		AttributeModifier current = speed.getModifier(SANDBOX_SPEED);
 		if (current == null ? bonus != 0.0 : current.amount() != bonus) {
 			speed.removeModifier(SANDBOX_SPEED);
@@ -469,6 +627,17 @@ public class Walker extends Zombie {
 	@Override
 	protected void tickDeath() {
 		this.deathTime++;
+		if (this.level() instanceof ServerLevel level) {
+			if (this.deathTime == 14) {
+				// The pool spreads out from where the body came down.
+				float yaw = this.entityData.get(DATA_FALL_YAW) * Mth.DEG_TO_RAD;
+				Blood.pool(level, this.position().add(-Mth.sin(yaw) * 0.8, 0.0, Mth.cos(yaw) * 0.8), this.hasLost(Limb.HEAD) ? 4 : 2);
+			} else if (this.hasLost(Limb.HEAD) && this.deathTime < 12 && this.deathTime % 3 == 0) {
+				// Pumping out of the neck as it goes down.
+				Blood.spray(level, this.getEyePosition().subtract(0.0, 0.3, 0.0), new Vec3(0.0, 1.0, 0.0), 3, 0.15F);
+			}
+		}
+
 		if (this.deathTime >= CORPSE_TICKS && !this.level().isClientSide() && !this.isRemoved()) {
 			this.level().broadcastEntityEvent(this, (byte) 60);
 			this.remove(RemovalReason.KILLED);
@@ -628,6 +797,7 @@ public class Walker extends Zombie {
 
 		output.putInt("skin", this.skin());
 		output.putBoolean("crawler", this.isCrawler());
+		output.putInt("limbs", this.lostLimbs());
 	}
 
 	@Override
@@ -636,6 +806,7 @@ public class Walker extends Zombie {
 		this.leaderId = input.read("herd_leader", UUIDUtil.CODEC).orElse(null);
 		input.getInt("skin").ifPresent(this::setSkin);
 		this.entityData.set(DATA_CRAWLER, input.getBooleanOr("crawler", false));
+		this.entityData.set(DATA_LIMBS, input.getIntOr("limbs", 0));
 	}
 
 	/** Shared between all walkers of one naturally spawned pack: the first one becomes the leader. */

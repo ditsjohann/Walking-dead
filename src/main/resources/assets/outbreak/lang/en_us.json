@@ -363,5 +363,7 @@
 	"outbreak.trait.short_sighted": "Short-sighted",
 	"outbreak.trait.short_sighted.desc": "Lost your glasses: everything far away is a blur.",
 	"outbreak.trait.burglar": "Burglar",
-	"outbreak.trait.burglar.desc": "Hotwires cars with bare hands, and more often."
+	"outbreak.trait.burglar.desc": "Hotwires cars with bare hands, and more often.",
+	"entity.outbreak.body_part": "Severed Limb",
+	"block.outbreak.blood": "Blood"
 }

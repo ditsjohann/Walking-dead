@@ -35,8 +35,8 @@ public class BreakObstacleGoal extends Goal {
 
 	@Override
 	public boolean canUse() {
-		// Looking around for obstacles is cheap but not free: twice a second is plenty.
-		if (++this.checkTimer < 10) {
+		// Looking around for obstacles is cheap but not free: twice a second is plenty. No hands, no battering.
+		if (++this.checkTimer < 10 || !this.walker.canBreakThings()) {
 			return false;
 		}
 

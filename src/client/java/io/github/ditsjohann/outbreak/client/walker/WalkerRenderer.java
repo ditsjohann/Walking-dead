@@ -39,9 +39,13 @@ public class WalkerRenderer extends MobRenderer<Walker, WalkerRenderState, Walke
 		return new WalkerRenderState();
 	}
 
+	public static Identifier skinTexture(int skin) {
+		return SKINS[Math.floorMod(skin, SKINS.length)];
+	}
+
 	@Override
 	public Identifier getTextureLocation(WalkerRenderState state) {
-		return SKINS[state.skin];
+		return skinTexture(state.skin);
 	}
 
 	@Override
@@ -52,6 +56,7 @@ public class WalkerRenderer extends MobRenderer<Walker, WalkerRenderState, Walke
 		state.gait = (int) Math.floorMod(seed, 5L);
 		state.headTilt = ((seed >>> 8) & 0xFF) / 255.0F * 0.5F - 0.25F;
 		state.crawler = walker.isCrawler();
+		state.lostLimbs = walker.lostLimbs();
 		state.aggressive = walker.isAggressive();
 		state.posture = walker.posture();
 		float now = walker.level().getGameTime() + partialTicks;

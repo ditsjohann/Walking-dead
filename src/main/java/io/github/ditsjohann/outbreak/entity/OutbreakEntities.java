@@ -1,6 +1,7 @@
 package io.github.ditsjohann.outbreak.entity;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.gore.BodyPart;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 
@@ -28,6 +29,18 @@ public final class OutbreakEntities {
 			.clientTrackingRange(8)
 			.notInPeaceful()
 			.build(WALKER_KEY)
+	);
+
+	public static final ResourceKey<EntityType<?>> BODY_PART_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Outbreak.id("body_part"));
+	/** A severed limb or head, lying where it landed. */
+	public static final EntityType<BodyPart> BODY_PART = Registry.register(
+		BuiltInRegistries.ENTITY_TYPE,
+		BODY_PART_KEY,
+		EntityType.Builder.<BodyPart>of(BodyPart::new, MobCategory.MISC)
+			.sized(0.4F, 0.25F)
+			.clientTrackingRange(6)
+			.updateInterval(2)
+			.build(BODY_PART_KEY)
 	);
 
 	private OutbreakEntities() {

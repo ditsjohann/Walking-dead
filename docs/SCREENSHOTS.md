@@ -17,6 +17,8 @@ itself still has to be generated with Arnis.
 | ![](screenshots/combat/head-hit.png) A blow to the side of the head. | ![](screenshots/combat/falling.png) Knocked down: each falls the way it was hit. |
 | ![](screenshots/combat/down.png) Down: now any hit is a headshot. | ![](screenshots/combat/getting-up.png) Getting back up. |
 | ![](screenshots/combat/crawler.png) A crawler. | ![](screenshots/combat/killed.png) A headshot: dead before it hits the ground. |
+| ![](screenshots/gore/1-flying.png) Limbs coming off: a forearm, an arm, a leg, a head, a shin. | ![](screenshots/gore/4-corpse.png) Headless, lying in its own pool. |
+| ![](screenshots/gore/6-trail.png) A legless crawler drags itself along, leaving a smear. | ![](screenshots/gore/5-ages.png) Puddles from fresh to dried. |
 | ![](screenshots/phase4/1-lineup.png) Bicycle, scooter, hatchback, sedan, van and a wreck. | ![](screenshots/phase4/3-driving.png) Driving: the dashboard bottom right. |
 | ![](screenshots/phase4/4-mechanics.png) Working on a car: tires and battery, repairs. | ![](screenshots/phase4/6-bicycle.png) On a bicycle. |
 | ![](screenshots/ui/hud.png) The dark-paper HUD, with the four new containers behind it. | ![](screenshots/ui/inventory.png) The 18-slot inventory: 9 pockets and the hotbar. |

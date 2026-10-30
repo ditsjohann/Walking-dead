@@ -2,12 +2,18 @@ package io.github.ditsjohann.outbreak.client.walker;
 
 import static io.github.ditsjohann.outbreak.client.walker.WalkerAnimator.*;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.github.ditsjohann.outbreak.client.model.BoxModels;
 import io.github.ditsjohann.outbreak.entity.Walker;
+import io.github.ditsjohann.outbreak.gore.Limb;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -36,9 +42,24 @@ public class WalkerModel extends EntityModel<WalkerRenderState> {
 	private final ModelPart leftLeg;
 	private final ModelPart leftShin;
 
+	/** The parts that can come off, the stumps they leave, and the cut ends (only ever shown on a severed piece). */
+	private final Map<Limb, ModelPart> limbs = new EnumMap<>(Limb.class);
+	private final Map<Limb, ModelPart> stumps = new EnumMap<>(Limb.class);
+	private final List<ModelPart> cuts = new ArrayList<>();
+
 	public WalkerModel(ModelPart root) {
 		super(root);
 		Map<String, ModelPart> parts = BoxModels.parts(root, json());
+		for (Limb limb : Limb.values()) {
+			this.limbs.put(limb, parts.get(limb.part));
+			this.stumps.put(limb, parts.get(stumpName(limb)));
+		}
+
+		parts.forEach((name, part) -> {
+			if (name.endsWith("_cut")) {
+				this.cuts.add(part);
+			}
+		});
 		this.waist = parts.get("waist");
 		this.chest = parts.get("chest");
 		this.head = parts.get("head");
@@ -54,6 +75,47 @@ public class WalkerModel extends EntityModel<WalkerRenderState> {
 
 	private static JsonObject json() {
 		return BoxModels.read(PATH);
+	}
+
+	/**
+	 * A severed piece on its own (see BodyPartRenderer): that limb's branch of the model, moved to
+	 * the origin, so it can lie anywhere.
+	 */
+	public static LayerDefinition pieceLayer(Limb limb) {
+		JsonObject branch = branch(limb).deepCopy();
+		JsonArray zero = new JsonArray();
+		zero.add(0);
+		zero.add(0);
+		zero.add(0);
+		branch.add("pivot", zero.deepCopy());
+		branch.add("rotation", zero);
+		JsonObject piece = new JsonObject();
+		piece.add("texture", json().get("texture"));
+		JsonArray parts = new JsonArray();
+		parts.add(branch);
+		piece.add("parts", parts);
+		return BoxModels.layer(piece, 0.0F);
+	}
+
+	/** The JSON of one limb's branch of the model (the limb and everything below it). */
+	static JsonObject branch(Limb limb) {
+		return find(json().getAsJsonArray("parts"), limb.part);
+	}
+
+	private static JsonObject find(JsonArray parts, String name) {
+		for (JsonElement element : parts) {
+			JsonObject part = element.getAsJsonObject();
+			if (part.get("name").getAsString().equals(name)) {
+				return part;
+			}
+
+			JsonObject found = find(part.getAsJsonArray("children"), name);
+			if (found != null) {
+				return found;
+			}
+		}
+
+		return null;
 	}
 
 	public static LayerDefinition layer() {
@@ -78,6 +140,35 @@ public class WalkerModel extends EntityModel<WalkerRenderState> {
 
 		this.poseAttack(state);
 		this.applySprings(state.springs);
+		this.showLimbs(state.lostLimbs);
+	}
+
+	/** The stump each limb leaves on the body. */
+	static String stumpName(Limb limb) {
+		return switch (limb) {
+			case RIGHT_FOREARM -> "right_elbow_stump";
+			case LEFT_FOREARM -> "left_elbow_stump";
+			case RIGHT_ARM -> "right_shoulder_stump";
+			case LEFT_ARM -> "left_shoulder_stump";
+			case RIGHT_SHIN -> "right_knee_stump";
+			case LEFT_SHIN -> "left_knee_stump";
+			case RIGHT_LEG -> "right_hip_stump";
+			case LEFT_LEG -> "left_hip_stump";
+			case HEAD -> "neck_stump";
+		};
+	}
+
+	/** Missing parts hidden, a stump where each one was (the model is shared, so every part is set every time). */
+	private void showLimbs(int lost) {
+		for (Limb limb : Limb.values()) {
+			boolean gone = (lost & limb.bit()) != 0;
+			this.limbs.get(limb).visible = !gone;
+			this.stumps.get(limb).visible = gone;
+		}
+
+		for (ModelPart cut : this.cuts) {
+			cut.visible = false;
+		}
 	}
 
 	private void poseWalking(WalkerRenderState state) {

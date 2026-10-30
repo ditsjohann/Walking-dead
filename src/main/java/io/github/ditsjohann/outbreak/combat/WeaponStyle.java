@@ -39,6 +39,11 @@ public enum WeaponStyle {
 		this.headKnockdown = headKnockdown;
 	}
 
+	/** A blade heavy enough to take a limb off: machetes, axes, swords. */
+	public static boolean isSharp(ItemStack stack) {
+		return stack.is(OutbreakItems.MACHETE) || stack.is(ItemTags.AXES) || stack.is(ItemTags.SWORDS);
+	}
+
 	public static WeaponStyle of(ItemStack stack) {
 		if (stack.isEmpty()) {
 			return FIST;
