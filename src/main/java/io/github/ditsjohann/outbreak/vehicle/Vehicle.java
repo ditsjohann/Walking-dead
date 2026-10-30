@@ -683,6 +683,50 @@ public class Vehicle extends VehicleEntity {
 		}
 	}
 
+	/**
+	 * The driver uses the ignition: a key they carry goes in first (and stays there), then it turns
+	 * (see {@link #toggleEngine}). Taking the key switches the engine off and puts the key in the
+	 * driver's pockets.
+	 */
+	public void useIgnition(ServerPlayer player, boolean takeKey) {
+		if (!this.type.hasEngine || this.getControllingPassenger() != player || this.actionCooldown > 0) {
+			return;
+		}
+
+		ServerLevel level = (ServerLevel) this.level();
+		if (takeKey) {
+			if (!this.isKeyInside()) {
+				return;
+			}
+
+			if (this.isRunning()) {
+				this.stopEngine(null);
+			}
+
+			this.setKeyInside(false);
+			this.actionCooldown = 10;
+			ItemStack key = CarKeyItem.forVehicle(this);
+			if (!player.getInventory().add(key)) {
+				player.spawnAtLocation(level, key);
+			}
+
+			level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.CHAIN_STEP, SoundSource.NEUTRAL, 0.6F, 1.6F);
+			player.sendOverlayMessage(Component.translatable("outbreak.vehicle.took_key"));
+			return;
+		}
+
+		if (!this.isRunning() && !this.isKeyInside() && this.type.needsKey) {
+			ItemStack key = CarKeyItem.find(player, this);
+			if (key != null) {
+				key.shrink(1);
+				this.setKeyInside(true);
+				level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.CHAIN_STEP, SoundSource.NEUTRAL, 0.6F, 1.8F);
+			}
+		}
+
+		this.toggleEngine(player);
+	}
+
 	/** The driver turns the key (or the wires): start the engine, or switch it off. */
 	public void toggleEngine(ServerPlayer player) {
 		if (!this.type.hasEngine || this.getControllingPassenger() != player || this.actionCooldown > 0) {

@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.ditsjohann.outbreak.client.combat.Punches;
 import io.github.ditsjohann.outbreak.client.combat.SwingAnimations;
+import io.github.ditsjohann.outbreak.client.vehicle.Ignition;
 import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -69,6 +70,15 @@ abstract class FirstPersonHandsMixin {
 		}
 
 		original.call(renderer, poseStack, collector, light, inverseArmHeight, 0.0F, arm, playerState);
+	}
+
+	/** Driving: your hands are on the wheel (drawn with the vehicle), not holding things up in front of you. */
+	@Inject(method = "submitHandsWithItems", at = @At("HEAD"), cancellable = true)
+	private void outbreak$handsOnWheel(float partialTicks, PoseStack poseStack, SubmitNodeCollector collector, PlayerRenderState playerState,
+		FirstPersonHandsAndItemsRenderState state, CallbackInfo ci) {
+		if (Ignition.handsOnWheel()) {
+			ci.cancel();
+		}
 	}
 
 	/** The other fist, for the left-hand turn of an empty-handed swing. */

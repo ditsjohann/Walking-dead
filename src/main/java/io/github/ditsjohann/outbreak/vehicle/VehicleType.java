@@ -16,22 +16,22 @@ import net.minecraft.world.phys.Vec3;
  */
 public enum VehicleType {
 	BICYCLE(new Builder(2, 1.0F, 1.4F).tireItem(TireSize.BIKE).speed(0.36F, 0.010F, 0.05F).turn(7.0F)
-		.noise(0.0F, 3.0F).length(1.8F).seats(seat(0, 0.95, -0.15))
+		.noise(0.0F, 3.0F).length(1.8F).seats(seat(0, 0.9, -0.2))
 		.colors("black", "red", "blue", "green")),
 	SCOOTER(new Builder(2, 1.0F, 1.4F).tireItem(TireSize.BIKE).speed(0.55F, 0.014F, 0.05F).turn(5.5F)
 		.engine(6.0F, 0.0025F, true).noise(10.0F, 22.0F).length(1.9F).seats(seat(0, 0.75, -0.1), seat(0, 0.8, -0.65))
 		.colors("red", "white", "black", "cream")),
 	HATCHBACK(new Builder(4, 2.3F, 1.7F).speed(0.85F, 0.011F, 0.045F).turn(4.2F)
 		.engine(40.0F, 0.007F, true).windows().trunk(ContainerKind.TRUNK).noise(16.0F, 28.0F).length(3.6F)
-		.seats(seat(-0.42, 0.35, 0.25), seat(0.42, 0.35, 0.25), seat(-0.42, 0.35, -0.65), seat(0.42, 0.35, -0.65))
+		.seats(seat(-0.41, 0.22, 0.0), seat(0.4, 0.22, 0.0), seat(-0.4, 0.22, -0.75), seat(0.4, 0.22, -0.75))
 		.colors("red", "blue", "white", "silver", "black", "green")),
 	SEDAN(new Builder(4, 2.4F, 1.7F).speed(0.95F, 0.012F, 0.045F).turn(3.8F)
 		.engine(50.0F, 0.008F, true).windows().trunk(ContainerKind.LARGE_TRUNK).noise(16.0F, 28.0F).length(4.2F)
-		.seats(seat(-0.42, 0.35, 0.35), seat(0.42, 0.35, 0.35), seat(-0.42, 0.35, -0.55), seat(0.42, 0.35, -0.55))
+		.seats(seat(-0.41, 0.22, 0.125), seat(0.4, 0.22, 0.125), seat(-0.4, 0.22, -0.69), seat(0.4, 0.22, -0.69))
 		.colors("silver", "black", "blue", "red", "white", "green")),
 	VAN(new Builder(4, 2.6F, 2.2F).speed(0.75F, 0.008F, 0.04F).turn(3.4F)
 		.engine(70.0F, 0.011F, true).windows().trunk(ContainerKind.VAN_CARGO).noise(18.0F, 32.0F).length(4.6F)
-		.seats(seat(-0.45, 0.6, 1.0), seat(0.45, 0.6, 1.0))
+		.seats(seat(-0.41, 0.5, 0.75), seat(0.4, 0.5, 0.75))
 		.colors("white", "silver", "blue", "red"));
 
 	/** Car tires and the small tires of bicycles and scooters are different items. */

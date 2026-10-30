@@ -6,7 +6,9 @@
 		"FirstPersonHandsMixin",
 		"FogRendererMixin",
 		"GuiMixin",
+		"HumanoidMobRendererMixin",
 		"HumanoidModelMixin",
+		"HumanoidRenderStateMixin",
 		"InventoryScreenMixin",
 		"LivingEntitySwingMixin",
 		"ScreenAccessor"

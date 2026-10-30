@@ -19,6 +19,8 @@ itself still has to be generated with Arnis.
 | ![](screenshots/combat/crawler.png) A crawler. | ![](screenshots/combat/killed.png) A headshot: dead before it hits the ground. |
 | ![](screenshots/gore/1-flying.png) Limbs coming off: a forearm, an arm, a leg, a head, a shin. | ![](screenshots/gore/4-corpse.png) Headless, lying in its own pool. |
 | ![](screenshots/gore/6-trail.png) A legless crawler drags itself along, leaving a smear. | ![](screenshots/gore/5-ages.png) Puddles from fresh to dried. |
+| ![](screenshots/vehicles/4-dashboard.png) In the driver's seat: hands on the wheel, the dials, the ignition. | ![](screenshots/vehicles/6-started.png) The key in the ignition, turned: the engine runs. |
+| ![](screenshots/vehicles/1-cars.png) Detailed cars, a moped and a Dutch bike. | ![](screenshots/vehicles/10-bicycle.png) Pedalling, hands on the bars. |
 | ![](screenshots/phase4/1-lineup.png) Bicycle, scooter, hatchback, sedan, van and a wreck. | ![](screenshots/phase4/3-driving.png) Driving: the dashboard bottom right. |
 | ![](screenshots/phase4/4-mechanics.png) Working on a car: tires and battery, repairs. | ![](screenshots/phase4/6-bicycle.png) On a bicycle. |
 | ![](screenshots/ui/hud.png) The dark-paper HUD, with the four new containers behind it. | ![](screenshots/ui/inventory.png) The 18-slot inventory: 9 pockets and the hotbar. |

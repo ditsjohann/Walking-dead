@@ -154,7 +154,7 @@
 	"outbreak.vehicle.locked": "Locked.",
 	"outbreak.vehicle.unlocked": "Unlocked.",
 	"outbreak.vehicle.is_locked": "It's locked. Find the key, or break a window.",
-	"outbreak.vehicle.how_to_start": "Press %s to start the engine.",
+	"outbreak.vehicle.how_to_start": "Press %s or click the ignition to start the engine.",
 	"outbreak.vehicle.no_tank": "It has no fuel tank.",
 	"outbreak.vehicle.tank_full": "The tank is full.",
 	"outbreak.vehicle.can_empty": "The jerrycan is empty.",
@@ -365,5 +365,12 @@
 	"outbreak.trait.burglar": "Burglar",
 	"outbreak.trait.burglar.desc": "Hotwires cars with bare hands, and more often.",
 	"entity.outbreak.body_part": "Severed Limb",
-	"block.outbreak.blood": "Blood"
+	"block.outbreak.blood": "Blood",
+	"outbreak.vehicle.took_key": "You take the key out.",
+	"outbreak.ignition.start": "Right-click: turn the key",
+	"outbreak.ignition.stop": "Right-click: switch off",
+	"outbreak.ignition.insert": "Right-click: put the key in and turn it",
+	"outbreak.ignition.hotwire": "Right-click: hotwire it",
+	"outbreak.ignition.no_key": "No key (hotwire it with a screwdriver)",
+	"outbreak.ignition.take_key": "Left-click: take the key"
 }

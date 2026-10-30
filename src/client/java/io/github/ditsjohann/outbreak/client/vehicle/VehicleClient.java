@@ -24,7 +24,10 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.entity.Entity;
 
-/** Vehicles on the client: models, the driver's controls (engine on R, horn on G), engine sounds, the mechanics screen. */
+/**
+ * Vehicles on the client: models, the driver's controls (engine on R or click the ignition, horn on
+ * G), engine sounds, the mechanics screen.
+ */
 public final class VehicleClient {
 	private static final Map<Integer, EngineSound> SOUNDS = new HashMap<>();
 
@@ -53,6 +56,8 @@ public final class VehicleClient {
 				var keys = player.input.keyPresses;
 				vehicle.setInput(keys.left(), keys.right(), keys.forward(), keys.backward(), keys.jump());
 			}
+
+			Ignition.tick(minecraft);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (engineKey.consumeClick()) {

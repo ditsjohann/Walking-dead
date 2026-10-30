@@ -11,11 +11,15 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 
-/** The driver does something: start or stop the engine, honk, or (sent by the client's physics) crash. */
+/**
+ * The driver does something: start or stop the engine, honk, click the ignition (value 1: take the key
+ * out), or (sent by the client's physics) crash.
+ */
 public record VehicleActionPayload(int action, float value) implements CustomPacketPayload {
 	public static final int ENGINE = 0;
 	public static final int HORN = 1;
 	public static final int CRASH = 2;
+	public static final int IGNITION = 3;
 
 	public static final CustomPacketPayload.Type<VehicleActionPayload> TYPE = new CustomPacketPayload.Type<>(Outbreak.id("vehicle_action"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, VehicleActionPayload> CODEC = StreamCodec.composite(
@@ -45,7 +49,8 @@ public record VehicleActionPayload(int action, float value) implements CustomPac
 			}
 
 			switch (payload.action) {
-				case ENGINE -> vehicle.toggleEngine(player);
+				case ENGINE -> vehicle.useIgnition(player, false);
+				case IGNITION -> vehicle.useIgnition(player, payload.value > 0.0F);
 				case HORN -> vehicle.honk(player);
 				case CRASH -> vehicle.crash(player, payload.value);
 				default -> {

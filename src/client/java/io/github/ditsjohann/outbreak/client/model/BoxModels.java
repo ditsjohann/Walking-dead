@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonArray;
@@ -58,6 +60,24 @@ public final class BoxModels {
 		Map<String, ModelPart> out = new HashMap<>();
 		collect(root, json.getAsJsonArray("parts"), out);
 		return out;
+	}
+
+	/** Every part by name, with the parts leading down to it from the root (itself last). */
+	public static Map<String, List<ModelPart>> chains(ModelPart root, JsonObject json) {
+		Map<String, List<ModelPart>> out = new HashMap<>();
+		chain(root, json.getAsJsonArray("parts"), new ArrayList<>(), out);
+		return out;
+	}
+
+	private static void chain(ModelPart part, JsonArray children, List<ModelPart> above, Map<String, List<ModelPart>> out) {
+		for (JsonElement element : children) {
+			JsonObject json = element.getAsJsonObject();
+			ModelPart child = part.getChild(json.get("name").getAsString());
+			List<ModelPart> path = new ArrayList<>(above);
+			path.add(child);
+			out.put(json.get("name").getAsString(), List.copyOf(path));
+			chain(child, json.getAsJsonArray("children"), path, out);
+		}
 	}
 
 	private static void collect(ModelPart part, JsonArray children, Map<String, ModelPart> out) {

@@ -12,11 +12,11 @@ played on a real 1:1 copy of Groningen generated with
 - [Phase 1](docs/PHASE1.md) — walkers, noise, vanilla removed
 - [Phase 2](docs/PHASE2.md) — wounds, infection, needs, moodle HUD
 - [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags
-- [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads
+- [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads; detailed cars with round wheels, a real cabin, hands on the wheel and a clickable ignition
 - [Phase 5](docs/PHASE5.md) — title screen, new survivor (scenarios, sandbox settings), professions, traits, skills
-- [Combat](docs/COMBAT.md) — walkers that react to every hit, 24 walker skins, crawlers, 3D weapons, swings and punches
+- [Combat](docs/COMBAT.md) — walkers that react to every hit, 24 walker skins, crawlers, 3D weapons, swings and punches, gore (limbs coming off, blood and puddles)
 
-Status: phase 5 done (character and menus), plus the combat overhaul. Next: phase 6, the world winding down.
+Status: phase 5 done (character and menus), plus the combat overhaul, gore and the vehicle upgrade. Next: phase 6, the world winding down.
 
 ## Development
 
