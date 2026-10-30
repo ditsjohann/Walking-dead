@@ -81,6 +81,32 @@ dark.
 
 ![Covered in guts](screenshots/phase6/7-guts.png)
 
+## Guns
+Rare (this is the Netherlands: a police pistol in a cabinet, a hunter's rifle in a shed, a shotgun in
+a car boot), and loud: every shot is heard streets away, and the dead come.
+
+| | Holds | Damage | Spread (hip / aimed) | Between shots | Heard from | |
+|---|---|---|---|---|---|---|
+| Pistol | 15 × 9mm | 6 | 2.5° / 0.6° | 0.3 s | 64 blocks | quick, a magazine at a time (2 s) |
+| Pump shotgun | 6 shells | 8 × 3 | 6° / 4.5° | 0.9 s (the pump) | 80 blocks | loaded a shell at a time; can take a head off |
+| Hunting rifle | 5 rounds | 16 | 3.5° / 0.1° | 1.3 s (the bolt) | 112 blocks | a scope; reaches 160 blocks |
+
+- **Left-click** fires. **Hold right-click** to aim: tighter, zoomed in, the gun up at your eye; the
+  rifle you look through its scope. **R** reloads from the ammunition in your pockets (and starts the
+  engine when you're in a car, as before). Running makes you miss.
+- **It's the same fight:** a body shot staggers a walker but never kills it; a head shot does four
+  times the damage. A shotgun or a rifle round to the head can take it off.
+- Each shot kicks the barrel up. Bullets break glass. Out of rounds, the gun clicks.
+- The counter bottom right: rounds in the gun / what it holds (+ what you carry).
+
+![The pistol](screenshots/phase6/guns-1-pistol-held.png)
+![Aimed](screenshots/phase6/guns-2-pistol-aimed.png)
+![The shotgun](screenshots/phase6/guns-3-shotgun-held.png)
+![The rifle](screenshots/phase6/guns-5-rifle-held.png)
+![Through the scope](screenshots/phase6/guns-6-rifle-aimed.png)
+![Aiming, from outside](screenshots/phase6/guns-8-third-person-aimed.png)
+![A head shot](screenshots/phase6/guns-10-down.png)
+
 ## Items
 | Item | |
 |---|---|
@@ -88,6 +114,8 @@ dark.
 | Portable radio | Hear the broadcasts. Runs on batteries. |
 | Batteries | New batteries for the radio. |
 | Walker guts | From a walker killed with a blade: smear them on to walk among the dead. |
+| Pistol, pump shotgun, hunting rifle | See Guns. |
+| 9mm rounds, shotgun shells, rifle rounds | Ammunition. |
 
 ## Admin and testing commands (operators only)
 ```
@@ -101,6 +129,7 @@ dark.
 /outbreak event gunfight               — a gunfight in the distance
 /outbreak event flare                  — a flare over the Euroborg
 /outbreak event migrate                — send the herds around you on their way now
+/outbreak gun fire [aimed] | reload    — fire or reload the gun you hold (for testing)
 ```
 
 ## How it's made
@@ -113,6 +142,11 @@ dark.
   helicopter only flies where the world is running (it comes in from the edge of it). Flares are drawn
   on each client in the Euroborg's direction, within view distance. Migrating herds: the leader of
   each herd walks a stretch at a time (`MigrateGoal`), the herd follows the leader.
+- **Guns** (`Guns`, `GunType`, `GunItem`): the client sends "fire" (aimed or not) or "reload"; the
+  server checks the gun and its rounds (kept on the gun), traces each bullet from your eye with the
+  gun's spread and deals the damage as a hit by you. The models are made by
+  `python3 tools/weapons/make_weapons.py` (held along the arm, so they point ahead when you aim), the
+  icons, the scope and the sounds (each shot, the click, the reload, the pump) by `make_world.py`.
 - `Camouflage` keeps until when you're covered (synced to everyone, for the overlay and the moodle);
   walkers can't see you while you are.
 - The dead light, the radio, batteries, tap water, walker guts and their overlay, the helicopter (a box
@@ -126,8 +160,13 @@ dark.
   filling a jerrycan and a car's tank and then dying with the power, the radio switching on, an alert,
   a new power day after changing the setting, a walker leaving a survivor covered in guts alone until
   they run, herds setting off across the map, the helicopter circling and a walker following it in).
+- Server: `python3 tools/servertest/driver.py . tools/servertest/guns.txt run/guns.log` (a head shot
+  kills, a body shot doesn't, rounds counting down, reloading a magazine and a shotgun shell by shell,
+  shooting out a window, a walker 60 blocks away coming to the sound of the rifle).
 - Client: `WorldClientTest` (a street at night, then without power; an NL-Alert; the radio; a dead
-  pump; covered in guts; the helicopter overhead; a flare over the Euroborg; the sandbox settings).
+  pump; covered in guts; the helicopter overhead; a flare over the Euroborg; the sandbox settings) and
+  `GunClientTest` (each gun held and aimed, the scope, third person, a head shot).
 
-## Still to come in this phase
-Guns.
+## Not yet
+Silencers and other attachments, more guns (the police's, the army's at the Euroborg), crafting
+ammunition, generators to keep your own power on, TVs, rain filling barrels.

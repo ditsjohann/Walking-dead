@@ -14,10 +14,10 @@ played on a real 1:1 copy of Groningen generated with
 - [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags
 - [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads; detailed cars with round wheels, a real cabin, hands on the wheel and a clickable ignition
 - [Phase 5](docs/PHASE5.md) — title screen, new survivor (scenarios, sandbox settings), professions, traits, skills
-- [Phase 6](docs/PHASE6.md) — the world winds down: water and power going off, the city going dark, fuel pumps, taps, NL-Alerts and the radio, the helicopter, flares, herds on the move, guts camouflage
+- [Phase 6](docs/PHASE6.md) — the world winds down: water and power going off, the city going dark, fuel pumps, taps, NL-Alerts and the radio, the helicopter, flares, herds on the move, guts camouflage, guns
 - [Combat](docs/COMBAT.md) — walkers that react to every hit, 24 walker skins, crawlers, 3D weapons, swings and punches, gore (limbs coming off, blood and puddles)
 
-Status: phase 5 done (character and menus), plus the combat overhaul, gore and the vehicle upgrade. Phase 6 (the world winding down) in progress.
+Status: phases 1-6 done (6: the world winding down), plus the combat overhaul, gore and the vehicle upgrade. Next: phase 7, Groningen's own data (building-aware loot and spawns from OpenStreetMap).
 
 ## Development
 

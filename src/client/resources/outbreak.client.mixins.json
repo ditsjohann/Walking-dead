@@ -3,6 +3,7 @@
 	"package": "io.github.ditsjohann.outbreak.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"AbstractClientPlayerMixin",
 		"FirstPersonHandsMixin",
 		"FogRendererMixin",
 		"GuiMixin",

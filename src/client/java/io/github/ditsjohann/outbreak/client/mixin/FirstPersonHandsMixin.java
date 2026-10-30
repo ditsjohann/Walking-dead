@@ -6,7 +6,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.ditsjohann.outbreak.client.combat.Punches;
 import io.github.ditsjohann.outbreak.client.combat.SwingAnimations;
+import io.github.ditsjohann.outbreak.client.combat.GunClient;
 import io.github.ditsjohann.outbreak.client.vehicle.Ignition;
+import io.github.ditsjohann.outbreak.combat.GunItem;
 import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -23,6 +26,7 @@ import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 
 /**
  * First person: our swings for our weapons (see {@link SwingAnimations}), and bare-handed punches
@@ -49,6 +53,16 @@ abstract class FirstPersonHandsMixin {
 	private void outbreak$lessDip(FirstPersonHandsAndItemsRenderer renderer, PoseStack poseStack, HumanoidArm arm, float inverseArmHeight, Operation<Void> original) {
 		boolean ours = WeaponStyle.of(SwingAnimations.current) != WeaponStyle.OTHER && !SwingAnimations.current.isEmpty();
 		original.call(renderer, poseStack, arm, ours ? inverseArmHeight * 0.2F : inverseArmHeight);
+		if (SwingAnimations.current.getItem() instanceof GunItem) {
+			GunClient.transform(poseStack, arm == HumanoidArm.RIGHT ? 1 : -1, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false));
+		}
+	}
+
+	/** Aiming a gun is held like any item (vanilla's bow pull would draw it back to your face). */
+	@WrapOperation(method = "submitArmWithItem", at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/world/item/ItemStack;getUseAnimation()Lnet/minecraft/world/item/ItemUseAnimation;"))
+	private ItemUseAnimation outbreak$gunAim(ItemStack stack, Operation<ItemUseAnimation> original) {
+		return stack.getItem() instanceof GunItem ? ItemUseAnimation.NONE : original.call(stack);
 	}
 
 	@Inject(method = "swingArm", at = @At("HEAD"), cancellable = true)
@@ -76,7 +90,8 @@ abstract class FirstPersonHandsMixin {
 	@Inject(method = "submitHandsWithItems", at = @At("HEAD"), cancellable = true)
 	private void outbreak$handsOnWheel(float partialTicks, PoseStack poseStack, SubmitNodeCollector collector, PlayerRenderState playerState,
 		FirstPersonHandsAndItemsRenderState state, CallbackInfo ci) {
-		if (Ignition.handsOnWheel()) {
+		// (and looking through the rifle's scope, the rifle isn't in the way).
+		if (Ignition.handsOnWheel() || Minecraft.getInstance().player != null && GunClient.scoped(Minecraft.getInstance().player)) {
 			ci.cancel();
 		}
 	}

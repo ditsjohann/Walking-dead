@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.client;
 import java.util.Locale;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.client.combat.GunClient;
 import io.github.ditsjohann.outbreak.client.vehicle.Dashboard;
 import io.github.ditsjohann.outbreak.client.vehicle.Ignition;
 import io.github.ditsjohann.outbreak.client.world.BroadcastClient;
@@ -66,10 +67,14 @@ final class OutbreakHud {
 			return;
 		}
 
+		GunClient.extractScope(graphics, player);
 		extractHotbar(graphics, minecraft, player);
 		Dashboard.extract(graphics, minecraft.font, player);
 		Ignition.extract(graphics, minecraft.font, player);
 		BroadcastClient.extract(graphics, minecraft.font);
+		if (player.getVehicle() == null) {
+			GunClient.extract(graphics, minecraft.font, player);
+		}
 		if (player.isCreative()) {
 			return;
 		}

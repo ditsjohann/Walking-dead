@@ -76,6 +76,21 @@
 					"weight": 3
 				},
 				{
+					"type": "minecraft:item",
+					"name": "outbreak:ammo_9mm",
+					"weight": 1,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 2,
+								"max": 7
+							}
+						}
+					]
+				},
+				{
 					"type": "minecraft:empty",
 					"weight": 68
 				}

@@ -154,8 +154,44 @@
 					]
 				},
 				{
+					"type": "minecraft:item",
+					"name": "outbreak:ammo_9mm",
+					"weight": 1,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 4,
+								"max": 12
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "outbreak:pistol",
+					"weight": 1,
+					"modifier": [
+						{
+							"type": "minecraft:set_damage",
+							"damage": {
+								"type": "minecraft:uniform",
+								"min": 0.25,
+								"max": 0.8
+							}
+						},
+						{
+							"type": "minecraft:set_components",
+							"components": {
+								"outbreak:rounds": 6
+							}
+						}
+					]
+				},
+				{
 					"type": "minecraft:empty",
-					"weight": 10
+					"weight": 12
 				}
 			]
 		}

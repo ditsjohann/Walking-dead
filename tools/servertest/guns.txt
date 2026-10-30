@@ -1,0 +1,60 @@
+# Phase 6 guns: a head shot kills, a body shot doesn't, rounds and reloading, glass, the noise.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+clear Bot
+tp Bot 0 -57 0 0 0
+== a pistol with 3 rounds; a walker 6 blocks ahead: aim at its head and fire (expect it dead)
+item replace entity Bot weapon.mainhand with outbreak:pistol[outbreak:rounds=3]
+summon outbreak:walker 0 -57 6 {NoAI:1b,PersistenceRequired:1b,Tags:["target"],Rotation:[180f,0f]}
+wait 1
+player Bot look at 0 -55.25 6
+execute as Bot run outbreak gun fire aimed
+wait 2
+outbreak walker corpses 12
+data get entity Bot SelectedItem.components
+== a body shot staggers but doesn't kill (expect the walker alive, hurt)
+summon outbreak:walker 0 -57 6 {NoAI:1b,PersistenceRequired:1b,Tags:["target2"],Rotation:[180f,0f]}
+wait 1
+player Bot look at 0 -56.2 6
+execute as Bot run outbreak gun fire aimed
+wait 1
+outbreak walker info @e[tag=target2,limit=1]
+== empty: fire the last round, then click; reload from the 9mm in your pockets (expect 15 loaded, 5 left over)
+execute as Bot run outbreak gun fire
+wait 1
+execute as Bot run outbreak gun fire
+item replace entity Bot inventory.0 with outbreak:ammo_9mm 20
+execute as Bot run outbreak gun reload
+wait 3
+data get entity Bot SelectedItem.components
+data get entity Bot Inventory[{Slot:9b}]
+kill @e[tag=target2]
+== the shotgun loads one shell at a time (expect 4 loaded from 4 shells)
+item replace entity Bot weapon.mainhand with outbreak:shotgun[outbreak:rounds=0]
+item replace entity Bot inventory.1 with outbreak:shotgun_shells 4
+execute as Bot run outbreak gun reload
+wait 4
+data get entity Bot SelectedItem.components
+== shooting out a window (expect the glass gone)
+setblock 0 -56 4 minecraft:glass
+player Bot look at 0.5 -55.5 4
+wait 1
+execute as Bot run outbreak gun fire aimed
+wait 1
+execute if block 0 -56 4 minecraft:air run say the window is shot out
+== the rifle is heard a long way off: a walker 60 blocks away comes to look
+summon outbreak:walker 60 -57 0 {Tags:["listener"],PersistenceRequired:1b}
+item replace entity Bot weapon.mainhand with outbreak:hunting_rifle[outbreak:rounds=5]
+wait 2
+data get entity @e[tag=listener,limit=1] Pos
+player Bot look at 0 -40 30
+execute as Bot run outbreak gun fire
+wait 8
+data get entity @e[tag=listener,limit=1] Pos

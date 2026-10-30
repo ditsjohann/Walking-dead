@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
+import io.github.ditsjohann.outbreak.client.combat.GunClient;
 import io.github.ditsjohann.outbreak.vehicle.MechanicsMenu;
 import io.github.ditsjohann.outbreak.vehicle.Vehicle;
 import io.github.ditsjohann.outbreak.vehicle.VehicleActionPayload;
@@ -61,7 +62,10 @@ public final class VehicleClient {
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (engineKey.consumeClick()) {
-				send(minecraft, VehicleActionPayload.ENGINE);
+				// The same key reloads a gun (when you're not in a vehicle).
+				if (!GunClient.reload(minecraft)) {
+					send(minecraft, VehicleActionPayload.ENGINE);
+				}
 			}
 
 			while (hornKey.consumeClick()) {

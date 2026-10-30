@@ -360,8 +360,44 @@
 					]
 				},
 				{
+					"type": "minecraft:item",
+					"name": "outbreak:rifle_rounds",
+					"weight": 1,
+					"modifier": [
+						{
+							"type": "minecraft:set_count",
+							"count": {
+								"type": "minecraft:uniform",
+								"min": 2,
+								"max": 6
+							}
+						}
+					]
+				},
+				{
+					"type": "minecraft:item",
+					"name": "outbreak:hunting_rifle",
+					"weight": 1,
+					"modifier": [
+						{
+							"type": "minecraft:set_damage",
+							"damage": {
+								"type": "minecraft:uniform",
+								"min": 0.25,
+								"max": 0.8
+							}
+						},
+						{
+							"type": "minecraft:set_components",
+							"components": {
+								"outbreak:rounds": 0
+							}
+						}
+					]
+				},
+				{
 					"type": "minecraft:empty",
-					"weight": 10
+					"weight": 12
 				}
 			]
 		}

@@ -6,6 +6,7 @@ import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.menu.CharacterSheetScreen;
 import io.github.ditsjohann.outbreak.client.menu.MenuClient;
 import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
+import io.github.ditsjohann.outbreak.client.combat.GunClient;
 import io.github.ditsjohann.outbreak.client.world.BroadcastClient;
 import io.github.ditsjohann.outbreak.client.world.MetaClient;
 import io.github.ditsjohann.outbreak.client.walker.BodyPartRenderer;
@@ -64,6 +65,7 @@ public class OutbreakClient implements ClientModInitializer {
 		MenuClient.register();
 		BroadcastClient.register();
 		MetaClient.register();
+		GunClient.register();
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			BroadcastClient.tick();
 			while (HEALTH_KEY.consumeClick()) {

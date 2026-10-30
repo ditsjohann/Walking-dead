@@ -16,6 +16,12 @@ public final class OutbreakSounds {
 	public static final Holder<SoundEvent> POWER_OUT = register("power_out");
 	public static final Holder<SoundEvent> HELICOPTER = register("helicopter");
 	public static final Holder<SoundEvent> GUNSHOT_DISTANT = register("gunshot_distant");
+	public static final Holder<SoundEvent> PISTOL_SHOT = register("pistol_shot");
+	public static final Holder<SoundEvent> SHOTGUN_SHOT = register("shotgun_shot");
+	public static final Holder<SoundEvent> RIFLE_SHOT = register("rifle_shot");
+	public static final Holder<SoundEvent> GUN_DRY = register("gun_dry");
+	public static final Holder<SoundEvent> GUN_RELOAD = register("gun_reload");
+	public static final Holder<SoundEvent> SHOTGUN_PUMP = register("shotgun_pump");
 
 	private OutbreakSounds() {
 	}

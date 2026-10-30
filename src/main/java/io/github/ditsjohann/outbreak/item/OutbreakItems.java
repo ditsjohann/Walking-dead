@@ -4,6 +4,8 @@ import java.util.function.Function;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
+import io.github.ditsjohann.outbreak.combat.GunItem;
+import io.github.ditsjohann.outbreak.combat.GunType;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.survivor.Treatment;
 
@@ -66,6 +68,14 @@ public final class OutbreakItems {
 			.hasConsumeParticles(false)
 			.build()));
 
+	// Guns and their ammunition: rare, loud, and the only way to kill from a distance.
+	public static final Item PISTOL = register("pistol", p -> new GunItem(GunType.PISTOL, p), new Item.Properties().stacksTo(1).durability(900));
+	public static final Item SHOTGUN = register("shotgun", p -> new GunItem(GunType.SHOTGUN, p), new Item.Properties().stacksTo(1).durability(500));
+	public static final Item HUNTING_RIFLE = register("hunting_rifle", p -> new GunItem(GunType.RIFLE, p), new Item.Properties().stacksTo(1).durability(600));
+	public static final Item AMMO_9MM = register("ammo_9mm", Item::new, new Item.Properties().stacksTo(50));
+	public static final Item SHOTGUN_SHELLS = register("shotgun_shells", Item::new, new Item.Properties().stacksTo(24));
+	public static final Item RIFLE_ROUNDS = register("rifle_rounds", Item::new, new Item.Properties().stacksTo(20));
+
 	// Melee weapons. Attack damage shown in game is 1 + the baseline; a headshot does 4x that.
 	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F, 7));
 	public static final Item BASEBALL_BAT = register("baseball_bat", Item::new, weapon(200, 5.0F, -3.0F, 12));
@@ -98,6 +108,12 @@ public final class OutbreakItems {
 			output.accept(CROWBAR);
 			output.accept(MACHETE);
 			output.accept(BATON);
+			output.accept(PISTOL);
+			output.accept(SHOTGUN);
+			output.accept(HUNTING_RIFLE);
+			output.accept(AMMO_9MM);
+			output.accept(SHOTGUN_SHELLS);
+			output.accept(RIFLE_ROUNDS);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
 			output.accept(HAMMER);

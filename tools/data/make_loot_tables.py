@@ -2,7 +2,8 @@
 
 Run from the repo root:  python3 tools/data/make_loot_tables.py
 Each entry is (item, weight, min, max), or (item, weight, min, max, extra) where extra is "worn"
-(random durability), "water" (a water bottle), "fuel:<litres>" (a jerrycan) or "charge:<0-1>" (a battery). "empty" is a roll that finds nothing: scarcity.
+(random durability), "water" (a water bottle), "fuel:<litres>" (a jerrycan), "charge:<0-1>" (a battery) or
+"rounds:<n>" (a gun with that many loaded). "empty" is a roll that finds nothing: scarcity.
 """
 import json
 from pathlib import Path
@@ -48,7 +49,8 @@ CONTAINERS = {
         ("outbreak:screwdriver", 2, 1, 1, "worn"), ("outbreak:jack", 1, 1, 1), ("outbreak:hose", 1, 1, 1, "worn"),
         ("outbreak:jerrycan", 2, 1, 1), ("outbreak:jerrycan", 1, 1, 1, "fuel:8"), ("outbreak:engine_parts", 1, 1, 2),
         ("outbreak:car_battery", 1, 1, 1, "charge:0.5"), ("outbreak:bike_tire", 1, 1, 1, "worn"), ("outbreak:batteries", 2, 1, 3),
-        ("outbreak:portable_radio", 1, 1, 1, "worn"), ("empty", 10),
+        ("outbreak:portable_radio", 1, 1, 1, "worn"), ("outbreak:rifle_rounds", 1, 2, 6),
+        ("outbreak:hunting_rifle", 1, 1, 1, "worn", "rounds:0"), ("empty", 12),
     ]),
     # Near bookshelves and lecterns.
     "study": ((1, 3), [
@@ -79,7 +81,8 @@ CONTAINERS = {
         ("outbreak:nails", 4, 2, 10), ("minecraft:iron_ingot", 2, 1, 3), ("minecraft:paper", 5, 1, 6),
         ("minecraft:book", 3, 1, 2), ("outbreak:bandage", 2, 1, 2), ("outbreak:disinfectant", 2, 1, 1),
         ("minecraft:torch", 3, 2, 6), ("outbreak:machete", 1, 1, 1, "worn"), ("outbreak:hiking_bag", 1, 1, 1),
-        ("outbreak:batteries", 2, 1, 2), ("outbreak:portable_radio", 1, 1, 1, "worn"), ("empty", 10),
+        ("outbreak:batteries", 2, 1, 2), ("outbreak:portable_radio", 1, 1, 1, "worn"), ("outbreak:ammo_9mm", 1, 4, 12),
+        ("outbreak:pistol", 1, 1, 1, "worn", "rounds:6"), ("empty", 12),
     ]),
     # The trunk of an abandoned car: whatever someone packed to get out of town.
     "trunk": ((1, 4), [
@@ -88,7 +91,8 @@ CONTAINERS = {
         ("outbreak:bandage", 2, 1, 2), ("outbreak:rag", 3, 1, 3), ("minecraft:potion", 3, 1, 2, "water"),
         ("minecraft:bread", 2, 1, 2), ("minecraft:white_wool", 2, 1, 2), ("outbreak:hiking_bag", 1, 1, 1),
         ("outbreak:school_bag", 1, 1, 1), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("outbreak:portable_radio", 1, 1, 1, "worn"),
-        ("outbreak:batteries", 1, 1, 2), ("empty", 12),
+        ("outbreak:batteries", 1, 1, 2), ("outbreak:shotgun_shells", 1, 2, 6), ("outbreak:shotgun", 1, 1, 1, "worn", "rounds:2"),
+        ("empty", 14),
     ]),
 }
 
@@ -96,7 +100,7 @@ CONTAINERS = {
 WALKER = [
     ("outbreak:rag", 15, 1, 2), ("minecraft:bread", 4, 1, 1), ("minecraft:potion", 3, 1, 1, "water"),
     ("outbreak:bandage", 2, 1, 1), ("outbreak:nails", 3, 1, 3), ("minecraft:iron_nugget", 2, 1, 2),
-    ("minecraft:paper", 3, 1, 1), ("empty", 68),
+    ("minecraft:paper", 3, 1, 1), ("outbreak:ammo_9mm", 1, 2, 7), ("empty", 68),
 ]
 
 
@@ -113,6 +117,8 @@ def entry(spec):
         if e.startswith("fuel:") or e.startswith("charge:"):
             key, value = e.split(":")
             modifiers.append({"type": "minecraft:set_components", "components": {f"outbreak:{key}": float(value)}})
+        if e.startswith("rounds:"):
+            modifiers.append({"type": "minecraft:set_components", "components": {"outbreak:rounds": int(e.split(":")[1])}})
     if "water" in extra:
         modifiers.append({"type": "minecraft:set_potion", "id": "minecraft:water"})
     result = {"type": "minecraft:item", "name": name, "weight": weight}

@@ -2,6 +2,7 @@ package io.github.ditsjohann.outbreak;
 
 import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
 import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.combat.Guns;
 import io.github.ditsjohann.outbreak.command.OutbreakCommand;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
@@ -44,6 +45,7 @@ public class Outbreak implements ModInitializer {
 		ContainerLoot.register();
 		Sandbox.register();
 		Timeline.register();
+		Guns.register();
 		OutbreakMenus.register();
 		OpenBagPayload.register();
 		Pockets.register();

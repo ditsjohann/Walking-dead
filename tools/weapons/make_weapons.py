@@ -36,6 +36,8 @@ MATERIALS = {
     "chrome": (3, 2, (210, 214, 220), "brushed"),
     "leather": (0, 3, (92, 56, 32), "rivets"),
     "blade_blood": (1, 3, (180, 184, 190), "blood_edge"),
+    "blued": (2, 3, (52, 56, 66), "brushed"),
+    "polymer": (3, 3, (40, 40, 42), "plain"),
 }
 
 
@@ -127,6 +129,56 @@ def screwdriver():
     ]
 
 
+# --- Guns: built lying along +y (the barrel pointing ahead), +z up; held by the grip. ---
+
+def pistol():
+    return [
+        box([7.1, 0, 9], [8.9, 8, 10.6], "blued"),                       # slide
+        box([7.2, 0.6, 8], [8.8, 7.6, 9], "polymer"),                    # frame
+        box([7.25, 0.4, 4], [8.75, 2.8, 8], "polymer", {"origin": [8, 1.6, 8], "axis": "x", "angle": 22.5}),  # grip
+        box([7.6, 2.8, 7.1], [8.4, 4.8, 7.5], "polymer"),                # trigger guard
+        box([7.85, 3.0, 7.4], [8.15, 3.5, 8], "steel"),                  # trigger
+        box([7.8, 7.2, 10.6], [8.2, 7.7, 11.1], "steel"),                # front sight
+        box([7.4, 0.3, 10.6], [8.6, 0.8, 11.1], "steel"),                # rear sight
+        box([7.6, 7.9, 9.4], [8.4, 8.2, 10.2], "steel_dark"),            # muzzle
+    ]
+
+
+def shotgun():
+    return [
+        box([7.2, -8, 4.5], [8.8, -1, 8], "wood"),                       # stock
+        box([7.15, -8.6, 4.4], [8.85, -8, 8.1], "rubber"),               # butt pad
+        box([7.1, -1, 6.5], [8.9, 4, 9.5], "blued"),                     # receiver
+        box([7.4, 4, 8.4], [8.6, 16, 9.4], "blued"),                     # barrel
+        box([7.5, 4, 7.2], [8.5, 13, 8.2], "steel_dark"),                # magazine tube
+        box([7.05, 6, 6.8], [8.95, 10.5, 8.7], "wood_dark"),             # pump
+        box([7.6, 0, 5.6], [8.4, 2, 6.5], "steel_dark"),                 # trigger guard
+        box([7.85, 15.2, 9.4], [8.15, 15.6, 9.8], "steel"),              # bead sight
+    ]
+
+
+def rifle():
+    return [
+        box([7.2, -10, 4.5], [8.8, -1, 8.2], "wood"),                    # stock
+        box([7.15, -10.6, 4.4], [8.85, -10, 8.3], "rubber"),             # butt pad
+        box([7.2, -1, 7], [8.8, 5, 9.4], "blued"),                       # receiver
+        box([7.55, 5, 8], [8.45, 18, 8.9], "blued"),                     # barrel
+        box([7.2, 2, 6.6], [8.8, 11.5, 8.2], "wood"),                    # forestock
+        box([8.8, 1, 8.4], [10.2, 1.6, 9], "steel"),                     # bolt handle
+        box([10.0, 0.9, 8.3], [10.6, 1.7, 9.1], "steel"),                # bolt knob
+        box([7.45, -1.5, 10.2], [8.55, 6.5, 11.3], "polymer"),           # scope tube
+        box([7.25, 5.5, 10.0], [8.75, 7.2, 11.5], "polymer"),            # scope bell
+        box([7.3, -2.3, 10.05], [8.7, -1.3, 11.45], "polymer"),          # eyepiece
+        box([7.7, -0.4, 9.4], [8.3, 0.4, 10.2], "steel_dark"),           # mount
+        box([7.7, 4.0, 9.4], [8.3, 4.8, 10.2], "steel_dark"),            # mount
+        box([7.6, 0, 5.8], [8.4, 2, 7], "steel_dark"),                   # trigger guard
+    ]
+
+
+# Builder, scale, where the hand grips it (y, z).
+GUNS = {"pistol": (pistol, 1.0, 1.6, 6.0), "shotgun": (shotgun, 1.05, 0.5, 6.4), "hunting_rifle": (rifle, 1.05, 0.5, 6.6)}
+
+
 # Builder, scale, where the hand grips it (y), and how it's held in third person (degrees up from
 # pointing straight ahead).
 WEAPONS = {
@@ -150,9 +202,9 @@ def rotate_xyz(v, rx, ry, rz):
     return x, y, z
 
 
-def display(rotation, scale, grip, offset=(0.0, 0.0, 0.0)):
-    """A display transform that puts the grip (model y, at the centre of x and z) at offset from the hand."""
-    g = rotate_xyz((0.0, (grip - 8.0) / 16.0 * scale, 0.0), *rotation)
+def display(rotation, scale, grip, offset=(0.0, 0.0, 0.0), grip_z=8.0):
+    """A display transform that puts the grip (model y, and z: at the centre of x) at offset from the hand."""
+    g = rotate_xyz((0.0, (grip - 8.0) / 16.0 * scale, (grip_z - 8.0) / 16.0 * scale), *rotation)
     translation = [round((offset[i] - g[i]) * 16.0, 3) for i in range(3)]
     scale = round(scale, 3)
     return {"rotation": list(rotation), "translation": translation, "scale": [scale, scale, scale]}
@@ -184,6 +236,29 @@ def model(boxes, scale, grip, raised):
     # Third person the hand's frame has the model's +y pointing ahead and +z up (arm hanging down).
     third = display((raised, 0.0, 0.0), scale * 0.9, grip)
     first = display(FIRST_PERSON_ROTATION, scale * 0.75, grip, (0.0, 0.3, 0.0))
+    return {
+        "textures": {"materials": "outbreak:item/weapon_materials", "particle": "outbreak:item/weapon_materials"},
+        "elements": elements,
+        "display": {
+            "thirdperson_righthand": third, "thirdperson_lefthand": third,
+            "firstperson_righthand": first, "firstperson_lefthand": first,
+        },
+    }
+
+
+def gun_model(boxes, scale, grip, grip_z):
+    """A gun: barrel along the arm in third person (so it points ahead when aimed, down at rest), and
+    pointing into the screen from low on the right in first person."""
+    elements = []
+    for b in boxes:
+        e = {"from": b["from"], "to": b["to"], "faces": {
+            face: {"uv": uv(b["mat"], face, b["from"], b["to"]), "texture": "#materials"}
+            for face in ("north", "south", "east", "west", "up", "down")}}
+        if b["rotation"]:
+            e["rotation"] = b["rotation"]
+        elements.append(e)
+    third = display((-90.0, 0.0, 0.0), scale * 0.85, grip, (0.0, 0.0, -0.06), grip_z)
+    first = display((-90.0, 6.0, 0.0), scale * 0.62, grip, (0.0, 0.05, -0.1), grip_z)
     return {
         "textures": {"materials": "outbreak:item/weapon_materials", "particle": "outbreak:item/weapon_materials"},
         "elements": elements,
@@ -229,9 +304,11 @@ def main():
     tex = ROOT / "textures/item/weapon_materials.png"
     sheet().save(tex)
     print("wrote", tex.relative_to(ROOT.parents[3]))
-    for name, (build, scale, grip, raised) in WEAPONS.items():
+    models = {name: model(build(), scale, grip, raised) for name, (build, scale, grip, raised) in WEAPONS.items()}
+    models.update({name: gun_model(build(), scale, grip, grip_z) for name, (build, scale, grip, grip_z) in GUNS.items()})
+    for name, data in models.items():
         out = ROOT / "models/item" / f"{name}_in_hand.json"
-        out.write_text(json.dumps(model(build(), scale, grip, raised), indent="\t") + "\n")
+        out.write_text(json.dumps(data, indent="\t") + "\n")
         definition = {"model": {
             "type": "minecraft:select", "property": "minecraft:display_context",
             "cases": [{"when": ["gui", "ground", "fixed", "on_shelf"], "model": {"type": "minecraft:model", "model": f"outbreak:item/{name}"}}],

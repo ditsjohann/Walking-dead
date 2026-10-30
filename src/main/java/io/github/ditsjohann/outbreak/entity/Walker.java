@@ -6,6 +6,7 @@ import java.util.UUID;
 import io.github.ditsjohann.outbreak.character.Characters;
 import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.character.Skill;
+import io.github.ditsjohann.outbreak.combat.GunItem;
 import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
@@ -255,7 +256,7 @@ public class Walker extends Zombie {
 		boolean head = false;
 		// Run over by a vehicle: crushed, head or not.
 		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !runOver) {
-			if (direct instanceof Player player) {
+			if (direct instanceof Player player && !(player.getMainHandItem().getItem() instanceof GunItem)) {
 				damage *= Perks.meleeDamage(player);
 			}
 

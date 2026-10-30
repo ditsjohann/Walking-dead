@@ -46,5 +46,50 @@
 				"attenuation_distance": 220
 			}
 		]
+	},
+	"pistol_shot": {
+		"subtitle": "subtitles.outbreak.pistol_shot",
+		"sounds": [
+			{
+				"name": "outbreak:pistol_shot",
+				"attenuation_distance": 96
+			}
+		]
+	},
+	"shotgun_shot": {
+		"subtitle": "subtitles.outbreak.shotgun_shot",
+		"sounds": [
+			{
+				"name": "outbreak:shotgun_shot",
+				"attenuation_distance": 112
+			}
+		]
+	},
+	"rifle_shot": {
+		"subtitle": "subtitles.outbreak.rifle_shot",
+		"sounds": [
+			{
+				"name": "outbreak:rifle_shot",
+				"attenuation_distance": 160
+			}
+		]
+	},
+	"gun_dry": {
+		"subtitle": "subtitles.outbreak.gun_dry",
+		"sounds": [
+			"outbreak:gun_dry"
+		]
+	},
+	"gun_reload": {
+		"subtitle": "subtitles.outbreak.gun_reload",
+		"sounds": [
+			"outbreak:gun_reload"
+		]
+	},
+	"shotgun_pump": {
+		"subtitle": "subtitles.outbreak.shotgun_pump",
+		"sounds": [
+			"outbreak:shotgun_pump"
+		]
 	}
 }

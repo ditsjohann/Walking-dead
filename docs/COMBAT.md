@@ -142,4 +142,5 @@ Yaw is Minecraft's: 0 = south, 90 = west, -90 = east.
   crawler's trail, a machete hit).
 
 ## Not yet
-Stomping, grabbing and shoving with a key, sounds for each weapon, guns, blood on walls.
+Stomping, grabbing and shoving with a key, sounds for each weapon, blood on walls. (Guns came in
+phase 6: see [PHASE6.md](PHASE6.md).)
