@@ -30,10 +30,18 @@ public final class Hydration {
 		Map.entry(Items.BEETROOT_SOUP, 0.2F),
 		Map.entry(Items.RABBIT_STEW, 0.2F),
 		Map.entry(Items.SUSPICIOUS_STEW, 0.2F),
-		Map.entry(OutbreakItems.BOILED_WATER, 0.4F)
+		Map.entry(OutbreakItems.BOILED_WATER, 0.4F),
+		Map.entry(OutbreakItems.TAP_WATER, 0.4F)
 	);
 
 	private Hydration() {
+	}
+
+	/** A few gulps straight from a tap. */
+	public static void drink(ServerPlayer player, float amount) {
+		SurvivorState state = Survivors.get(player);
+		state.thirst = Math.max(0.0F, state.thirst - amount);
+		Survivors.sync(player);
 	}
 
 	/** Called when a player finishes eating or drinking something. */

@@ -32,6 +32,11 @@ public final class OutbreakBlocks {
 		.ignitedByLava());
 
 	/** Blood on the ground (no item form either): left by hits, the dead, the dismembered and the bleeding. */
+	/** What the city's electric lights look like once the power is gone (see PowerGrid). */
+	public static final Block DEAD_LIGHT = register("dead_light", Block::new, BlockBehaviour.Properties.of()
+		.mapColor(MapColor.COLOR_LIGHT_GRAY)
+		.strength(0.3F)
+		.sound(SoundType.GLASS));
 	public static final Block BLOOD = register("blood", BloodBlock::new, BlockBehaviour.Properties.of()
 		.mapColor(MapColor.COLOR_RED)
 		.noCollision()

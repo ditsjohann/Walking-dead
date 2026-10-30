@@ -18,6 +18,7 @@
 			"io.github.ditsjohann.outbreak.test.CharacterClientTest",
 			"io.github.ditsjohann.outbreak.test.AnimationClientTest",
 			"io.github.ditsjohann.outbreak.test.GoreClientTest",
+			"io.github.ditsjohann.outbreak.test.WorldClientTest",
 			"io.github.ditsjohann.outbreak.test.BackdropClientTest"
 		]
 	},

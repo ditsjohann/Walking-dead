@@ -1,0 +1,75 @@
+# Phase 6 checks: the timeline, the lights going out, taps, fuel pumps, the radio.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+clear Bot
+== the timeline: day 1, water and power on until some day in the first weeks
+outbreak timeline
+== electric lights (glowstone, a sea lantern, a lit street lamp) and a lantern, then the power goes
+setblock 3 -55 -3 minecraft:glowstone
+setblock 4 -55 -3 minecraft:sea_lantern
+setblock 5 -56 -3 minecraft:redstone_block
+setblock 5 -55 -3 minecraft:redstone_lamp[lit=true]
+setblock 6 -55 -3 minecraft:lantern
+wait 1
+outbreak timeline power off
+wait 3
+outbreak timeline
+execute if block 3 -55 -3 outbreak:dead_light run say glowstone went dark
+execute if block 4 -55 -3 outbreak:dead_light run say the sea lantern went dark
+execute if block 5 -55 -3 minecraft:redstone_lamp[lit=false] run say the street lamp went dark
+execute if block 6 -55 -3 minecraft:lantern run say the lantern still burns
+== a tap: while the water runs, a bottle fills with clean tap water
+outbreak timeline power on
+setblock 2 -57 2 minecraft:cauldron
+item replace entity Bot weapon.mainhand with minecraft:glass_bottle
+player Bot look at 2 -56.6 2
+player Bot use once
+wait 1
+execute if items entity Bot weapon.mainhand outbreak:tap_water run say tap water
+== the water goes off: the tap runs dry
+outbreak timeline water off
+item replace entity Bot weapon.mainhand with minecraft:glass_bottle
+player Bot use once
+wait 1
+execute if items entity Bot weapon.mainhand minecraft:glass_bottle run say the tap is dry
+== a fuel pump (white base, red head, a nozzle on its side): fill an empty jerrycan
+setblock 5 -57 4 minecraft:white_concrete
+setblock 5 -56 4 minecraft:red_concrete
+setblock 6 -56 4 minecraft:tripwire_hook[facing=east]
+item replace entity Bot weapon.mainhand with outbreak:jerrycan
+tp Bot 8 -57 4
+player Bot look at 6.5 -55.7 4.5
+player Bot use once
+wait 1
+data get entity Bot SelectedItem.components
+== a car parked next to the pump: fill its tank (half full, 20 of 40 L)
+execute positioned 8 -57 7 rotated 0 0 run outbreak vehicle spawn hatchback new
+item replace entity Bot weapon.mainhand with minecraft:air
+player Bot use once
+wait 1
+execute positioned 8 -57 7 run outbreak vehicle info
+== the power goes: the pump is dead (still a full jerrycan's worth missing from a new one)
+outbreak timeline power off
+item replace entity Bot weapon.mainhand with outbreak:jerrycan
+player Bot use once
+wait 1
+data get entity Bot SelectedItem.components
+== the radio: switch it on (custom model data flag true), then an NL-Alert and the radio
+item replace entity Bot weapon.mainhand with outbreak:portable_radio
+player Bot look at 8 -40 20
+player Bot use once
+wait 1
+data get entity Bot SelectedItem.components
+outbreak timeline alert 0
+execute as Bot run outbreak timeline radio
+== the sandbox: power off early instead (picks a new day)
+outbreak sandbox set power early
+wait 2
+outbreak timeline

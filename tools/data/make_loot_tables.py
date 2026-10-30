@@ -18,7 +18,8 @@ CONTAINERS = {
         ("minecraft:paper", 3, 1, 3), ("minecraft:book", 2, 1, 1), ("minecraft:candle", 3, 1, 2),
         ("minecraft:torch", 3, 1, 4), ("minecraft:white_wool", 3, 1, 2), ("outbreak:nails", 2, 2, 6),
         ("outbreak:bandage", 1, 1, 1), ("outbreak:disinfectant", 1, 1, 1), ("outbreak:kitchen_knife", 1, 1, 1, "worn"),
-        ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("outbreak:school_bag", 1, 1, 1), ("empty", 15),
+        ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("outbreak:school_bag", 1, 1, 1), ("outbreak:batteries", 2, 1, 2),
+        ("outbreak:portable_radio", 1, 1, 1, "worn"), ("empty", 15),
     ]),
     # Near furnaces, smokers, cauldrons: food, drink and knives.
     "kitchen": ((2, 5), [
@@ -46,7 +47,8 @@ CONTAINERS = {
         ("minecraft:torch", 3, 2, 6), ("minecraft:leather", 1, 1, 2), ("outbreak:wrench", 2, 1, 1, "worn"),
         ("outbreak:screwdriver", 2, 1, 1, "worn"), ("outbreak:jack", 1, 1, 1), ("outbreak:hose", 1, 1, 1, "worn"),
         ("outbreak:jerrycan", 2, 1, 1), ("outbreak:jerrycan", 1, 1, 1, "fuel:8"), ("outbreak:engine_parts", 1, 1, 2),
-        ("outbreak:car_battery", 1, 1, 1, "charge:0.5"), ("outbreak:bike_tire", 1, 1, 1, "worn"), ("empty", 10),
+        ("outbreak:car_battery", 1, 1, 1, "charge:0.5"), ("outbreak:bike_tire", 1, 1, 1, "worn"), ("outbreak:batteries", 2, 1, 3),
+        ("outbreak:portable_radio", 1, 1, 1, "worn"), ("empty", 10),
     ]),
     # Near bookshelves and lecterns.
     "study": ((1, 3), [
@@ -77,7 +79,7 @@ CONTAINERS = {
         ("outbreak:nails", 4, 2, 10), ("minecraft:iron_ingot", 2, 1, 3), ("minecraft:paper", 5, 1, 6),
         ("minecraft:book", 3, 1, 2), ("outbreak:bandage", 2, 1, 2), ("outbreak:disinfectant", 2, 1, 1),
         ("minecraft:torch", 3, 2, 6), ("outbreak:machete", 1, 1, 1, "worn"), ("outbreak:hiking_bag", 1, 1, 1),
-        ("empty", 10),
+        ("outbreak:batteries", 2, 1, 2), ("outbreak:portable_radio", 1, 1, 1, "worn"), ("empty", 10),
     ]),
     # The trunk of an abandoned car: whatever someone packed to get out of town.
     "trunk": ((1, 4), [
@@ -85,7 +87,8 @@ CONTAINERS = {
         ("outbreak:jack", 2, 1, 1), ("outbreak:wrench", 1, 1, 1, "worn"), ("outbreak:engine_parts", 1, 1, 1),
         ("outbreak:bandage", 2, 1, 2), ("outbreak:rag", 3, 1, 3), ("minecraft:potion", 3, 1, 2, "water"),
         ("minecraft:bread", 2, 1, 2), ("minecraft:white_wool", 2, 1, 2), ("outbreak:hiking_bag", 1, 1, 1),
-        ("outbreak:school_bag", 1, 1, 1), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("empty", 12),
+        ("outbreak:school_bag", 1, 1, 1), ("outbreak:baseball_bat", 1, 1, 1, "worn"), ("outbreak:portable_radio", 1, 1, 1, "worn"),
+        ("outbreak:batteries", 1, 1, 2), ("empty", 12),
     ]),
 }
 

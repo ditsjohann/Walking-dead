@@ -6,6 +6,7 @@ import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.menu.CharacterSheetScreen;
 import io.github.ditsjohann.outbreak.client.menu.MenuClient;
 import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
+import io.github.ditsjohann.outbreak.client.world.BroadcastClient;
 import io.github.ditsjohann.outbreak.client.walker.BodyPartRenderer;
 import io.github.ditsjohann.outbreak.client.walker.WalkerModel;
 import io.github.ditsjohann.outbreak.client.walker.WalkerRenderer;
@@ -60,7 +61,9 @@ public class OutbreakClient implements ClientModInitializer {
 
 		// The title screen, the new survivor screens, character creation and the sandbox editor.
 		MenuClient.register();
+		BroadcastClient.register();
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
+			BroadcastClient.tick();
 			while (HEALTH_KEY.consumeClick()) {
 				if (minecraft.player != null && minecraft.gui.screen() == null) {
 					minecraft.gui.setScreen(new HealthPanelScreen());

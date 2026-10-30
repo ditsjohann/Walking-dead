@@ -81,10 +81,11 @@ final class SandboxCommand {
 	private static int info(CommandSourceStack source) {
 		SandboxSettings s = Sandbox.current();
 		source.sendSuccess(() -> Component.literal(String.format(Locale.ROOT,
-			"sandbox: %s, scenario %s (day %d), map %s [%s], walker_speed %s, population %s (x%.2f), herd_size %s, infection %s, loot %s (x%.2f), permadeath %s, vanilla_monsters %s",
+			"sandbox: %s, scenario %s (day %d), map %s [%s], walker_speed %s, population %s (x%.2f), herd_size %s, infection %s, loot %s (x%.2f), permadeath %s, vanilla_monsters %s, water %s, power %s",
 			s.preset().getSerializedName(), s.scenario().getSerializedName(), s.scenario().startDay, s.map().getSerializedName(), s.bbox(),
 			s.walkerSpeed().getSerializedName(), s.population().getSerializedName(), s.populationMultiplier(), s.herdSize().getSerializedName(),
-			s.infection().getSerializedName(), s.loot().getSerializedName(), s.lootMultiplier(), s.permadeath(), s.vanillaMonsters())), false);
+			s.infection().getSerializedName(), s.loot().getSerializedName(), s.lootMultiplier(), s.permadeath(), s.vanillaMonsters(),
+			s.water().getSerializedName(), s.power().getSerializedName())), false);
 		return 1;
 	}
 

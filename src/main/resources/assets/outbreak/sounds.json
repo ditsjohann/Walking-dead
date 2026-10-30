@@ -1,0 +1,31 @@
+{
+	"nl_alert": {
+		"subtitle": "subtitles.outbreak.nl_alert",
+		"sounds": [
+			"outbreak:nl_alert"
+		]
+	},
+	"radio_static": {
+		"subtitle": "subtitles.outbreak.radio_static",
+		"sounds": [
+			"outbreak:radio_static_0",
+			"outbreak:radio_static_1",
+			"outbreak:radio_static_2"
+		]
+	},
+	"fuel_pump": {
+		"subtitle": "subtitles.outbreak.fuel_pump",
+		"sounds": [
+			"outbreak:fuel_pump"
+		]
+	},
+	"power_out": {
+		"subtitle": "subtitles.outbreak.power_out",
+		"sounds": [
+			{
+				"name": "outbreak:power_out",
+				"attenuation_distance": 64
+			}
+		]
+	}
+}

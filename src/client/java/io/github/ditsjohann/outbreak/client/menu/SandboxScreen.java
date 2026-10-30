@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
@@ -56,11 +57,16 @@ public class SandboxScreen extends Screen {
 		this.addRenderableWidget(this.toggle("permadeath", this.settings.permadeath(), left + column, y));
 		y += 24;
 		this.addRenderableWidget(this.toggle("vanilla_monsters", this.settings.vanillaMonsters(), left, y));
+		this.addRenderableWidget(this.cycle("water", SandboxSettings.Utilities.values(), this.settings.water(), SandboxSettings.Utilities::translationKey, left + column, y));
+		y += 24;
+		this.addRenderableWidget(this.cycle("power", SandboxSettings.Utilities.values(), this.settings.power(), SandboxSettings.Utilities::translationKey, left, y));
 
 		if (this.settings.map() == SandboxSettings.MapKind.GRONINGEN) {
-			EditBox bbox = new EditBox(this.font, left, y + 38, 372, 18, Component.translatable("outbreak.sandbox.bbox"));
+			// The map's bounding box, next to the power (what it is: in its tooltip).
+			EditBox bbox = new EditBox(this.font, left + column, y + 1, 180, 18, Component.translatable("outbreak.sandbox.bbox"));
 			bbox.setMaxLength(64);
 			bbox.setValue(this.settings.bbox());
+			bbox.setTooltip(Tooltip.create(Component.translatable("outbreak.sandbox.bbox")));
 			bbox.setResponder(value -> this.settings = this.settings.withMap(this.settings.map(), value));
 			this.addRenderableWidget(bbox);
 		}
@@ -110,10 +116,6 @@ public class SandboxScreen extends Screen {
 		page.draw(graphics, this.width, this.height);
 		Paper.heading(graphics, this.font, this.title, left, top + 12);
 		graphics.text(this.font, Component.translatable("outbreak.sandbox.intro"), left, top + 26, Paper.PENCIL, false);
-		if (this.settings.map() == SandboxSettings.MapKind.GRONINGEN) {
-			graphics.text(this.font, Component.translatable("outbreak.sandbox.bbox"), left, top + 66 + 3 * 24 + 26, Paper.INK, false);
-		}
-
 		super.extractRenderState(graphics, mouseX, mouseY, partialTick);
 	}
 }

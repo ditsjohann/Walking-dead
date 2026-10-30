@@ -14,9 +14,10 @@ played on a real 1:1 copy of Groningen generated with
 - [Phase 3](docs/PHASE3.md) — loot, barricades, weapons, carry weight, bags
 - [Phase 4](docs/PHASE4.md) — vehicles: parts, fuel, keys, hotwiring, cars on the roads; detailed cars with round wheels, a real cabin, hands on the wheel and a clickable ignition
 - [Phase 5](docs/PHASE5.md) — title screen, new survivor (scenarios, sandbox settings), professions, traits, skills
+- [Phase 6](docs/PHASE6.md) — the world winds down: water and power going off, the city going dark, fuel pumps, taps, NL-Alerts and the radio
 - [Combat](docs/COMBAT.md) — walkers that react to every hit, 24 walker skins, crawlers, 3D weapons, swings and punches, gore (limbs coming off, blood and puddles)
 
-Status: phase 5 done (character and menus), plus the combat overhaul, gore and the vehicle upgrade. Next: phase 6, the world winding down.
+Status: phase 5 done (character and menus), plus the combat overhaul, gore and the vehicle upgrade. Phase 6 (the world winding down) in progress.
 
 ## Development
 
@@ -46,4 +47,4 @@ Client test with screenshots (real game window; on a headless Linux box use a vi
 SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest   # build/run/clientGameTest/screenshots/
 ```
 
-Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; vehicle models and textures by `python3 tools/vehicles/make_vehicles.py`; the walker model and skins by `python3 tools/walkers/make_walkers.py`; blood puddles by `python3 tools/gore/make_gore.py`; the 3D weapons by `python3 tools/weapons/make_weapons.py`; the title panorama, logo, widget skins and menu pages by `python3 tools/menu/make_menu.py`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).
+Textures are generated from ASCII pixel art (`python3 tools/textures/make_textures.py`) and, for the UI, by `python3 tools/textures/hudart.py export`; vehicle models and textures by `python3 tools/vehicles/make_vehicles.py`; the walker model and skins by `python3 tools/walkers/make_walkers.py`; blood puddles by `python3 tools/gore/make_gore.py`; the phase 6 blocks, items and sounds by `python3 tools/world/make_world.py`; the 3D weapons by `python3 tools/weapons/make_weapons.py`; the title panorama, logo, widget skins and menu pages by `python3 tools/menu/make_menu.py`; loot tables from compact lists (`python3 tools/data/make_loot_tables.py`).

@@ -44,6 +44,19 @@ public final class OutbreakItems {
 			.hasConsumeParticles(false)
 			.build())
 		.usingConvertsTo(Items.GLASS_BOTTLE));
+	/** From a tap, while the water still runs: as safe as boiled. */
+	public static final Item TAP_WATER = register("tap_water", Item::new, new Item.Properties()
+		.stacksTo(1)
+		.component(DataComponents.CONSUMABLE, Consumable.builder()
+			.consumeSeconds(1.6F)
+			.animation(ItemUseAnimation.DRINK)
+			.sound(SoundEvents.GENERIC_DRINK)
+			.hasConsumeParticles(false)
+			.build())
+		.usingConvertsTo(Items.GLASS_BOTTLE));
+	/** Runs on batteries; while it's on you hear the emergency broadcasts (see Broadcasts). */
+	public static final Item PORTABLE_RADIO = register("portable_radio", RadioItem::new, new Item.Properties().stacksTo(1).durability(RadioItem.BATTERY_LIFE));
+	public static final Item BATTERIES = register("batteries", Item::new, new Item.Properties().stacksTo(8));
 
 	// Melee weapons. Attack damage shown in game is 1 + the baseline; a headshot does 4x that.
 	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F, 7));
@@ -83,6 +96,8 @@ public final class OutbreakItems {
 			output.accept(NAILS);
 			output.accept(SCHOOL_BAG);
 			output.accept(HIKING_BAG);
+			output.accept(PORTABLE_RADIO);
+			output.accept(BATTERIES);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> {
 			output.accept(FRIDGE);
@@ -95,6 +110,7 @@ public final class OutbreakItems {
 			output.accept(BANDAGE);
 			output.accept(DISINFECTANT);
 			output.accept(BOILED_WATER);
+			output.accept(TAP_WATER);
 		});
 	}
 

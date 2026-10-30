@@ -5,6 +5,7 @@ import java.util.Locale;
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.client.vehicle.Dashboard;
 import io.github.ditsjohann.outbreak.client.vehicle.Ignition;
+import io.github.ditsjohann.outbreak.client.world.BroadcastClient;
 import io.github.ditsjohann.outbreak.entity.Walker;
 import io.github.ditsjohann.outbreak.inventory.CarryWeight;
 import io.github.ditsjohann.outbreak.survivor.Moodle;
@@ -68,6 +69,7 @@ final class OutbreakHud {
 		extractHotbar(graphics, minecraft, player);
 		Dashboard.extract(graphics, minecraft.font, player);
 		Ignition.extract(graphics, minecraft.font, player);
+		BroadcastClient.extract(graphics, minecraft.font);
 		if (player.isCreative()) {
 			return;
 		}

@@ -19,6 +19,8 @@ itself still has to be generated with Arnis.
 | ![](screenshots/combat/crawler.png) A crawler. | ![](screenshots/combat/killed.png) A headshot: dead before it hits the ground. |
 | ![](screenshots/gore/1-flying.png) Limbs coming off: a forearm, an arm, a leg, a head, a shin. | ![](screenshots/gore/4-corpse.png) Headless, lying in its own pool. |
 | ![](screenshots/gore/6-trail.png) A legless crawler drags itself along, leaving a smear. | ![](screenshots/gore/5-ages.png) Puddles from fresh to dried. |
+| ![](screenshots/phase6/1-street-lit.png) A street at night, its lamps and lit windows. | ![](screenshots/phase6/2-power-out.png) The power goes: the city goes dark. |
+| ![](screenshots/phase6/3-nl-alert.png) An NL-Alert on everyone's phone. | ![](screenshots/phase6/4-radio.png) The emergency broadcast on the radio. |
 | ![](screenshots/vehicles/4-dashboard.png) In the driver's seat: hands on the wheel, the dials, the ignition. | ![](screenshots/vehicles/6-started.png) The key in the ignition, turned: the engine runs. |
 | ![](screenshots/vehicles/1-cars.png) Detailed cars, a moped and a Dutch bike. | ![](screenshots/vehicles/10-bicycle.png) Pedalling, hands on the bars. |
 | ![](screenshots/phase4/1-lineup.png) Bicycle, scooter, hatchback, sedan, van and a wreck. | ![](screenshots/phase4/3-driving.png) Driving: the dashboard bottom right. |

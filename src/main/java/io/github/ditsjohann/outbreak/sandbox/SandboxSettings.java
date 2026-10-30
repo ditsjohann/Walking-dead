@@ -28,7 +28,9 @@ public record SandboxSettings(
 	Infection infection,
 	Loot loot,
 	boolean permadeath,
-	boolean vanillaMonsters
+	boolean vanillaMonsters,
+	Utilities water,
+	Utilities power
 ) {
 	/** Arnis's bounding box for the city of Groningen (see docs/MAP_GRONINGEN.md). */
 	public static final String GRONINGEN_BBOX = "53.17,6.48,53.26,6.65";
@@ -46,7 +48,9 @@ public record SandboxSettings(
 		Infection.CODEC.optionalFieldOf("infection", Infection.NORMAL).forGetter(SandboxSettings::infection),
 		Loot.CODEC.optionalFieldOf("loot", Loot.NORMAL).forGetter(SandboxSettings::loot),
 		Codec.BOOL.optionalFieldOf("permadeath", true).forGetter(SandboxSettings::permadeath),
-		Codec.BOOL.optionalFieldOf("vanilla_monsters", false).forGetter(SandboxSettings::vanillaMonsters)
+		Codec.BOOL.optionalFieldOf("vanilla_monsters", false).forGetter(SandboxSettings::vanillaMonsters),
+		Utilities.CODEC.optionalFieldOf("water", Utilities.NORMAL).forGetter(SandboxSettings::water),
+		Utilities.CODEC.optionalFieldOf("power", Utilities.NORMAL).forGetter(SandboxSettings::power)
 	).apply(i, SandboxSettings::new));
 
 	public static final StreamCodec<RegistryFriendlyByteBuf, SandboxSettings> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(CODEC);
@@ -64,18 +68,18 @@ public record SandboxSettings(
 	/** These rules under a preset; picking "custom" keeps them as they are. */
 	public SandboxSettings withPreset(Preset preset) {
 		if (preset == Preset.CUSTOM) {
-			return new SandboxSettings(Preset.CUSTOM, this.scenario, this.map, this.bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters);
+			return new SandboxSettings(Preset.CUSTOM, this.scenario, this.map, this.bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters, this.water, this.power);
 		}
 
 		return preset.apply(this.scenario, this.map, this.bbox);
 	}
 
 	public SandboxSettings withScenario(Scenario scenario) {
-		return new SandboxSettings(this.preset, scenario, this.map, this.bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters);
+		return new SandboxSettings(this.preset, scenario, this.map, this.bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters, this.water, this.power);
 	}
 
 	public SandboxSettings withMap(MapKind map, String bbox) {
-		return new SandboxSettings(this.preset, this.scenario, map, bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters);
+		return new SandboxSettings(this.preset, this.scenario, map, bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, this.vanillaMonsters, this.water, this.power);
 	}
 
 	/** Same rules with one of them changed: the preset becomes "custom". Values are the names used by the command. */
@@ -87,6 +91,8 @@ public record SandboxSettings(
 		Loot loot = this.loot;
 		boolean permadeath = this.permadeath;
 		boolean vanillaMonsters = this.vanillaMonsters;
+		Utilities water = this.water;
+		Utilities power = this.power;
 		switch (key) {
 			case "walker_speed" -> walkerSpeed = parse(WalkerSpeed.values(), value);
 			case "population" -> population = parse(Population.values(), value);
@@ -95,14 +101,16 @@ public record SandboxSettings(
 			case "loot" -> loot = parse(Loot.values(), value);
 			case "permadeath" -> permadeath = parseBool(value);
 			case "vanilla_monsters" -> vanillaMonsters = parseBool(value);
+			case "water" -> water = parse(Utilities.values(), value);
+			case "power" -> power = parse(Utilities.values(), value);
 			default -> throw new IllegalArgumentException("Unknown setting: " + key);
 		}
 
-		return new SandboxSettings(Preset.CUSTOM, this.scenario, this.map, this.bbox, walkerSpeed, population, herdSize, infection, loot, permadeath, vanillaMonsters);
+		return new SandboxSettings(Preset.CUSTOM, this.scenario, this.map, this.bbox, walkerSpeed, population, herdSize, infection, loot, permadeath, vanillaMonsters, water, power);
 	}
 
 	/** The keys {@link #with} takes, and their possible values. */
-	public static final String[] KEYS = {"walker_speed", "population", "herd_size", "infection", "loot", "permadeath", "vanilla_monsters"};
+	public static final String[] KEYS = {"walker_speed", "population", "herd_size", "infection", "loot", "permadeath", "vanilla_monsters", "water", "power"};
 
 	public static String[] values(String key) {
 		return switch (key) {
@@ -111,6 +119,7 @@ public record SandboxSettings(
 			case "herd_size" -> names(HerdSize.values());
 			case "infection" -> names(Infection.values());
 			case "loot" -> names(Loot.values());
+			case "water", "power" -> names(Utilities.values());
 			default -> new String[] {"true", "false"};
 		};
 	}
@@ -149,15 +158,15 @@ public record SandboxSettings(
 	/** Ready-made sets of rules, from forgiving to brutal. */
 	public enum Preset implements StringRepresentable {
 		/** TWD-heroic: few walkers, only bites infect, plenty of loot, you keep your character when you die. */
-		SURVIVOR(WalkerSpeed.SHAMBLERS, Population.LOW, HerdSize.SMALL, Infection.BITES_ONLY, Loot.COMMON, false),
+		SURVIVOR(WalkerSpeed.SHAMBLERS, Population.LOW, HerdSize.SMALL, Infection.BITES_ONLY, Loot.COMMON, false, Utilities.LATE),
 		/** The default, PZ-style: slow but many, every scratch can kill you, one life. */
-		APOCALYPSE(WalkerSpeed.SHAMBLERS, Population.NORMAL, HerdSize.NORMAL, Infection.NORMAL, Loot.NORMAL, true),
+		APOCALYPSE(WalkerSpeed.SHAMBLERS, Population.NORMAL, HerdSize.NORMAL, Infection.NORMAL, Loot.NORMAL, true, Utilities.NORMAL),
 		/** For building: hardly any walkers, no infection, loot everywhere. */
-		BUILDER(WalkerSpeed.SHAMBLERS, Population.LOW, HerdSize.SMALL, Infection.OFF, Loot.ABUNDANT, false),
+		BUILDER(WalkerSpeed.SHAMBLERS, Population.LOW, HerdSize.SMALL, Infection.OFF, Loot.ABUNDANT, false, Utilities.NEVER),
 		/** Fast, many, in big herds; little to find. */
-		NIGHTMARE(WalkerSpeed.SPRINTERS, Population.HIGH, HerdSize.LARGE, Infection.HARSH, Loot.RARE, true),
+		NIGHTMARE(WalkerSpeed.SPRINTERS, Population.HIGH, HerdSize.LARGE, Infection.HARSH, Loot.RARE, true, Utilities.EARLY),
 		/** Anything changed by hand. */
-		CUSTOM(WalkerSpeed.SHAMBLERS, Population.NORMAL, HerdSize.NORMAL, Infection.NORMAL, Loot.NORMAL, true);
+		CUSTOM(WalkerSpeed.SHAMBLERS, Population.NORMAL, HerdSize.NORMAL, Infection.NORMAL, Loot.NORMAL, true, Utilities.NORMAL);
 
 		public static final Codec<Preset> CODEC = StringRepresentable.fromEnum(Preset::values);
 		final WalkerSpeed walkerSpeed;
@@ -166,18 +175,21 @@ public record SandboxSettings(
 		final Infection infection;
 		final Loot loot;
 		final boolean permadeath;
+		final Utilities utilities;
 
-		Preset(WalkerSpeed walkerSpeed, Population population, HerdSize herdSize, Infection infection, Loot loot, boolean permadeath) {
+		Preset(WalkerSpeed walkerSpeed, Population population, HerdSize herdSize, Infection infection, Loot loot, boolean permadeath, Utilities utilities) {
 			this.walkerSpeed = walkerSpeed;
 			this.population = population;
 			this.herdSize = herdSize;
 			this.infection = infection;
 			this.loot = loot;
 			this.permadeath = permadeath;
+			this.utilities = utilities;
 		}
 
 		public SandboxSettings apply(Scenario scenario, MapKind map, String bbox) {
-			return new SandboxSettings(this, scenario, map, bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, false);
+			return new SandboxSettings(this, scenario, map, bbox, this.walkerSpeed, this.population, this.herdSize, this.infection, this.loot, this.permadeath, false,
+				this.utilities, this.utilities);
 		}
 
 		@Override
@@ -367,6 +379,37 @@ public record SandboxSettings(
 
 		public String translationKey() {
 			return "outbreak.sandbox.loot." + lower(this);
+		}
+	}
+
+	/**
+	 * When the water and the power go off: a random day in the range, picked when the world starts
+	 * (see Timeline). PZ's default is somewhere in the first month.
+	 */
+	public enum Utilities implements StringRepresentable {
+		ALREADY_OFF(0, 0),
+		EARLY(2, 6),
+		NORMAL(7, 21),
+		LATE(21, 60),
+		NEVER(-1, -1);
+
+		public static final Codec<Utilities> CODEC = StringRepresentable.fromEnum(Utilities::values);
+		/** Days after the outbreak began (-1: never). */
+		public final int first;
+		public final int last;
+
+		Utilities(int first, int last) {
+			this.first = first;
+			this.last = last;
+		}
+
+		@Override
+		public String getSerializedName() {
+			return lower(this);
+		}
+
+		public String translationKey() {
+			return "outbreak.sandbox.utilities." + lower(this);
 		}
 	}
 }
