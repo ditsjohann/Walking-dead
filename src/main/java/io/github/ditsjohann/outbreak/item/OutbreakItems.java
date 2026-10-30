@@ -51,6 +51,7 @@ public final class OutbreakItems {
 	public static final Item CROWBAR = register("crowbar", Item::new, weapon(600, 5.0F, -2.8F, 10));
 	public static final Item MACHETE = register("machete", Item::new, weapon(250, 6.0F, -2.6F, 10));
 	public static final Item HAMMER = register("hammer", HammerItem::new, weapon(300, 3.0F, -2.8F, 10));
+	public static final Item BATON = register("baton", Item::new, weapon(400, 4.0F, -2.4F, 9));
 	public static final Item NAILS = register("nails", Item::new, new Item.Properties());
 
 	// Bags: rows of storage, and how much lighter their contents are while worn.
@@ -75,6 +76,7 @@ public final class OutbreakItems {
 			output.accept(BASEBALL_BAT);
 			output.accept(CROWBAR);
 			output.accept(MACHETE);
+			output.accept(BATON);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
 			output.accept(HAMMER);

@@ -3,6 +3,8 @@ package io.github.ditsjohann.outbreak.client;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.client.menu.CharacterSheetScreen;
+import io.github.ditsjohann.outbreak.client.menu.MenuClient;
 import io.github.ditsjohann.outbreak.client.vehicle.VehicleClient;
 import io.github.ditsjohann.outbreak.client.walker.WalkerModel;
 import io.github.ditsjohann.outbreak.client.walker.WalkerRenderer;
@@ -25,6 +27,7 @@ public class OutbreakClient implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Outbreak.id("outbreak"));
 	static final KeyMapping HEALTH_KEY = new KeyMapping("key.outbreak.health", InputConstants.KEY_H, CATEGORY);
 	static final KeyMapping BAG_KEY = new KeyMapping("key.outbreak.open_bag", InputConstants.KEY_B, CATEGORY);
+	static final KeyMapping SHEET_KEY = new KeyMapping("key.outbreak.character_sheet", InputConstants.KEY_K, CATEGORY);
 
 	@Override
 	public void onInitializeClient() {
@@ -45,10 +48,20 @@ public class OutbreakClient implements ClientModInitializer {
 
 		KeyMappingHelper.registerKeyMapping(HEALTH_KEY);
 		KeyMappingHelper.registerKeyMapping(BAG_KEY);
+		KeyMappingHelper.registerKeyMapping(SHEET_KEY);
+
+		// The title screen, the new survivor screens, character creation and the sandbox editor.
+		MenuClient.register();
 		ClientTickEvents.END_CLIENT_TICK.register(minecraft -> {
 			while (HEALTH_KEY.consumeClick()) {
 				if (minecraft.player != null && minecraft.gui.screen() == null) {
 					minecraft.gui.setScreen(new HealthPanelScreen());
+				}
+			}
+
+			while (SHEET_KEY.consumeClick()) {
+				if (minecraft.player != null && minecraft.gui.screen() == null) {
+					minecraft.gui.setScreen(new CharacterSheetScreen(SHEET_KEY));
 				}
 			}
 

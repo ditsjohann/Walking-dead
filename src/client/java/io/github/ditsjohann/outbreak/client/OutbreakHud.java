@@ -174,8 +174,8 @@ final class OutbreakHud {
 
 		y += 13;
 		float weight = CarryWeight.total(player);
-		graphics.text(font, String.format(Locale.ROOT, "%.1f / %.0f kg", weight, CarryWeight.CAPACITY), x, y,
-			weight > CarryWeight.CAPACITY ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
+		graphics.text(font, String.format(Locale.ROOT, "%.1f / %s kg", weight, CarryWeight.capacityLabel(player)), x, y,
+			weight > CarryWeight.capacity(player) ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
 	}
 
 	/**

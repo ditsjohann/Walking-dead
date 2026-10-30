@@ -21,11 +21,11 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
  */
 @Mixin(ChunkGenerator.class)
 abstract class ChunkGeneratorMixin {
-	@Inject(method = "getMobsAt", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "getMobsAt", at = @At("RETURN"), cancellable = true)
 	private void outbreak$walkersOnly(Level level, StructureManager structureManager, MobCategory category, BlockPos pos,
 			CallbackInfoReturnable<WeightedList<MobSpawnSettings.SpawnerData>> cir) {
 		if (category == MobCategory.MONSTER) {
-			cir.setReturnValue(VanillaRules.WALKER_SPAWNS);
+			cir.setReturnValue(VanillaRules.walkerSpawns(cir.getReturnValue()));
 		}
 	}
 }

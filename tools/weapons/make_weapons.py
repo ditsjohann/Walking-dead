@@ -107,6 +107,16 @@ def wrench():
     ]
 
 
+def baton():
+    # A police baton (wapenstok): black, with a rubber grip and a steel tip.
+    return [
+        box([7.1, -1, 7.1], [8.9, 0, 8.9], "steel_dark"),
+        box([7.2, 0, 7.2], [8.8, 6, 8.8], "rubber"),
+        box([7.35, 6, 7.35], [8.65, 17, 8.65], "steel_dark"),
+        box([7.25, 17, 7.25], [8.75, 18.5, 8.75], "steel"),
+    ]
+
+
 def screwdriver():
     return [
         box([7, 0, 7], [9, 5, 9], "yellow"),
@@ -122,7 +132,7 @@ def screwdriver():
 WEAPONS = {
     "baseball_bat": (bat, 0.95, 1.0, 70), "kitchen_knife": (knife, 0.85, 2.5, 35), "machete": (machete, 0.95, 3.0, 50),
     "crowbar": (crowbar, 1.0, 3.0, 55), "hammer": (hammer, 1.0, 2.0, 55), "wrench": (wrench, 0.95, 2.0, 50),
-    "screwdriver": (screwdriver, 0.85, 2.5, 35),
+    "screwdriver": (screwdriver, 0.85, 2.5, 35), "baton": (baton, 0.95, 2.0, 55),
 }
 # First person: leaning away up and to the left, from the hand at the bottom right.
 FIRST_PERSON_ROTATION = (-18.0, -15.0, 12.0)

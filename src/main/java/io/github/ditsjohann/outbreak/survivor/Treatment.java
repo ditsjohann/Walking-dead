@@ -2,6 +2,9 @@ package io.github.ditsjohann.outbreak.survivor;
 
 import java.util.Map;
 
+import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.character.Perks;
+import io.github.ditsjohann.outbreak.character.Skill;
 import io.github.ditsjohann.outbreak.survivor.body.BandageType;
 import io.github.ditsjohann.outbreak.survivor.body.BodyPart;
 import io.github.ditsjohann.outbreak.survivor.body.Wound;
@@ -86,7 +89,7 @@ public final class Treatment {
 			wound.bandage = bandage;
 			wound.bandageAge = 0;
 			wound.bleeding = false;
-			if (!wound.disinfected && player.getRandom().nextFloat() < bandage.infectionChance()) {
+			if (!wound.disinfected && player.getRandom().nextFloat() < bandage.infectionChance() * Perks.woundInfectionMultiplier(player)) {
 				wound.infected = true;
 			}
 
@@ -94,6 +97,7 @@ public final class Treatment {
 		}
 
 		Survivors.sync(player);
+		Characters.addXp(player, Skill.FIRST_AID, 8.0F);
 		player.sendOverlayMessage(Component.translatable(messageKey, Component.translatable(part.translationKey())));
 		return true;
 	}

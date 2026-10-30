@@ -10,6 +10,7 @@ import com.mojang.serialization.Codec;
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.entity.Walker;
+import io.github.ditsjohann.outbreak.sandbox.Sandbox;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
@@ -119,7 +120,7 @@ public final class VehicleSpawner {
 		int placed = 0;
 		if (road.size() >= MIN_ROAD_BLOCKS && random.nextFloat() < carChance) {
 			VehicleType type = pick(random);
-			Condition condition = random.nextFloat() < 0.4F ? Condition.WRECK : Condition.ABANDONED;
+			Condition condition = random.nextFloat() < Sandbox.current().scenario().wreckChance ? Condition.WRECK : Condition.ABANDONED;
 			if (place(level, type, condition, road, random)) {
 				placed++;
 			}

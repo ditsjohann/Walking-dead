@@ -1,0 +1,350 @@
+{
+	"textures": {
+		"materials": "outbreak:item/weapon_materials",
+		"particle": "outbreak:item/weapon_materials"
+	},
+	"elements": [
+		{
+			"from": [
+				7.1,
+				-1,
+				7.1
+			],
+			"to": [
+				8.9,
+				0,
+				8.9
+			],
+			"faces": {
+				"north": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.5
+					],
+					"texture": "#materials"
+				},
+				"south": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.5
+					],
+					"texture": "#materials"
+				},
+				"east": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.5
+					],
+					"texture": "#materials"
+				},
+				"west": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.5
+					],
+					"texture": "#materials"
+				},
+				"up": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.9
+					],
+					"texture": "#materials"
+				},
+				"down": {
+					"uv": [
+						12.0,
+						0.0,
+						12.9,
+						0.9
+					],
+					"texture": "#materials"
+				}
+			}
+		},
+		{
+			"from": [
+				7.2,
+				0,
+				7.2
+			],
+			"to": [
+				8.8,
+				6,
+				8.8
+			],
+			"faces": {
+				"north": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						7.0
+					],
+					"texture": "#materials"
+				},
+				"south": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						7.0
+					],
+					"texture": "#materials"
+				},
+				"east": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						7.0
+					],
+					"texture": "#materials"
+				},
+				"west": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						7.0
+					],
+					"texture": "#materials"
+				},
+				"up": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						4.8
+					],
+					"texture": "#materials"
+				},
+				"down": {
+					"uv": [
+						4.0,
+						4.0,
+						4.8,
+						4.8
+					],
+					"texture": "#materials"
+				}
+			}
+		},
+		{
+			"from": [
+				7.35,
+				6,
+				7.35
+			],
+			"to": [
+				8.65,
+				17,
+				8.65
+			],
+			"faces": {
+				"north": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						4.0
+					],
+					"texture": "#materials"
+				},
+				"south": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						4.0
+					],
+					"texture": "#materials"
+				},
+				"east": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						4.0
+					],
+					"texture": "#materials"
+				},
+				"west": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						4.0
+					],
+					"texture": "#materials"
+				},
+				"up": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						0.65
+					],
+					"texture": "#materials"
+				},
+				"down": {
+					"uv": [
+						12.0,
+						0.0,
+						12.65,
+						0.65
+					],
+					"texture": "#materials"
+				}
+			}
+		},
+		{
+			"from": [
+				7.25,
+				17,
+				7.25
+			],
+			"to": [
+				8.75,
+				18.5,
+				8.75
+			],
+			"faces": {
+				"north": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				},
+				"south": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				},
+				"east": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				},
+				"west": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				},
+				"up": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				},
+				"down": {
+					"uv": [
+						8.0,
+						0.0,
+						8.75,
+						0.75
+					],
+					"texture": "#materials"
+				}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [
+				55,
+				0.0,
+				0.0
+			],
+			"translation": [
+				0.0,
+				2.942,
+				4.202
+			],
+			"scale": [
+				0.855,
+				0.855,
+				0.855
+			]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [
+				55,
+				0.0,
+				0.0
+			],
+			"translation": [
+				0.0,
+				2.942,
+				4.202
+			],
+			"scale": [
+				0.855,
+				0.855,
+				0.855
+			]
+		},
+		"firstperson_righthand": {
+			"rotation": [
+				-18.0,
+				-15.0,
+				12.0
+			],
+			"translation": [
+				-0.859,
+				8.706,
+				-1.511
+			],
+			"scale": [
+				0.712,
+				0.712,
+				0.712
+			]
+		},
+		"firstperson_lefthand": {
+			"rotation": [
+				-18.0,
+				-15.0,
+				12.0
+			],
+			"translation": [
+				-0.859,
+				8.706,
+				-1.511
+			],
+			"scale": [
+				0.712,
+				0.712,
+				0.712
+			]
+		}
+	}
+}

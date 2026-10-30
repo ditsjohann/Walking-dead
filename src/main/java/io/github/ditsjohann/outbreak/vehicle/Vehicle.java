@@ -7,6 +7,9 @@ import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 
+import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.character.Perks;
+import io.github.ditsjohann.outbreak.character.Skill;
 import io.github.ditsjohann.outbreak.inventory.ContainerKind;
 import io.github.ditsjohann.outbreak.inventory.OutbreakMenus;
 import io.github.ditsjohann.outbreak.noise.NoiseSystem;
@@ -695,14 +698,19 @@ public class Vehicle extends VehicleEntity {
 
 		if (CarKeyItem.find(player, this) == null && !this.isKeyInside() && !this.isHotwired()) {
 			ItemStack held = player.getMainHandItem();
-			if (!held.is(VehicleItems.SCREWDRIVER)) {
+			boolean bareHanded = !held.is(VehicleItems.SCREWDRIVER);
+			if (bareHanded && !Perks.hotwiresBareHanded(player)) {
 				player.sendOverlayMessage(Component.translatable("outbreak.vehicle.no_key"));
 				return;
 			}
 
-			held.hurtAndBreak(4, player, InteractionHand.MAIN_HAND.asEquipmentSlot());
+			if (!bareHanded) {
+				held.hurtAndBreak(4, player, InteractionHand.MAIN_HAND.asEquipmentSlot());
+			}
+
 			level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.TRIPWIRE_CLICK_ON, SoundSource.NEUTRAL, 1.0F, 1.2F);
-			if (this.random.nextFloat() >= 0.4F) {
+			Characters.addXp(player, Skill.MECHANICS, 5.0F);
+			if (this.random.nextFloat() >= Perks.hotwireChance(player)) {
 				player.sendOverlayMessage(Component.translatable("outbreak.vehicle.hotwire_failed"));
 				if (this.random.nextFloat() < 0.4F) {
 					this.soundAlarm();

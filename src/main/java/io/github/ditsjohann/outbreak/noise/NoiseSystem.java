@@ -3,6 +3,7 @@ package io.github.ditsjohann.outbreak.noise;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.entity.Walker;
 
 import org.jspecify.annotations.Nullable;
@@ -92,6 +93,10 @@ public final class NoiseSystem {
 				radius *= 0.5F;
 			} else if (player.isSprinting() && key == GameEvent.STEP.key()) {
 				radius *= 2.5F;
+			}
+
+			if (key == GameEvent.STEP.key() || key == GameEvent.HIT_GROUND.key()) {
+				radius *= Perks.stepNoise(player);
 			}
 		} else if (!SOURCELESS.containsKey(key) || context.sourceEntity() instanceof Walker) {
 			// Only players and big world events (explosions, music...) make noise walkers care about.

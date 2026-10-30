@@ -1,0 +1,73 @@
+# Phase 5 checks: sandbox settings, characters (professions, traits, kits), skills levelling, and
+# what they change in the game.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Cam spawn at 0 -45 0
+wait 3
+gamemode spectator Cam
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+== the world's rules start as the default (apocalypse, the first day)
+gamemode survival Bot
+outbreak sandbox info
+== a test player gets a plain survivor straight away (unemployed, no traits)
+outbreak character info Bot
+== a carpenter who is strong and lucky, paid for by being clumsy and a slow learner: carpentry 3, 16 kg capacity, hammer, nails, planks and an axe
+outbreak character create Bot carpenter strong,lucky,clumsy,slow_learner
+data get entity Bot Inventory
+== practice: 300 fighting xp (0.7x as a slow learner = 210: level 1, almost 2)
+outbreak character xp Bot fighting 300
+== a student comes with the fast learner trait for free and a bicycle; 300 more fitness xp counts as 390 (75 + 390 = 465: level 3)
+outbreak character create Bot student
+outbreak character xp Bot fitness 300
+execute if items entity Bot container.* outbreak:bicycle
+== the police officer starts with the baton
+outbreak character create Bot police_officer
+execute if items entity Bot container.* outbreak:baton
+== nailing a plank up teaches carpentry (expect carpentry above 0 xp)
+outbreak character create Bot carpenter
+fill 3 -58 10 3 -55 14 minecraft:stone
+setblock 3 -57 12 minecraft:glass_pane
+setblock 3 -56 12 minecraft:glass_pane
+tp Bot 5 -57 12
+player Bot hotbar 1
+item replace entity Bot hotbar.0 with outbreak:hammer
+item replace entity Bot hotbar.5 with minecraft:oak_planks 4
+item replace entity Bot hotbar.6 with outbreak:nails 8
+player Bot look at 3.5 -56.5 12.5
+player Bot use once
+wait 1
+outbreak character info Bot
+execute if block 4 -57 12 outbreak:barricade
+== sandbox: nightmare makes walkers sprinters (expect speed 0.31)
+outbreak sandbox preset nightmare
+summon outbreak:walker 0 -57 20 {Tags:["runner"],PersistenceRequired:1b,NoAI:1b}
+wait 3
+attribute @e[tag=runner,limit=1] minecraft:movement_speed get
+== ...and back to shamblers (expect 0.18)
+outbreak sandbox set walker_speed shamblers
+wait 3
+attribute @e[tag=runner,limit=1] minecraft:movement_speed get
+kill @e[tag=runner]
+== loot: abundant fills a kitchen chest fuller than very rare (compare the two)
+outbreak sandbox set loot abundant
+setblock 10 -57 0 minecraft:chest[facing=west]
+setblock 12 -57 1 minecraft:furnace
+tp Bot 8 -57 0
+player Bot look at 10 -56.5 0.5
+player Bot use once
+wait 1
+data get block 10 -57 0 Items
+outbreak sandbox set loot very_rare
+setblock 10 -57 4 minecraft:chest[facing=west]
+setblock 12 -57 5 minecraft:furnace
+tp Bot 8 -57 4
+player Bot look at 10 -56.5 4.5
+player Bot use once
+wait 1
+data get block 10 -57 4 Items
+== the rules as they stand now (custom)
+outbreak sandbox info
+outbreak sandbox preset apocalypse

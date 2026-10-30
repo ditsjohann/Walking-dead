@@ -1,6 +1,8 @@
 package io.github.ditsjohann.outbreak.survivor;
 
+import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.entity.Walker;
+import io.github.ditsjohann.outbreak.sandbox.Sandbox;
 import io.github.ditsjohann.outbreak.survivor.body.BandageType;
 import io.github.ditsjohann.outbreak.survivor.body.BodyPart;
 import io.github.ditsjohann.outbreak.survivor.body.Wound;
@@ -31,8 +33,18 @@ public final class Injuries {
 
 	private static void onWalkerHit(ServerPlayer player) {
 		RandomSource random = player.getRandom();
+		if (random.nextFloat() < Perks.woundDodge(player)) {
+			// Thick skin: it didn't break through.
+			return;
+		}
+
 		float roll = random.nextFloat();
 		WoundType type = roll < SCRATCH_CHANCE ? WoundType.SCRATCH : roll < SCRATCH_CHANCE + LACERATION_CHANCE ? WoundType.LACERATION : WoundType.BITE;
+		if (type != WoundType.BITE && random.nextFloat() < Perks.woundWorsen(player)) {
+			// Thin skin: it goes deeper.
+			type = WoundType.values()[type.ordinal() + 1];
+		}
+
 		BodyPart part = randomPart(random);
 		inflict(player, part, type);
 	}
@@ -51,7 +63,7 @@ public final class Injuries {
 			existing.bandageAge = 0;
 		}
 
-		if (!state.knox && player.getRandom().nextFloat() < type.knoxChance()) {
+		if (!state.knox && player.getRandom().nextFloat() < Sandbox.current().infection().chance(type)) {
 			state.knox = true;
 			state.knoxTicks = 0;
 		}

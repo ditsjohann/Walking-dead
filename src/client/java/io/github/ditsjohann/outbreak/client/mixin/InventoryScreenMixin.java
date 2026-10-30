@@ -42,10 +42,10 @@ abstract class InventoryScreenMixin {
 		Font font = minecraft.font;
 		float weight = CarryWeight.total(minecraft.player);
 		// Under the pockets row: the armour slots leave no room above it.
-		String carrying = String.format(Locale.ROOT, "%.1f / %.0f kg", weight, CarryWeight.CAPACITY);
+		String carrying = String.format(Locale.ROOT, "%.1f / %s kg", weight, CarryWeight.capacityLabel(minecraft.player));
 		graphics.text(font, Component.translatable("outbreak.screen.pockets"), 8, 106, PaperStyle.INK, false);
 		graphics.text(font, carrying, 168 - font.width(carrying), 106,
-			weight > CarryWeight.CAPACITY ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
+			weight > CarryWeight.capacity(minecraft.player) ? PaperStyle.MARKER_RED : PaperStyle.PENCIL, false);
 		graphics.text(font, Component.translatable("outbreak.screen.find_a_bag"), 8, 120, PaperStyle.PENCIL, false);
 	}
 }

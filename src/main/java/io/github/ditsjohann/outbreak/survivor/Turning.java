@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import io.github.ditsjohann.outbreak.character.CharacterData;
+import io.github.ditsjohann.outbreak.character.Characters;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
 import io.github.ditsjohann.outbreak.entity.Walker;
 
@@ -31,7 +33,10 @@ public final class Turning {
 	public static void register() {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (entity instanceof ServerPlayer player) {
-				PENDING.add(new PendingTurn(player.level().dimension(), player.position(), player.getName().getString(), TURN_DELAY_TICKS));
+				// Your old self rises with your survivor's name.
+				CharacterData character = Characters.get(player);
+				String name = character.created ? character.name : player.getName().getString();
+				PENDING.add(new PendingTurn(player.level().dimension(), player.position(), name, TURN_DELAY_TICKS));
 			}
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Turning::tick);

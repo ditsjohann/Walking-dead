@@ -228,7 +228,7 @@ anywhere from TWD-heroic to PZ-brutal:
 | 2 ✅ | **Body and HUD:** injuries per body part, bleeding, bandages, Knox infection, moodles, thirst and fatigue | PZ-style survival |
 | 3 ✅ | **Inventory and crafting:** weight-based inventory, bags, containers, the new recipe system, loot tables, barricades, melee weapons | Scavenge and fortify |
 | 4 | **Vehicles:** bicycle, then car with parts (tires, engine, battery, fuel), keys and hotwiring, siphoning, wrecks on the roads, then scooter, van and boat. *Built, except the boat (later).* | Travel Groningen |
-| 5 | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
+| 5 ✅ | **Character and menus:** title screen, scenario picker, professions and traits, skills, sandbox settings screen | Starts like its own game |
 | 6 | **World winds down:** day counter, power and water shutoff (gas pumps die), broadcasts, meta events, migrating herds, guns, guts camouflage | Full loop |
 | 7 | **Groningen data:** building-aware loot and spawns from OSM; modpack release with the world | Groningen feels real |
 | 8 | **People:** survivor NPCs, factions, community | The TWD heart |
@@ -247,7 +247,7 @@ anywhere from TWD-heroic to PZ-brutal:
   system on Fabric 26.3.
 - **Dependencies:** allowed.
   - Required: **GeckoLib**, for walker, vehicle and gun models and animations.
-  - Likely: a config library (for example YACL) for the sandbox settings screen.
+  - The sandbox settings screen turned out not to need a config library: it's our own screen.
   - In the modpack: Sodium and Distant Horizons for performance.
 
 **Still open:** nothing blocking.

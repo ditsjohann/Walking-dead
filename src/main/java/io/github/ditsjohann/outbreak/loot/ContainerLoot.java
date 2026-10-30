@@ -2,10 +2,13 @@ package io.github.ditsjohann.outbreak.loot;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.block.StorageBlockEntity;
+import io.github.ditsjohann.outbreak.sandbox.Sandbox;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+
+import java.util.function.ToDoubleFunction;
 
 import com.mojang.serialization.Codec;
 
@@ -14,8 +17,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.RandomizableContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
@@ -23,7 +30,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Scavenging. The first time anyone opens a container that a player didn't place, it gets loot:
@@ -57,10 +68,10 @@ public final class ContainerLoot {
 		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
 			if (level instanceof ServerLevel serverLevel && !player.isSpectator()) {
 				BlockPos pos = hit.getBlockPos();
-				prepare(serverLevel, pos);
+				prepare(serverLevel, pos, player);
 				BlockState state = level.getBlockState(pos);
 				if (state.getBlock() instanceof ChestBlock && state.getValue(ChestBlock.TYPE) != ChestType.SINGLE) {
-					prepare(serverLevel, ChestBlock.getConnectedBlockPos(pos, state));
+					prepare(serverLevel, ChestBlock.getConnectedBlockPos(pos, state), player);
 				}
 			}
 
@@ -68,8 +79,11 @@ public final class ContainerLoot {
 		});
 	}
 
-	/** Give the container at pos its loot table, if it's due one. Vanilla fills it as it opens. */
-	public static void prepare(ServerLevel level, BlockPos pos) {
+	/**
+	 * Fill the container at pos with loot, if it's due some: its loot table, then more or less of it
+	 * as the sandbox loot setting (and the scenario, and the player's luck) says.
+	 */
+	public static void prepare(ServerLevel level, BlockPos pos, Player player) {
 		BlockEntity blockEntity = level.getBlockEntity(pos);
 		if (!(blockEntity instanceof ChestBlockEntity || blockEntity instanceof BarrelBlockEntity || blockEntity instanceof StorageBlockEntity)
 			|| !(blockEntity instanceof RandomizableContainer container)
@@ -87,9 +101,40 @@ public final class ContainerLoot {
 				? ResourceKey.create(Registries.LOOT_TABLE, Outbreak.id("containers/" + storage.kind().id()))
 				: roomAt(level, pos).lootTable();
 			container.setLootTable(table, level.getRandom().nextLong());
+			container.unpackLootTable(player);
+			scale(level, pos, container, table, player, Sandbox.current().lootMultiplier() * lootLuck.applyAsDouble(player));
 		}
 
 		blockEntity.setChanged();
+	}
+
+	/** How lucky a player is when scavenging (1 = normal). Set by the character system (the Lucky and Unlucky traits). */
+	public static ToDoubleFunction<Player> lootLuck = player -> 1.0;
+
+	/** Below 1, each stack has that chance to stay; above 1, the table is rolled again for the extra into the empty slots. */
+	private static void scale(ServerLevel level, BlockPos pos, Container container, ResourceKey<LootTable> table, Player player, double multiplier) {
+		RandomSource random = level.getRandom();
+		if (multiplier < 1.0) {
+			for (int slot = 0; slot < container.getContainerSize(); slot++) {
+				if (!container.getItem(slot).isEmpty() && random.nextDouble() >= multiplier) {
+					container.setItem(slot, ItemStack.EMPTY);
+				}
+			}
+
+			return;
+		}
+
+		LootTable loot = level.getServer().reloadableRegistries().getLootTable(table);
+		for (double extra = multiplier - 1.0; extra > 0.0; extra -= 1.0) {
+			if (extra >= 1.0 || random.nextDouble() < extra) {
+				LootParams params = new LootParams.Builder(level)
+					.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
+					.withParameter(LootContextParams.THIS_ENTITY, player)
+					.withLuck(player.getLuck())
+					.create(LootContextParamSets.CHEST);
+				loot.fill(container, params, random.nextLong());
+			}
+		}
 	}
 
 	/** Guess the room from what's nearby: the kind of block that turns up most decides. */

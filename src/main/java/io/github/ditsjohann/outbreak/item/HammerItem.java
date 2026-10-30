@@ -3,12 +3,16 @@ package io.github.ditsjohann.outbreak.item;
 import io.github.ditsjohann.outbreak.block.BarricadeBlock;
 import io.github.ditsjohann.outbreak.block.Barricades;
 import io.github.ditsjohann.outbreak.block.OutbreakBlocks;
+import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.character.Perks;
+import io.github.ditsjohann.outbreak.character.Skill;
 import io.github.ditsjohann.outbreak.noise.NoiseSystem;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
@@ -53,6 +57,9 @@ public class HammerItem extends Item {
 			if (level instanceof ServerLevel serverLevel) {
 				Barricades.removePlank(serverLevel, clicked, clickedState, true);
 				hammered(serverLevel, clicked, player, context);
+				if (player instanceof ServerPlayer serverPlayer) {
+					Characters.addXp(serverPlayer, Skill.CARPENTRY, 2.0F);
+				}
 			}
 
 			return InteractionResult.SUCCESS;
@@ -91,12 +98,16 @@ public class HammerItem extends Item {
 		}
 
 		if (level instanceof ServerLevel serverLevel) {
-			if (!player.hasInfiniteMaterials()) {
+			// A good carpenter sometimes gets it up with the scraps (no plank or nails used).
+			if (!player.hasInfiniteMaterials() && player.getRandom().nextFloat() >= Perks.sparedMaterials(player)) {
 				consumeMaterials(player.getInventory());
 			}
 
 			serverLevel.setBlock(target, newState, Block.UPDATE_ALL);
 			hammered(serverLevel, target, player, context);
+			if (player instanceof ServerPlayer serverPlayer) {
+				Characters.addXp(serverPlayer, Skill.CARPENTRY, 6.0F);
+			}
 		}
 
 		return InteractionResult.SUCCESS;

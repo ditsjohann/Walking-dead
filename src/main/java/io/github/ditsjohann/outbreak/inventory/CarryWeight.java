@@ -2,6 +2,7 @@ package io.github.ditsjohann.outbreak.inventory;
 
 import java.util.Map;
 
+import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.item.BagItem;
 import io.github.ditsjohann.outbreak.item.OutbreakItems;
 import io.github.ditsjohann.outbreak.vehicle.JerrycanItem;
@@ -22,7 +23,6 @@ import net.minecraft.world.item.component.ItemContainerContents;
  * A worn bag makes its contents lighter; a bag carried in your hands doesn't.
  */
 public final class CarryWeight {
-	public static final float CAPACITY = 12.0F;
 
 	private static final Map<Item, Float> WEIGHTS = Map.ofEntries(
 		Map.entry(OutbreakItems.RAG, 0.05F),
@@ -34,6 +34,7 @@ public final class CarryWeight {
 		Map.entry(OutbreakItems.CROWBAR, 2.0F),
 		Map.entry(OutbreakItems.MACHETE, 1.0F),
 		Map.entry(OutbreakItems.HAMMER, 1.0F),
+		Map.entry(OutbreakItems.BATON, 0.6F),
 		Map.entry(OutbreakItems.NAILS, 0.01F),
 		Map.entry(OutbreakItems.SCHOOL_BAG, 0.5F),
 		Map.entry(OutbreakItems.HIKING_BAG, 1.0F),
@@ -114,15 +115,26 @@ public final class CarryWeight {
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
 			ItemStack stack = inventory.getItem(i);
 			boolean wornBag = stack == player.getItemBySlot(EquipmentSlot.CHEST) && stack.getItem() instanceof BagItem;
-			float factor = wornBag ? 1.0F - ((BagItem) stack.getItem()).weightReduction() : 1.0F;
+			float factor = wornBag ? Math.max(0.0F, 1.0F - ((BagItem) stack.getItem()).weightReduction() - Perks.bagBonus(player)) : 1.0F;
 			total += stackWeight(stack, factor);
 		}
 
 		return total;
 	}
 
+	/** How much this survivor can carry (12 kg, more or less with strength and traits). */
+	public static float capacity(Player player) {
+		return Perks.capacity(player);
+	}
+
+	/** The capacity as shown: "12", or "12.5" when strength gives half a kilo. */
+	public static String capacityLabel(Player player) {
+		float capacity = capacity(player);
+		return capacity == Math.round(capacity) ? Integer.toString(Math.round(capacity)) : String.format(java.util.Locale.ROOT, "%.1f", capacity);
+	}
+
 	/** 1.0 = exactly at capacity. */
 	public static float ratio(Player player) {
-		return total(player) / CAPACITY;
+		return total(player) / capacity(player);
 	}
 }

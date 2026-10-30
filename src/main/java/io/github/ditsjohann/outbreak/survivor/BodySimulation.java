@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import io.github.ditsjohann.outbreak.character.Perks;
 import io.github.ditsjohann.outbreak.entity.Walker;
 import io.github.ditsjohann.outbreak.survivor.body.BodyPart;
 import io.github.ditsjohann.outbreak.survivor.body.Wound;
@@ -97,8 +98,8 @@ public final class BodySimulation {
 
 	private static void stepNeeds(ServerPlayer player, SurvivorState state) {
 		int load = Moodle.HEAVY.level(player, state);
-		float exertion = (player.isSprinting() ? 2.0F : 1.0F) * (1.0F + 0.5F * load);
-		state.thirst = Math.min(1.0F, state.thirst + THIRST_PER_STEP * (player.isSprinting() ? 1.5F : 1.0F));
+		float exertion = (player.isSprinting() ? 2.0F : 1.0F) * (1.0F + 0.5F * load) * Perks.fatigueMultiplier(player);
+		state.thirst = Math.min(1.0F, state.thirst + THIRST_PER_STEP * (player.isSprinting() ? 1.5F : 1.0F) * Perks.thirstMultiplier(player));
 		if (player.isSleeping()) {
 			state.fatigue = Math.max(0.0F, state.fatigue - 0.05F);
 		} else {
@@ -127,13 +128,14 @@ public final class BodySimulation {
 
 			if (wound.isBandaged()) {
 				wound.bandageAge += STEP;
-				if (wound.bandageAge >= Wound.BANDAGE_INFECTS_TICKS && !wound.disinfected) {
+				if (wound.bandageAge >= Wound.BANDAGE_INFECTS_TICKS / Perks.woundInfectionMultiplier(player) && !wound.disinfected) {
 					wound.infected = true;
 				}
 			}
 
 			if (!wound.bleeding && !wound.infected) {
 				float speed = wound.isBandageDirty() ? 0.5F : wound.bandage.healSpeed();
+				speed *= Perks.healMultiplier(player) * (wound.isBandaged() ? Perks.bandagedHealMultiplier(player) : 1.0F);
 				if (starving) {
 					speed *= 0.3F;
 				}
@@ -188,9 +190,10 @@ public final class BodySimulation {
 	private static void stepPanic(ServerPlayer player, SurvivorState state) {
 		AABB area = player.getBoundingBox().inflate(PANIC_RADIUS);
 		int threats = player.level().getEntitiesOfClass(Walker.class, area, w -> w.getTarget() == player || w.hasLineOfSight(player)).size();
-		float target = Math.min(1.0F, threats * 0.15F + (state.bleedingCount() > 0 ? 0.1F : 0.0F));
+		float bleeding = state.bleedingCount() > 0 ? (Perks.isHemophobic(player) ? 0.4F : 0.1F) : 0.0F;
+		float target = Math.min(1.0F, (threats * 0.15F + bleeding) * Perks.panicMultiplier(player));
 		if (target > state.panic) {
-			state.panic = Math.min(target, state.panic + 0.1F);
+			state.panic = Math.min(target, state.panic + 0.1F * Perks.panicMultiplier(player));
 		} else {
 			state.panic = Math.max(target, state.panic - 0.02F);
 		}
@@ -207,7 +210,7 @@ public final class BodySimulation {
 		}
 
 		timers.regen += STEP;
-		if (timers.regen >= REGEN_INTERVAL) {
+		if (timers.regen >= REGEN_INTERVAL / Perks.healMultiplier(player)) {
 			timers.regen = 0;
 			player.heal(1.0F);
 		}

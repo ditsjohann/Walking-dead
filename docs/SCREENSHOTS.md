@@ -6,6 +6,9 @@ itself still has to be generated with Arnis.
 
 | | |
 |---|---|
+| ![](screenshots/phase5/title.png) The title screen: Groningen burning, turning slowly behind every menu. | ![](screenshots/phase5/new-survivor.png) A new survivor: when, how hard, which map. |
+| ![](screenshots/phase5/character.png) Making a survivor: a nurse, lucky and a fast healer. | ![](screenshots/phase5/sheet.png) The character sheet (K): traits and skills. |
+| ![](screenshots/phase5/sandbox.png) Sandbox settings, on Nightmare. | ![](screenshots/phase5/arrived.png) Day 1, 07:00: the nurse wakes up, bandages and disinfectant in the pockets. |
 | ![](screenshots/combat/bat-head.png) A bat to the head: down it goes, to your left. | ![](screenshots/combat/bat-body.png) A bat to the body: it reels away. |
 | ![](screenshots/combat/swing-bat.png) The bat, in 3D, mid-swing. | ![](screenshots/combat/punch.png) Bare hands: left, right, left. |
 | ![](screenshots/combat/swing-hammer.png) A hammer, coming down. | ![](screenshots/combat/swing-knife.png) A knife, thrust. |

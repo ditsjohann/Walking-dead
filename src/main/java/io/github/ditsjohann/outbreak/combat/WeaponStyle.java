@@ -18,7 +18,7 @@ public enum WeaponStyle {
 	FIST(0.0F, 0.55F, 0.12F, 0.0F),
 	/** Knives and screwdrivers: quick thrusts, barely move a walker. */
 	STAB(0.0F, 0.3F, 0.03F, 0.0F),
-	/** Hammers, machetes, crowbars, wrenches, axes: a diagonal chop. */
+	/** Hammers, batons, machetes, crowbars, wrenches, axes: a diagonal chop. */
 	CHOP(25.0F, 0.75F, 0.2F, 0.35F),
 	/** The bat: a two-handed sweep. Sends them flying sideways. */
 	SWING(75.0F, 1.0F, 0.35F, 0.5F),
@@ -52,7 +52,7 @@ public enum WeaponStyle {
 			return STAB;
 		}
 
-		if (stack.is(OutbreakItems.HAMMER) || stack.is(OutbreakItems.MACHETE) || stack.is(OutbreakItems.CROWBAR)
+		if (stack.is(OutbreakItems.HAMMER) || stack.is(OutbreakItems.BATON) || stack.is(OutbreakItems.MACHETE) || stack.is(OutbreakItems.CROWBAR)
 			|| stack.is(VehicleItems.WRENCH) || stack.is(ItemTags.AXES) || stack.is(ItemTags.SWORDS)) {
 			return CHOP;
 		}

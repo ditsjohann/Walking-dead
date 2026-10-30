@@ -77,7 +77,7 @@ public class HealthPanelScreen extends Screen {
 		graphics.text(this.font, Component.translatable("outbreak.health.overall", health), textX, y, health <= 30 ? PaperStyle.MARKER_RED : PaperStyle.INK, false);
 		y += 11;
 		graphics.text(this.font, Component.translatable("outbreak.health.carrying",
-			String.format(Locale.ROOT, "%.1f", CarryWeight.total(player)), String.format(Locale.ROOT, "%.0f", CarryWeight.CAPACITY)), textX, y, PaperStyle.PENCIL, false);
+			String.format(Locale.ROOT, "%.1f", CarryWeight.total(player)), CarryWeight.capacityLabel(player)), textX, y, PaperStyle.PENCIL, false);
 		y += 15;
 
 		if (state.wounds.isEmpty()) {

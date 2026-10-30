@@ -4,9 +4,12 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"FirstPersonHandsMixin",
+		"FogRendererMixin",
+		"GuiMixin",
 		"HumanoidModelMixin",
 		"InventoryScreenMixin",
-		"LivingEntitySwingMixin"
+		"LivingEntitySwingMixin",
+		"ScreenAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

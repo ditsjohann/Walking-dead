@@ -1,10 +1,14 @@
 package io.github.ditsjohann.outbreak.vanilla;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.entity.OutbreakEntities;
+import io.github.ditsjohann.outbreak.sandbox.Sandbox;
+import io.github.ditsjohann.outbreak.sandbox.SandboxSettings;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 
@@ -30,9 +34,14 @@ public final class VanillaRules {
 	/** Blocks that can't be broken by hand at all, on top of the ones that already need a tool for drops (stone, metal...). */
 	public static final TagKey<Block> NEEDS_TOOL = TagKey.create(Registries.BLOCK, Outbreak.id("needs_tool"));
 
-	/** The only natural monster spawn: walkers, in loose groups of 2 to 6 that form a herd. */
-	public static final WeightedList<MobSpawnSettings.SpawnerData> WALKER_SPAWNS =
-		WeightedList.of(new MobSpawnSettings.SpawnerData(OutbreakEntities.WALKER, UniformInt.of(2, 6)));
+	/** Natural monster spawns, per sandbox herd size: walkers, in loose groups that form a herd. */
+	private static final Map<SandboxSettings.HerdSize, WeightedList<MobSpawnSettings.SpawnerData>> WALKER_SPAWNS = new EnumMap<>(SandboxSettings.HerdSize.class);
+
+	static {
+		for (SandboxSettings.HerdSize size : SandboxSettings.HerdSize.values()) {
+			WALKER_SPAWNS.put(size, WeightedList.of(new MobSpawnSettings.SpawnerData(OutbreakEntities.WALKER, UniformInt.of(size.min, size.max))));
+		}
+	}
 
 	/**
 	 * Vanilla recipe ids that are removed. Building blocks (wood, stone, bricks, glass, doors, stairs...),
@@ -69,7 +78,21 @@ public final class VanillaRules {
 			return false;
 		}
 
-		return type.getCategory() == MobCategory.MONSTER || entity.typeHolder().is(BANNED_ENTITIES);
+		boolean monster = type.getCategory() == MobCategory.MONSTER && !Sandbox.current().vanillaMonsters();
+		return monster || entity.typeHolder().is(BANNED_ENTITIES);
+	}
+
+	/**
+	 * What spawns where the game would spawn a monster: walkers, in herds as big as the sandbox
+	 * settings say, plus the vanilla monsters if those are switched on.
+	 */
+	public static WeightedList<MobSpawnSettings.SpawnerData> walkerSpawns(WeightedList<MobSpawnSettings.SpawnerData> vanilla) {
+		WeightedList<MobSpawnSettings.SpawnerData> walkers = WALKER_SPAWNS.get(Sandbox.current().herdSize());
+		if (!Sandbox.current().vanillaMonsters() || vanilla.isEmpty()) {
+			return walkers;
+		}
+
+		return WeightedList.<MobSpawnSettings.SpawnerData>builder().addAll(vanilla).add(walkers.unwrap().getFirst().value(), 100).build();
 	}
 
 	public static boolean isRecipeRemoved(ResourceKey<Recipe<?>> key) {

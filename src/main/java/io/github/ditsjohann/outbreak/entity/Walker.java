@@ -3,10 +3,15 @@ package io.github.ditsjohann.outbreak.entity;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.character.Perks;
+import io.github.ditsjohann.outbreak.character.Skill;
 import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
+import io.github.ditsjohann.outbreak.sandbox.Sandbox;
+import io.github.ditsjohann.outbreak.sandbox.SandboxSettings;
 import io.github.ditsjohann.outbreak.survivor.OutbreakDamageTypes;
 import io.github.ditsjohann.outbreak.vehicle.Vehicle;
 
@@ -19,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
@@ -98,6 +104,8 @@ public class Walker extends Zombie {
 	/** The last hit, packed: see {@link Hit}. A new one has a new sequence number. */
 	private static final EntityDataAccessor<Integer> DATA_HIT = SynchedEntityData.defineId(Walker.class, EntityDataSerializers.INT);
 	private static final Identifier CRAWLER_SPEED = Identifier.fromNamespaceAndPath("outbreak", "crawler");
+	/** The world's sandbox walker speed, on top of the shambler's base speed. */
+	private static final Identifier SANDBOX_SPEED = Identifier.fromNamespaceAndPath("outbreak", "sandbox_speed");
 
 	/** Standing, knocked down (falling, then lying there), or getting back up. */
 	public enum Posture {
@@ -159,6 +167,10 @@ public class Walker extends Zombie {
 
 	public static boolean checkWalkerSpawnRules(EntityType<? extends Mob> type, LevelAccessor level, EntitySpawnReason reason, BlockPos pos, RandomSource random) {
 		// Unlike vanilla monsters, walkers don't care about light: they're out in broad daylight too.
+		if (reason == EntitySpawnReason.NATURAL && Sandbox.current().population() == SandboxSettings.Population.NONE) {
+			return false;
+		}
+
 		return level.getDifficulty() != Difficulty.PEACEFUL && Mob.checkMobSpawnRules(type, level, reason, pos, random);
 	}
 
@@ -184,9 +196,18 @@ public class Walker extends Zombie {
 
 	/** Sight check: range depends on how bright it is where the target stands, crouching halves it, and walkers only see what's in front of them. */
 	private boolean canSpot(LivingEntity target) {
+		if (target instanceof Player player && !Characters.hasCharacter(player)) {
+			// Still making their survivor.
+			return false;
+		}
+
 		double range = 6.0 + this.level().getMaxLocalRawBrightness(target.blockPosition());
 		if (target.isCrouching()) {
 			range *= 0.5;
+		}
+
+		if (target instanceof Player player) {
+			range *= Perks.visibility(player);
 		}
 
 		double distSqr = this.distanceToSqr(target);
@@ -212,6 +233,10 @@ public class Walker extends Zombie {
 		boolean head = false;
 		// Run over by a vehicle: crushed, head or not.
 		if (isAttack && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !runOver) {
+			if (direct instanceof Player player) {
+				damage *= Perks.meleeDamage(player);
+			}
+
 			// A walker on the ground can't protect its head: every hit is a head hit.
 			head = this.posture() != Posture.STANDING || this.isCrawler() || this.isHeadshot(direct);
 			if (head) {
@@ -228,6 +253,10 @@ public class Walker extends Zombie {
 		boolean hurt = super.hurtServer(level, source, damage);
 		if (hurt && isAttack) {
 			this.knockAbout(level, source, direct, head, runOver);
+			if (direct instanceof ServerPlayer player && !runOver) {
+				Characters.addXp(player, Skill.FIGHTING, head ? 3.0F : 2.0F);
+				Characters.addXp(player, Skill.STRENGTH, 0.5F);
+			}
 		}
 
 		return hurt;
@@ -249,6 +278,10 @@ public class Walker extends Zombie {
 		// Yaw the blow pushes towards; a sideways swing comes across towards the attacker's left.
 		float yaw = (float) Math.toDegrees(Math.atan2(-away.x, away.z)) - (runOver ? 0.0F : style.lateral);
 		float strength = runOver ? 1.6F : style.strength * (head ? 1.3F : 1.0F);
+		if (!runOver && attacker instanceof Player player) {
+			strength *= Perks.push(player);
+		}
+
 		this.hitSequence++;
 		this.entityData.set(DATA_HIT, Hit.pack(this.hitSequence, yaw, Math.round(strength * 8.0F), head));
 		if (this.isDeadOrDying()) {
@@ -364,6 +397,10 @@ public class Walker extends Zombie {
 	public void aiStep() {
 		// Here rather than in customServerAiStep: that doesn't run while the walker is down (immobile).
 		if (!this.level().isClientSide() && this.isAlive()) {
+			if (this.tickCount % 40 == 1) {
+				this.applySandboxSpeed();
+			}
+
 			if (this.staggerTicks > 0) {
 				this.staggerTicks--;
 			}
@@ -377,6 +414,19 @@ public class Walker extends Zombie {
 		}
 
 		super.aiStep();
+	}
+
+	/** Shamblers, fast shamblers or sprinters, as the world's sandbox settings say (they can change any time). */
+	private void applySandboxSpeed() {
+		double bonus = Sandbox.current().walkerSpeed().speed - SandboxSettings.WalkerSpeed.SHAMBLERS.speed;
+		var speed = this.getAttribute(Attributes.MOVEMENT_SPEED);
+		AttributeModifier current = speed.getModifier(SANDBOX_SPEED);
+		if (current == null ? bonus != 0.0 : current.amount() != bonus) {
+			speed.removeModifier(SANDBOX_SPEED);
+			if (bonus != 0.0) {
+				speed.addTransientModifier(new AttributeModifier(SANDBOX_SPEED, bonus, AttributeModifier.Operation.ADD_VALUE));
+			}
+		}
 	}
 
 	@Override

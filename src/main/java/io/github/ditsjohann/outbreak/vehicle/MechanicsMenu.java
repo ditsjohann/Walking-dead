@@ -3,6 +3,9 @@ package io.github.ditsjohann.outbreak.vehicle;
 import org.jspecify.annotations.Nullable;
 
 import io.github.ditsjohann.outbreak.Outbreak;
+import io.github.ditsjohann.outbreak.character.Characters;
+import io.github.ditsjohann.outbreak.character.Perks;
+import io.github.ditsjohann.outbreak.character.Skill;
 
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
@@ -168,7 +171,8 @@ public class MechanicsMenu extends AbstractContainerMenu {
 
 				engineParts.shrink(1);
 				wrench.hurtAndBreak(2, serverPlayer, InteractionHand.MAIN_HAND.asEquipmentSlot());
-				vehicle.setEngine(vehicle.engine() + ENGINE_PARTS_REPAIR);
+				vehicle.setEngine(vehicle.engine() + ENGINE_PARTS_REPAIR + Perks.engineRepairBonus(player));
+				Characters.addXp(serverPlayer, Skill.MECHANICS, 12.0F);
 				player.level().playSound(null, vehicle.getX(), vehicle.getY(), vehicle.getZ(), SoundEvents.ANVIL_USE, SoundSource.PLAYERS, 0.5F, 1.4F);
 				return true;
 			}
@@ -193,7 +197,8 @@ public class MechanicsMenu extends AbstractContainerMenu {
 				}
 
 				screwdriver.hurtAndBreak(2, serverPlayer, InteractionHand.MAIN_HAND.asEquipmentSlot());
-				vehicle.setWindows(vehicle.windows() + WINDOWS_PER_REPAIR);
+				vehicle.setWindows(vehicle.windows() + WINDOWS_PER_REPAIR + Perks.windowRepairBonus(player));
+				Characters.addXp(serverPlayer, Skill.MECHANICS, 8.0F);
 				player.level().playSound(null, vehicle.getX(), vehicle.getY(), vehicle.getZ(), SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 1.0F, 1.0F);
 				return true;
 			}
@@ -269,6 +274,22 @@ public class MechanicsMenu extends AbstractContainerMenu {
 		@Override
 		public int getMaxStackSize() {
 			return 1;
+		}
+
+		@Override
+		public void setByPlayer(ItemStack itemStack, ItemStack previous) {
+			super.setByPlayer(itemStack, previous);
+			if (!itemStack.isEmpty() && this.player instanceof ServerPlayer serverPlayer) {
+				Characters.addXp(serverPlayer, Skill.MECHANICS, 8.0F);
+			}
+		}
+
+		@Override
+		public void onTake(Player player, ItemStack carried) {
+			super.onTake(player, carried);
+			if (player instanceof ServerPlayer serverPlayer) {
+				Characters.addXp(serverPlayer, Skill.MECHANICS, 3.0F);
+			}
 		}
 	}
 }
