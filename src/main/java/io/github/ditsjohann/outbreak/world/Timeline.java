@@ -81,6 +81,8 @@ public final class Timeline extends SavedData {
 		FuelPumps.register();
 		Taps.register();
 		Broadcasts.register();
+		MetaEvents.register();
+		Camouflage.register();
 		OutbreakSounds.register();
 		TimelineCommand.register();
 	}

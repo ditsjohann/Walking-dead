@@ -8,6 +8,7 @@ import json
 import math
 import random
 import subprocess
+import sys
 import tempfile
 import wave
 from pathlib import Path
@@ -16,6 +17,8 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2] / "src/main/resources/assets/outbreak"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "vehicles"))
+import make_vehicles as mv  # noqa: E402  (the box model tools)
 RATE = 44100
 
 PALETTE = {
@@ -93,6 +96,40 @@ SPRITES = {
 ....kCuuuuCk....
 .....kkkkkk.....
 ................
+................
+................""",
+    "item/walker_guts": """
+................
+................
+.....kkk........
+....krRrkk......
+...krrRrrrk.....
+..krrrrrsrrk....
+..krsrrrrrrrk...
+...krrrsrrrrrk..
+....kkrrrrssrk..
+......krrrrrrk..
+.....krrsrrrk...
+.....krrrrkk....
+......kkkk......
+................
+................
+................""",
+    "gui/sprites/moodle/guts": """
+................
+................
+.....kkkkkk.....
+....krrrRrrk....
+...krRrrrrsrk...
+...krrkrrkrrk...
+...krrrrrrrrk...
+...krsrrrrRrk...
+....krrkkrrk....
+....kr.rr.rk....
+.....k.kk.k.....
+......r..r......
+.....r....r.....
+......r..r......
 ................
 ................""",
 }
@@ -255,13 +292,201 @@ def sounds():
     write(sounds_json, existing)
 
 
+# --- Phase 6b: the helicopter, the flare, walker guts ------------------------------------------
+
+def helicopter_parts():
+    """An army helicopter (an NH90, grey-green): cabin, nose, tail boom and fin, engines on top, the
+    main rotor and the tail rotor (both spin), skids. In pixels, y up, z forward."""
+    B, box, Part = mv.Box, mv.box, mv.Part
+    body = Part("body", boxes=[
+        box(-16, 6, -24, 16, 40, 30, {"all": "hull", "left": ("hull_side", -24, 30), "right": ("hull_side", -24, 30), "bottom": "hull_dark"}),
+        box(-12, 8, 30, 12, 32, 44, {"all": "hull", "bottom": "hull_dark", "front": "nose"}),
+        box(-11, 22, 34, 11, 33, 45, {"all": "cockpit", "bottom": "hull"}, inflate=0.3),
+        box(-10, 40, -18, 10, 48, 16, {"all": "engine", "top": "engine_top"}),
+        box(-2, 48, -2, 2, 54, 2, "metal"),
+        box(-5, 25, -82, 5, 35, -24, {"all": "hull", "left": "boom_side", "right": "boom_side"}),
+        box(-1.5, 30, -94, 1.5, 58, -80, {"all": "hull", "left": "fin", "right": "fin"}),
+        box(-15, 31, -88, 15, 33, -80, "hull"),
+        box(-13, 0, -22, -11, 2, 34, "skid"), box(11, 0, -22, 13, 2, 34, "skid"),
+        box(-13, 2, -14, -11, 8, -12, "skid"), box(11, 2, -14, 13, 8, -12, "skid"),
+        box(-13, 2, 18, -11, 8, 20, "skid"), box(11, 2, 18, 13, 8, 20, "skid"),
+    ])
+    blades = [Part(f"blade_{i}", rotation=(0, 90 * i, 0), boxes=[box(-2.5, 0, 2, 2.5, 0.8, 76, "blade")]) for i in range(4)]
+    rotor = Part("rotor", pivot=(0, 54, 0), boxes=[box(-3, -1, -3, 3, 2, 3, "metal")], children=blades)
+    tail_blades = [Part(f"tail_blade_{i}", rotation=(90 * i, 0, 0), boxes=[box(0, 0, -1.2, 0.8, 14, 1.2, "blade")]) for i in range(4)]
+    tail_rotor = Part("tail_rotor", pivot=(2, 50, -88), boxes=[box(0, -1.2, -1.2, 1.4, 1.2, 1.2, "metal")], children=tail_blades)
+    return [body, rotor, tail_rotor]
+
+
+HELI = {"hull": (84, 94, 82), "hull_dark": (52, 58, 52), "engine": (74, 84, 74), "metal": (60, 62, 64),
+        "blade": (34, 36, 38), "skid": (44, 46, 46), "cockpit": (22, 30, 36)}
+
+
+def heli_colour(spec, face, u, v, w, h, b):
+    name, *args = spec if isinstance(spec, tuple) else (spec,)
+    if name in ("hull_side", "boom_side", "fin", "nose", "engine_top"):
+        c = HELI["hull" if name != "engine_top" else "engine"]
+    else:
+        c = HELI.get(name, (255, 0, 255))
+    light = 1.12 if face == "top" else 0.6 if face == "bottom" else 1.0
+    c = tuple(int(x * light) for x in c)
+    seam = (int(u) % 12 == 0 and u > 1) or (int(v) % 10 == 0 and v > 1)
+    if name in ("hull", "hull_side", "boom_side", "fin", "engine", "engine_top") and seam:
+        c = tuple(int(x * 0.82) for x in c)
+    if name == "hull_side":
+        # A sliding door, windows along the cabin, the step.
+        if 30 <= u < 52 and 4 <= v < 30 and (u in (30, 51) or v in (4, 29)):
+            c = (30, 34, 30)
+        if 34 <= u < 48 and 7 <= v < 15:
+            c = (24, 32, 38)
+        if (8 <= u < 20 or 60 <= u < 70) and 7 <= v < 14:
+            c = (24, 32, 38)
+    if name == "boom_side":
+        # The Dutch roundel: red, white, blue, an orange heart.
+        d = math.hypot(u - 29, v - 5)
+        if d < 4.6:
+            c = (230, 120, 20) if d < 1.6 else (30, 50, 140) if d < 2.6 else (230, 230, 226) if d < 3.6 else (180, 30, 30)
+        if 8 <= u < 20 and v in (2, 3, 6, 7) and (u % 2 == 0):
+            c = (200, 200, 190)
+    if name == "fin" and 18 <= v < 24 and 3 <= u < 11:
+        c = (230, 120, 20) if v < 20 else (230, 230, 226) if v < 22 else (30, 50, 140)
+    if name == "nose" and v < 6:
+        c = (24, 32, 38)
+    if name == "cockpit":
+        c = (60, 76, 88) if (u + v) % 7 < 2 else c
+    if name == "blade" and (u < 1 or u > w - 1) and face == "top":
+        c = (200, 200, 60)
+    return c + (255,)
+
+
+def helicopter():
+    parts = helicopter_parts()
+    width = 512
+    height = mv.pack(parts, width)
+    model = {"texture": [width, height], "tints": [], "parts": [p.to_json() for p in parts]}
+    write(ROOT / "vehicles/helicopter.json", model)
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    for part in parts:
+        for b in part.all_boxes():
+            for face, (x0, y0, fw, fh) in mv.face_regions(b).items():
+                spec = b.face(face)
+                for j in range(fh):
+                    for i in range(fw):
+                        if x0 + i < width and y0 + j < height:
+                            img.putpixel((x0 + i, y0 + j), heli_colour(spec, face, i, j, fw, fh, b))
+    out = ROOT / "textures/entity/helicopter.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out, optimize=True)
+
+
+def flare():
+    """The flare particle: a hot red-white core in a red glow."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(16):
+        for x in range(16):
+            d = math.hypot(x - 7.5, y - 7.5)
+            if d < 2.2:
+                c = (255, 236, 220, 255)
+            elif d < 4.5:
+                c = (255, 90, 60, 255)
+            elif d < 7.5:
+                a = int(200 * (7.5 - d) / 3.0)
+                c = (230, 40, 30, a)
+            else:
+                continue
+            img.putpixel((x, y), c)
+    out = ROOT / "textures/particle/flare.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out)
+    write(ROOT / "particles/flare.json", {"textures": ["outbreak:flare"]})
+
+
+def guts_overlay():
+    """Walker guts smeared over a player: a 64x64 overlay in the player skin's layout, on both the
+    inner and the outer layer (skins often have their clothes on the outer one): big blotches of dark
+    blood and worse, thickest on the chest and the hands."""
+    rng = random.Random("guts")
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    # (x0, y0, x1, y1, how covered): body, arms, legs, head; then the same on the outer layer.
+    regions = [(16, 16, 40, 32, 0.6), (40, 16, 56, 32, 0.5), (32, 48, 48, 64, 0.5), (0, 16, 16, 32, 0.4), (16, 48, 32, 64, 0.4),
+               (0, 0, 32, 16, 0.15),
+               (16, 32, 40, 48, 0.6), (40, 32, 56, 48, 0.5), (48, 48, 64, 64, 0.5), (0, 32, 16, 48, 0.4), (0, 48, 16, 64, 0.4)]
+    blobs = [(rng.uniform(0, 64), rng.uniform(0, 64), rng.uniform(2.0, 5.0)) for _ in range(200)]
+    for x0, y0, x1, y1, cover in regions:
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                wet = max((r - math.hypot(x - bx, y - by)) / r for bx, by, r in blobs)
+                if wet > 1.0 - cover - rng.random() * 0.25:
+                    tone = rng.random()
+                    c = (110, 16, 12) if tone < 0.45 else (66, 10, 10) if tone < 0.85 else (124, 100, 66)
+                    img.putpixel((x, y), c + (255,))
+    out = ROOT / "textures/entity/guts_overlay.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out)
+    write(ROOT / "models/item/walker_guts.json", {"parent": "minecraft:item/generated", "textures": {"layer0": "outbreak:item/walker_guts"}})
+    write(ROOT / "items/walker_guts.json", {"model": {"type": "minecraft:model", "model": "outbreak:item/walker_guts"}})
+
+
+def rotor_loop():
+    """A helicopter overhead: the blades' thwop, nine to the loop (so it loops cleanly), the turbine."""
+    seconds = 2.0
+    n = int(seconds * RATE)
+    t = np.arange(n) / RATE
+    rng = np.random.default_rng(5)
+    noise = rng.normal(0, 1, n)
+    spectrum = np.fft.rfft(noise)
+    freqs = np.fft.rfftfreq(n, 1 / RATE)
+    low = np.fft.irfft(spectrum * np.exp(-((freqs - 140) / 120) ** 2), n)
+    low /= np.max(np.abs(low))
+    beat = 0.5 + 0.5 * np.cos(2 * np.pi * 4.5 * t)
+    slap = low * beat ** 6 * 1.4
+    wind = np.fft.irfft(spectrum * np.exp(-((freqs - 900) / 900) ** 2), n)
+    wind /= np.max(np.abs(wind))
+    turbine = 0.05 * np.sin(2 * np.pi * 1180 * t) + 0.03 * np.sin(2 * np.pi * 2360 * t)
+    return slap * 0.8 + wind * 0.18 + turbine
+
+
+def gunshot_distant():
+    """A gunshot a long way off: a dull crack, then its echo rolling round the buildings."""
+    seconds = 2.2
+    n = int(seconds * RATE)
+    t = np.arange(n) / RATE
+    rng = np.random.default_rng(11)
+    noise = rng.normal(0, 1, n)
+    crack = np.convolve(noise * np.exp(-t * 60), np.ones(25) / 25, mode="same") * 4
+    tail = np.convolve(noise * np.exp(-t * 3.5), np.ones(140) / 140, mode="same") * 5
+    echo = np.zeros(n)
+    delay = int(0.32 * RATE)
+    echo[delay:] = crack[:-delay] * 0.35
+    return np.clip((crack + tail * 0.6 + echo), -1, 1) * envelope(n, 0.001, 0.4) * 0.9
+
+
+def sounds_6b():
+    save_ogg("helicopter", rotor_loop())
+    save_ogg("gunshot_distant", gunshot_distant())
+    events = {
+        "helicopter": {"subtitle": "subtitles.outbreak.helicopter",
+                       "sounds": [{"name": "outbreak:helicopter", "attenuation_distance": 160, "stream": True}]},
+        "gunshot_distant": {"subtitle": "subtitles.outbreak.gunshot_distant",
+                            "sounds": [{"name": "outbreak:gunshot_distant", "attenuation_distance": 220}]},
+    }
+    sounds_json = ROOT / "sounds.json"
+    existing = json.loads(sounds_json.read_text())
+    existing.update(events)
+    write(sounds_json, existing)
+
+
 def main():
     for name, art in SPRITES.items():
         sprite(name, art)
     dead_light()
     items()
     sounds()
-    print("wrote the dead light, the radio, batteries, tap water and the sounds")
+    helicopter()
+    flare()
+    guts_overlay()
+    sounds_6b()
+    print("wrote the dead light, the radio, batteries, tap water, the helicopter, the flare, walker guts and the sounds")
 
 
 if __name__ == "__main__":

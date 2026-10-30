@@ -73,3 +73,49 @@ execute as Bot run outbreak timeline radio
 outbreak sandbox set power early
 wait 2
 outbreak timeline
+== guts: smear walker guts on (hold right-click), then a walker right next to you leaves you alone
+outbreak timeline water on
+clear Bot
+tp Bot 0 -57 -20
+item replace entity Bot weapon.mainhand with outbreak:walker_guts
+player Bot use continuous
+wait 3
+player Bot stop
+execute if items entity Bot weapon.mainhand outbreak:walker_guts run say the guts are still in my hand
+summon outbreak:walker 0 -57 -18 {Tags:["sniffer"],PersistenceRequired:1b}
+wait 6
+data get entity Bot Health
+data get entity Bot "fabric:attachments"
+== sprinting shakes it off (the guts are gone from the attachments)
+player Bot look north
+player Bot sprint
+player Bot move forward
+wait 5
+player Bot stop
+data get entity Bot "fabric:attachments"
+kill @e[tag=sniffer]
+outbreak cure Bot
+== herds migrate: four walkers far from anyone, sent across the city
+summon outbreak:walker 40 -57 40 {Tags:["herd"],PersistenceRequired:1b}
+summon outbreak:walker 70 -57 -40 {Tags:["herd"],PersistenceRequired:1b}
+summon outbreak:walker -50 -57 50 {Tags:["herd"],PersistenceRequired:1b}
+summon outbreak:walker -60 -57 -60 {Tags:["herd"],PersistenceRequired:1b}
+wait 2
+execute as @e[tag=herd] run data get entity @s Pos
+outbreak event migrate
+wait 12
+execute as @e[tag=herd] run data get entity @s Pos
+kill @e[tag=herd]
+== the helicopter comes for Bot, circles low and loud; a walker 40 blocks off follows it in
+summon outbreak:walker 40 -57 -20 {Tags:["follower"],PersistenceRequired:1b}
+execute as Bot run outbreak event helicopter
+wait 1
+execute if entity @e[type=outbreak:helicopter] run say helicopter inbound
+wait 25
+execute as @e[type=outbreak:helicopter] run data get entity @s Pos
+data get entity Bot Pos
+data get entity @e[tag=follower,limit=1] Pos
+== a gunfight in the distance, and a flare over the Euroborg
+execute as Bot run outbreak event gunfight
+execute as Bot run outbreak event flare
+wait 3

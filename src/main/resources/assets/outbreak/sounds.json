@@ -27,5 +27,24 @@
 				"attenuation_distance": 64
 			}
 		]
+	},
+	"helicopter": {
+		"subtitle": "subtitles.outbreak.helicopter",
+		"sounds": [
+			{
+				"name": "outbreak:helicopter",
+				"attenuation_distance": 160,
+				"stream": true
+			}
+		]
+	},
+	"gunshot_distant": {
+		"subtitle": "subtitles.outbreak.gunshot_distant",
+		"sounds": [
+			{
+				"name": "outbreak:gunshot_distant",
+				"attenuation_distance": 220
+			}
+		]
 	}
 }

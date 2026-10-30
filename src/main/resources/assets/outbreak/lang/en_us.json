@@ -414,5 +414,15 @@
 	"outbreak.radio.2": "Emergency broadcast. Evacuation at the Euroborg today, until eight tonight. Army escorts leave the Hoofdstation every hour. Do not take your car: the roads are blocked.",
 	"outbreak.radio.3": "...the Euroborg is overrun. I repeat, the Euroborg is overrun. Stay away from crowds. Noise draws them. Do not... [static]",
 	"outbreak.radio.4": "This is a recorded message from the Veiligheidsregio Groningen. Stay indoors. Ration your water. Boil water from the canals before you drink it. Help is on its way.",
-	"outbreak.radio.5": "[The emergency tone. Then the recorded message again, slower, as if the tape is stretching.] ...help is on its way..."
+	"outbreak.radio.5": "[The emergency tone. Then the recorded message again, slower, as if the tape is stretching.] ...help is on its way...",
+	"entity.outbreak.helicopter": "Helicopter",
+	"item.outbreak.walker_guts": "Walker Guts",
+	"subtitles.outbreak.helicopter": "Helicopter rotors thud",
+	"subtitles.outbreak.gunshot_distant": "Distant gunfire",
+	"outbreak.moodle.guts.1": "Covered in guts",
+	"outbreak.guts.applied": "You smear the guts all over yourself. You smell like one of them now. Walk, don't run.",
+	"outbreak.guts.washed": "The water washes the guts off. They can smell you again.",
+	"outbreak.guts.ran": "Running, you shake it off. They can smell you again.",
+	"outbreak.guts.attacked": "The others turn. They know what you are.",
+	"outbreak.guts.worn_off": "The guts have dried and flaked off. They can smell you again."
 }

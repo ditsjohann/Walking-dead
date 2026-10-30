@@ -80,6 +80,45 @@ public class WorldClientTest implements FabricClientGameTest {
 			context.waitTicks(5);
 			context.takeScreenshot("world-5-pump-dead");
 
+			// Covered in walker guts: seen from the front, and the moodle.
+			server.runCommand("item replace entity @p weapon.mainhand with outbreak:walker_guts");
+			server.runCommand("execute as @p at @s run tp @s ~ ~ ~-6 180 10");
+			context.getInput().holdKey(options -> options.keyUse);
+			context.waitTicks(50);
+			context.getInput().releaseKey(options -> options.keyUse);
+			context.runOnClient(minecraft -> minecraft.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+			context.waitTicks(5);
+			context.takeScreenshot("world-7-guts");
+			context.runOnClient(minecraft -> minecraft.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
+
+			// The helicopter: it finds you and circles low overhead.
+			server.runCommand("execute as @p run outbreak event helicopter");
+			context.waitTicks(20 * 20);
+			context.runOnClient(minecraft -> {
+				var heli = minecraft.level.getEntitiesOfClass(io.github.ditsjohann.outbreak.world.Helicopter.class,
+					minecraft.player.getBoundingBox().inflate(200.0)).stream().findFirst();
+				heli.ifPresent(h -> {
+					var to = h.position().subtract(minecraft.player.getEyePosition());
+					minecraft.player.setYRot((float) (Math.atan2(to.z, to.x) * 180.0 / Math.PI) - 90.0F);
+					minecraft.player.setXRot((float) (-Math.atan2(to.y, Math.hypot(to.x, to.z)) * 180.0 / Math.PI) + 8.0F);
+				});
+			});
+			context.waitTicks(2);
+			context.takeScreenshot("world-8-helicopter");
+			server.runCommand("kill @e[type=outbreak:helicopter]");
+
+			// A flare over the Euroborg at dusk, a long way off.
+			server.runCommand("time set 13500");
+			server.runCommand("execute as @p run outbreak event flare");
+			context.waitTicks(3);
+			context.runOnClient(minecraft -> {
+				// Look the way of the flare: the Euroborg of the default map box is far east and south of here.
+				minecraft.player.setYRot(-52.0F);
+				minecraft.player.setXRot(-6.0F);
+			});
+			context.waitTicks(45);
+			context.takeScreenshot("world-9-flare");
+
 			// The sandbox settings, with when the water and the power go.
 			server.runCommand("execute as @p run outbreak sandbox");
 			context.waitTicks(20);

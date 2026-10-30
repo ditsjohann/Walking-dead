@@ -10,13 +10,16 @@ import io.github.ditsjohann.outbreak.combat.WeaponStyle;
 import io.github.ditsjohann.outbreak.entity.ai.BreakObstacleGoal;
 import io.github.ditsjohann.outbreak.entity.ai.FollowHerdLeaderGoal;
 import io.github.ditsjohann.outbreak.entity.ai.InvestigateNoiseGoal;
+import io.github.ditsjohann.outbreak.entity.ai.MigrateGoal;
 import io.github.ditsjohann.outbreak.gore.Blood;
 import io.github.ditsjohann.outbreak.gore.BodyPart;
 import io.github.ditsjohann.outbreak.gore.Limb;
+import io.github.ditsjohann.outbreak.item.OutbreakItems;
 import io.github.ditsjohann.outbreak.sandbox.Sandbox;
 import io.github.ditsjohann.outbreak.sandbox.SandboxSettings;
 import io.github.ditsjohann.outbreak.survivor.OutbreakDamageTypes;
 import io.github.ditsjohann.outbreak.vehicle.Vehicle;
+import io.github.ditsjohann.outbreak.world.Camouflage;
 
 import org.jspecify.annotations.Nullable;
 
@@ -83,6 +86,8 @@ public class Walker extends Zombie {
 	/** A crawler's hitbox: as wide as a standing walker (so changing to it never pushes anything up), but low. */
 	private static final EntityDimensions CRAWLING = EntityDimensions.scalable(0.6F, 0.6F).withEyeHeight(0.4F);
 	private static final float HEADSHOT_MULTIPLIER = 4.0F;
+	/** Chance a walker killed with a blade leaves its guts behind. */
+	private static final float GUTS_CHANCE = 0.4F;
 	private static final float BODY_MULTIPLIER = 0.5F;
 	/** Cosine of the half-angle of a walker's field of view (~65 degrees). */
 	private static final double VIEW_CONE_COS = 0.42;
@@ -142,6 +147,9 @@ public class Walker extends Zombie {
 	private long noiseHeardAt;
 	private int noiseVersion;
 	private @Nullable UUID leaderId;
+	/** Where its herd is heading (only for leaders and loners), and until when it keeps going. */
+	private @Nullable BlockPos migration;
+	private long migrationUntil;
 
 	public Walker(EntityType<? extends Walker> type, Level level) {
 		super(type, level);
@@ -200,6 +208,7 @@ public class Walker extends Zombie {
 		this.goalSelector.addGoal(2, new ZombieAttackGoal(this, 1.15, false));
 		this.goalSelector.addGoal(4, new InvestigateNoiseGoal(this, 1.0));
 		this.goalSelector.addGoal(5, new FollowHerdLeaderGoal(this, 0.9));
+		this.goalSelector.addGoal(6, new MigrateGoal(this, 0.75));
 		this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.7));
 		this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
 		this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -209,8 +218,8 @@ public class Walker extends Zombie {
 
 	/** Sight check: range depends on how bright it is where the target stands, crouching halves it, and walkers only see what's in front of them. */
 	private boolean canSpot(LivingEntity target) {
-		if (target instanceof Player player && !Characters.hasCharacter(player)) {
-			// Still making their survivor.
+		if (target instanceof Player player && (!Characters.hasCharacter(player) || Camouflage.isCovered(player))) {
+			// Still making their survivor, or smelling like one of us.
 			return false;
 		}
 
@@ -264,6 +273,17 @@ public class Walker extends Zombie {
 		}
 
 		boolean hurt = super.hurtServer(level, source, damage);
+		if (hurt && direct instanceof ServerPlayer player && Camouflage.isCovered(player)) {
+			// Attacking one of them gives you away.
+			Camouflage.wash(player, "outbreak.guts.attacked");
+		}
+
+		if (hurt && this.isDeadOrDying() && direct instanceof Player player && WeaponStyle.isSharp(player.getMainHandItem())
+			&& this.random.nextFloat() < GUTS_CHANCE) {
+			// Opened up: its guts, for smearing on.
+			this.spawnAtLocation(level, new ItemStack(OutbreakItems.WALKER_GUTS));
+		}
+
 		if (hurt && source.is(DamageTypeTags.IS_EXPLOSION)) {
 			this.blownApart(level, source);
 		}
@@ -565,6 +585,10 @@ public class Walker extends Zombie {
 			}
 
 			this.trail((ServerLevel) this.level());
+			// Covered in guts: it loses interest, unless they've just hit it.
+			if (this.getTarget() instanceof Player player && Camouflage.isCovered(player) && this.getLastHurtByMob() != player) {
+				this.setTarget(null);
+			}
 		}
 
 		super.aiStep();
@@ -710,6 +734,24 @@ public class Walker extends Zombie {
 		return null;
 	}
 
+	public @Nullable BlockPos getMigration() {
+		if (this.migration != null && this.level().getGameTime() > this.migrationUntil) {
+			this.migration = null;
+		}
+
+		return this.migration;
+	}
+
+	/** Sets off with its herd towards somewhere, for a while (see Migration). */
+	public void migrate(BlockPos to, long ticks) {
+		this.migration = to;
+		this.migrationUntil = this.level().getGameTime() + ticks;
+	}
+
+	public void clearMigration() {
+		this.migration = null;
+	}
+
 	public void setLeader(@Nullable Walker leader) {
 		this.leaderId = leader == null || leader == this ? null : leader.getUUID();
 	}
@@ -798,6 +840,10 @@ public class Walker extends Zombie {
 		output.putInt("skin", this.skin());
 		output.putBoolean("crawler", this.isCrawler());
 		output.putInt("limbs", this.lostLimbs());
+		if (this.getMigration() != null) {
+			output.store("migration", BlockPos.CODEC, this.migration);
+			output.putLong("migration_until", this.migrationUntil);
+		}
 	}
 
 	@Override
@@ -807,6 +853,8 @@ public class Walker extends Zombie {
 		input.getInt("skin").ifPresent(this::setSkin);
 		this.entityData.set(DATA_CRAWLER, input.getBooleanOr("crawler", false));
 		this.entityData.set(DATA_LIMBS, input.getIntOr("limbs", 0));
+		this.migration = input.read("migration", BlockPos.CODEC).orElse(null);
+		this.migrationUntil = input.getLongOr("migration_until", 0L);
 	}
 
 	/** Shared between all walkers of one naturally spawned pack: the first one becomes the leader. */

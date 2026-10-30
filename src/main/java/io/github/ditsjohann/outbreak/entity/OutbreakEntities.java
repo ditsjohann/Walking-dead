@@ -2,6 +2,7 @@ package io.github.ditsjohann.outbreak.entity;
 
 import io.github.ditsjohann.outbreak.Outbreak;
 import io.github.ditsjohann.outbreak.gore.BodyPart;
+import io.github.ditsjohann.outbreak.world.Helicopter;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 
@@ -41,6 +42,18 @@ public final class OutbreakEntities {
 			.clientTrackingRange(6)
 			.updateInterval(2)
 			.build(BODY_PART_KEY)
+	);
+
+	public static final ResourceKey<EntityType<?>> HELICOPTER_KEY = ResourceKey.create(Registries.ENTITY_TYPE, Outbreak.id("helicopter"));
+	/** The army helicopter of the helicopter event, seen and heard from far off. */
+	public static final EntityType<Helicopter> HELICOPTER = Registry.register(
+		BuiltInRegistries.ENTITY_TYPE,
+		HELICOPTER_KEY,
+		EntityType.Builder.<Helicopter>of(Helicopter::new, MobCategory.MISC)
+			.sized(4.0F, 3.5F)
+			.clientTrackingRange(20)
+			.updateInterval(2)
+			.build(HELICOPTER_KEY)
 	);
 
 	private OutbreakEntities() {

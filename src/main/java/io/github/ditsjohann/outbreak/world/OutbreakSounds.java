@@ -14,6 +14,8 @@ public final class OutbreakSounds {
 	public static final Holder<SoundEvent> RADIO_STATIC = register("radio_static");
 	public static final Holder<SoundEvent> FUEL_PUMP = register("fuel_pump");
 	public static final Holder<SoundEvent> POWER_OUT = register("power_out");
+	public static final Holder<SoundEvent> HELICOPTER = register("helicopter");
+	public static final Holder<SoundEvent> GUNSHOT_DISTANT = register("gunshot_distant");
 
 	private OutbreakSounds() {
 	}

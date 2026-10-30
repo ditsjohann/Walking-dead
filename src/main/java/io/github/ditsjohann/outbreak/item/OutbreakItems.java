@@ -57,6 +57,14 @@ public final class OutbreakItems {
 	/** Runs on batteries; while it's on you hear the emergency broadcasts (see Broadcasts). */
 	public static final Item PORTABLE_RADIO = register("portable_radio", RadioItem::new, new Item.Properties().stacksTo(1).durability(RadioItem.BATTERY_LIFE));
 	public static final Item BATTERIES = register("batteries", Item::new, new Item.Properties().stacksTo(8));
+	/** From a walker cut down with a blade: smear them on to walk among the dead. */
+	public static final Item WALKER_GUTS = register("walker_guts", GutsItem::new, new Item.Properties().stacksTo(4)
+		.component(DataComponents.CONSUMABLE, Consumable.builder()
+			.consumeSeconds(2.0F)
+			.animation(ItemUseAnimation.BRUSH)
+			.sound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.HONEY_BLOCK_SLIDE))
+			.hasConsumeParticles(false)
+			.build()));
 
 	// Melee weapons. Attack damage shown in game is 1 + the baseline; a headshot does 4x that.
 	public static final Item KITCHEN_KNIFE = register("kitchen_knife", Item::new, weapon(120, 3.0F, -1.6F, 7));
@@ -98,6 +106,7 @@ public final class OutbreakItems {
 			output.accept(HIKING_BAG);
 			output.accept(PORTABLE_RADIO);
 			output.accept(BATTERIES);
+			output.accept(WALKER_GUTS);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> {
 			output.accept(FRIDGE);

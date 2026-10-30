@@ -56,12 +56,38 @@ dark.
 ![An NL-Alert](screenshots/phase6/3-nl-alert.png)
 ![The radio](screenshots/phase6/4-radio.png)
 
+## Out of your hands (meta events)
+- **The helicopter.** Once, on a day in the first two weeks, an army helicopter comes in low, finds
+  one of you and circles overhead for a minute, as if it's looking for something. Then it flies off.
+  You hear it a long way off. So does every walker: they all follow it, and it leaves them at your
+  door.
+- **Gunfights in the distance:** a burst of shots somewhere far off (often in the first days, rarely
+  later, then never). The dead near it go to look, and so might you.
+- **Flares over the Euroborg:** on the nights the evacuation centre still holds out, a red flare goes
+  up over the stadium, seen from all over the city.
+- **Herds on the move.** Every couple of minutes some of the herds around you set off across the
+  city, a hundred blocks or so, all drifting the same way; the way changes every day. The street you
+  cleared won't stay clear.
+
+![The helicopter](screenshots/phase6/8-helicopter.png)
+![A flare over the Euroborg](screenshots/phase6/9-flare.png)
+
+## Walking among them
+- **Walker guts:** kill a walker with a blade (machete, axe, sword) and you may get its guts. Hold
+  right-click to smear them all over yourself: the dead take you for one of them and walk right past
+  you (the moodle shows you're covered, and everyone sees it).
+- It doesn't last: **rain** or water washes it off, **running** shakes it off, and the moment you
+  **attack** one of them, they know. Otherwise it dries and flakes off after a quarter of an hour.
+
+![Covered in guts](screenshots/phase6/7-guts.png)
+
 ## Items
 | Item | |
 |---|---|
 | Tap water | From a tap while the water runs: as safe as boiled water. |
 | Portable radio | Hear the broadcasts. Runs on batteries. |
 | Batteries | New batteries for the radio. |
+| Walker guts | From a walker killed with a blade: smear them on to walk among the dead. |
 
 ## Admin and testing commands (operators only)
 ```
@@ -71,6 +97,10 @@ dark.
 /outbreak timeline radio               — tune in: what you'd hear now
 /outbreak timeline darken <radius>     — put the lights out in the chunks around you now
 /outbreak sandbox set water|power <already_off|early|normal|late|never>
+/outbreak event helicopter             — the helicopter comes for you now
+/outbreak event gunfight               — a gunfight in the distance
+/outbreak event flare                  — a flare over the Euroborg
+/outbreak event migrate                — send the herds around you on their way now
 ```
 
 ## How it's made
@@ -79,18 +109,25 @@ dark.
   redstone lamps go out; each chunk only once (it's marked), a few chunks per tick.
 - `FuelPumps` recognises Arnis's pumps (a nozzle on a coloured pump head on white concrete) and keeps
   how much each has left. `Taps` are the empty cauldrons. `Broadcasts` holds the schedule.
-- The dead light, the radio, batteries, tap water and the sounds (the NL-Alert tone, radio static, the
-  pump, the transformer) are made by `python3 tools/world/make_world.py`.
+- `MetaEvents` picks the helicopter's day when the world starts and rolls for gunfights each hour; the
+  helicopter only flies where the world is running (it comes in from the edge of it). Flares are drawn
+  on each client in the Euroborg's direction, within view distance. Migrating herds: the leader of
+  each herd walks a stretch at a time (`MigrateGoal`), the herd follows the leader.
+- `Camouflage` keeps until when you're covered (synced to everyone, for the overlay and the moodle);
+  walkers can't see you while you are.
+- The dead light, the radio, batteries, tap water, walker guts and their overlay, the helicopter (a box
+  model and texture, like the vehicles), the flare and the sounds (the NL-Alert tone, radio static,
+  the pump, the transformer, the rotors, distant gunfire) are made by
+  `python3 tools/world/make_world.py`.
 
 ## Tests
 - Server: `python3 tools/servertest/driver.py . tools/servertest/phase6.txt run/phase6.log` (the
   lights going out and the lantern staying lit, a tap filling a bottle and then running dry, a pump
   filling a jerrycan and a car's tank and then dying with the power, the radio switching on, an alert,
-  a new power day after changing the setting).
+  a new power day after changing the setting, a walker leaving a survivor covered in guts alone until
+  they run, herds setting off across the map, the helicopter circling and a walker following it in).
 - Client: `WorldClientTest` (a street at night, then without power; an NL-Alert; the radio; a dead
-  pump; the sandbox settings).
+  pump; covered in guts; the helicopter overhead; a flare over the Euroborg; the sandbox settings).
 
 ## Still to come in this phase
-Meta events (a helicopter flying over and drawing the herds, distant gunshots, a flare over the
-Euroborg), herds that migrate across the city, smearing walker guts on yourself to walk among them,
-and guns.
+Guns.
