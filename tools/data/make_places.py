@@ -7,8 +7,10 @@ and a box in latitude/longitude (the game projects it onto the map). A shop mapp
 the box of the building it stands in.
 
 Queries an Overpass API server (overpass.kumi.systems by default; OVERPASS=<url> to use another).
-The raw answers are cached in tools/data/cache/ (not committed), so a rerun works offline.
+The raw answers are cached in tools/data/cache/ (not committed), so a rerun only fetches what's
+missing. OFFLINE=1 builds the file from the cache alone, listing the tiles it doesn't have yet.
 """
+import hashlib
 import json
 import math
 import os
@@ -79,7 +81,7 @@ QUERIES = {
     "buildings": 'way["building"~"^(hospital|fire_station|school|university|college|kindergarten|church|chapel|cathedral|mosque|synagogue|hotel|stadium|sports_hall|office|commercial|government|industrial|warehouse|factory|manufacture|retail|supermarket)$"]({b});',
     "land": 'nwr["landuse"~"^(military|industrial)$"]({b}); nwr["military"]({b});',
 }
-WRAP = "[out:json][timeout:30];\n(\n{q}\n);\nout tags bb center qt;\n"
+WRAP = "[out:json][timeout:30];\n(\n{q}\n);\nout tags bb qt;\n"
 
 # The buildings around point POIs, to give each its building's box.
 BUILDINGS = """
@@ -96,6 +98,14 @@ out bb qt;
 
 
 MISSING = []
+# OFFLINE=1: build from the cache only (whatever the servers already gave), listing what's missing.
+OFFLINE = os.environ.get("OFFLINE") == "1"
+
+
+def quarters_of(tile):
+    mid_lat, mid_lng = (tile[0] + tile[2]) / 2, (tile[1] + tile[3]) / 2
+    return [(tile[0], tile[1], mid_lat, mid_lng), (tile[0], mid_lng, mid_lat, tile[3]),
+            (mid_lat, tile[1], tile[2], mid_lng), (mid_lat, mid_lng, tile[2], tile[3])]
 
 
 def fetch(name, query):
@@ -118,6 +128,13 @@ def fetch_tile(name, query, tile, depth=0):
     cached = CACHE / f"{name}.json"
     if cached.exists():
         return json.loads(cached.read_text())
+    if OFFLINE and not name.startswith("bounds_"):
+        # Only what's cached (the quick box lookups still go out): the pieces of a tile that was split, or nothing.
+        if depth >= 2:
+            MISSING.append(name)
+            return {"elements": []}
+        return {"elements": [e for k, quarter in enumerate(quarters_of(tile))
+                             for e in fetch_tile(f"{name}{'abcd'[k]}", query, quarter, depth + 1)["elements"]]}
     b = ",".join(f"{v:.5f}" for v in tile)
     body = urllib.parse.urlencode({"data": query.replace("{b}", b)}).encode()
     error = None
@@ -141,15 +158,31 @@ def fetch_tile(name, query, tile, depth=0):
         print("  ", name, "SKIPPED:", error, flush=True)
         MISSING.append(name)
         return {"elements": []}
-    mid_lat, mid_lng = (tile[0] + tile[2]) / 2, (tile[1] + tile[3]) / 2
-    quarters = [(tile[0], tile[1], mid_lat, mid_lng), (tile[0], mid_lng, mid_lat, tile[3]),
-                (mid_lat, tile[1], tile[2], mid_lng), (mid_lat, mid_lng, tile[2], tile[3])]
     elements = []
-    for k, quarter in enumerate(quarters):
+    for k, quarter in enumerate(quarters_of(tile)):
         elements += fetch_tile(f"{name}{'abcd'[k]}", query, quarter, depth + 1)["elements"]
     data = {"elements": elements}
     cached.write_text(json.dumps(data))
     return data
+
+
+def add_bounds(elements):
+    """Ways and relations some servers sent with only a centre: look their boxes up by id (quick)."""
+    missing = sorted({(e["type"], e["id"]) for e in elements if e["type"] != "node" and "bounds" not in e})
+    bounds = {}
+    for start in range(0, len(missing), 200):
+        batch = missing[start:start + 200]
+        ways = ",".join(str(i) for t, i in batch if t == "way")
+        relations = ",".join(str(i) for t, i in batch if t == "relation")
+        query = "[out:json][timeout:60];(" + (f"way(id:{ways});" if ways else "") + (f"relation(id:{relations});" if relations else "") + ");out ids bb qt;"
+        name = "bounds_" + hashlib.sha1(query.encode()).hexdigest()[:10]
+        for e in fetch_tile(name, query, BBOX, 2)["elements"]:
+            if "bounds" in e:
+                bounds[(e["type"], e["id"])] = e["bounds"]
+    for e in elements:
+        if (e["type"], e["id"]) in bounds:
+            e["bounds"] = bounds[(e["type"], e["id"])]
+    return elements
 
 
 def kind_of(tags):
@@ -180,11 +213,13 @@ def main():
     places = []
     for name, query in QUERIES.items():
         places += fetch(name, WRAP.replace("{q}", query))
-    buildings = [box_of(e) for e in fetch("buildings", BUILDINGS) if box_of(e)]
+    places = add_bounds(places)
+    buildings = [box_of(e) for e in fetch("around", BUILDINGS) if box_of(e)]
     # A degree of latitude is 111 km; of longitude here, 111 km x cos(53.2).
     pad_lat = 8 / 111000
     pad_lng = 8 / (111000 * math.cos(math.radians(53.2)))
     out = []
+    seen = set()
     kinds = {}
     for element in places:
         kind = kind_of(element.get("tags", {}))
@@ -199,14 +234,23 @@ def main():
         # Leave out whole districts (an industrial estate is its own buildings).
         if (box[2] - box[0]) * 111000 > 1500 or (box[3] - box[1]) * 111000 * 0.6 > 1500:
             continue
-        out.append([kind] + [round(v, 6) for v in box])
+        row = [kind] + [round(v, 6) for v in box]
+        if tuple(row) in seen:
+            continue  # the same place from two queries (a hospital is an amenity and healthcare)
+        seen.add(tuple(row))
+        out.append(row)
         kinds[kind] = kinds.get(kind, 0) + 1
     out.sort()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({"bbox": list(BBOX), "places": out}, separators=(",", ":")) + "\n")
     print("wrote", OUT.relative_to(ROOT), len(out), "places")
     if MISSING:
-        print("left out (the servers gave up on them; run again to fill them in):", " ".join(MISSING))
+        counts = {}
+        for name in MISSING:
+            query = name.rsplit("_", 1)[0]
+            counts[query] = counts.get(query, 0) + 1
+        print("left out (the servers gave up on them; run again to fill them in):",
+              ", ".join(f"{n} tiles of {q}" for q, n in counts.items()))
     for kind, n in sorted(kinds.items(), key=lambda kv: -kv[1]):
         print(f"  {kind}: {n}")
 
