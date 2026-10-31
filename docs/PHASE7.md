@@ -3,7 +3,7 @@
 Arnis builds the city's buildings, but not what they are: to the game a pharmacy was just a house
 with shelves. Now every shop, pharmacy, hospital, school, police station, petrol station, office,
 church, gym, hotel, factory and barracks in Groningen is on the map, from OpenStreetMap
-(PLACES_COUNT places), and the game knows which building you're in.
+(3,152 places so far), and the game knows which building you're in.
 
 ## Loot by building
 A cupboard, chest or barrel in a known building is filled from that kind of building's own list
@@ -64,7 +64,16 @@ Walkers spawn naturally (see [phase 1](PHASE1.md)), but now:
   that matches: `amenity=pharmacy` is a pharmacy, `shop=bicycle` a bike shop, `landuse=military` the
   barracks...). Shops mapped as a point get the box of the building they stand in. It writes
   `data/outbreak/places/groningen.json`: the kind and a latitude/longitude box for each place. The
-  raw answers are cached in `tools/data/cache/` (not committed).
+  raw answers are cached in `tools/data/cache/` (not committed). Ways sent with only a centre get
+  their box from a quick lookup by id. The public servers are often overloaded: a tile they keep
+  giving up on is split in four, then left out for that run (a rerun fetches only what's missing),
+  and `OFFLINE=1` builds the file from the cache alone.
+- **What's in so far:** every shop and amenity (3,152 places: 683 shops, 613 restaurants and cafés,
+  342 offices, 252 clothes shops, 207 schools, 181 clinics, 63 supermarkets, 32 pharmacies, 39
+  petrol stations, 6 police stations, the UMCG, the Martini Ziekenhuis and Beatrixoord...). Still to
+  fetch: the building-type outlines (offices, warehouses mapped only as buildings), military and
+  industrial land, and the buildings round shops mapped as a point (those get a 24 m square
+  for now).
 - In game, `Places` projects the boxes onto the map with the world's own Arnis box (the same
   projection as the start points), indexes them in a 64-block grid, and answers "what's here" with
   the smallest box that contains the spot. Only on the Groningen map.
@@ -75,7 +84,9 @@ Walkers spawn naturally (see [phase 1](PHASE1.md)), but now:
   density.
 
 ## Tests
-- Server: `spawning.txt` (a survivor in a walled field: the count after 30 s, 1, 2 and 3 minutes;
+- Server: `phase7.txt` (standing in a pharmacy, a police station and the UMCG, `/outbreak place`
+  names it and a chest there fills from its list: bandages and disinfectant, 9 mm rounds and a
+  radio, rags and bottles; out in a field a chest goes by the room), `spawning.txt` (a survivor in a walled field: the count after 30 s, 1, 2 and 3 minutes;
   none closer than 32 blocks, none in sight), `persist_a.txt` then `KEEP_WORLD=1 persist_b.txt`
   (a car with its key in, a walker's skin and lost limbs, the power and water being off, guts on
   you and a gun's rounds all survive saving and loading).

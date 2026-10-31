@@ -1,0 +1,53 @@
+# Phase 7: Groningen's buildings. Standing in a pharmacy, a police station and the UMCG (projected
+# from OpenStreetMap onto the default Groningen box), /outbreak place names the building and a chest
+# there fills from that building's list. Out in a field, a chest goes by the room as before.
+== setup
+gamerule spawn_mobs false
+time set noon
+player Bot spawn at 0 -57 0
+wait 3
+gamemode survival Bot
+== a pharmacy: expect "In a pharmacy" and its loot
+forceload add 6632 6933 6648 6949
+tp Bot 6640 -57 6941
+wait 2
+execute as Bot at @s run outbreak place
+setblock 6642 -57 6941 minecraft:chest[facing=west]
+player Bot look at 6642 -56.5 6941.5
+player Bot use once
+wait 1
+data get block 6642 -57 6941 Items
+forceload remove 6632 6933 6648 6949
+== a police station: expect "In a police station" and its loot
+forceload add 8028 9669 8044 9685
+tp Bot 8036 -57 9677
+wait 2
+execute as Bot at @s run outbreak place
+setblock 8038 -57 9677 minecraft:chest[facing=west]
+player Bot look at 8038 -56.5 9677.5
+player Bot use once
+wait 1
+data get block 8038 -57 9677 Items
+forceload remove 8028 9669 8044 9685
+== the UMCG: expect "In a hospital" and its loot
+forceload add 6201 4078 6217 4094
+tp Bot 6209 -57 4086
+wait 2
+execute as Bot at @s run outbreak place
+setblock 6211 -57 4086 minecraft:chest[facing=west]
+player Bot look at 6211 -56.5 4086.5
+player Bot use once
+wait 1
+data get block 6211 -57 4086 Items
+forceload remove 6201 4078 6217 4094
+== a field outside the city (by the room instead): expect "No known building here" and room loot
+forceload add 42 42 58 58
+tp Bot 50 -57 50
+wait 2
+execute as Bot at @s run outbreak place
+setblock 52 -57 50 minecraft:chest[facing=west]
+player Bot look at 52 -56.5 50.5
+player Bot use once
+wait 1
+data get block 52 -57 50 Items
+forceload remove 42 42 58 58

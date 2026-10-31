@@ -79,10 +79,25 @@ final class TimelineCommand {
 				// What building you're in, from the map of Groningen's places.
 				net.minecraft.core.BlockPos pos = net.minecraft.core.BlockPos.containing(ctx.getSource().getPosition());
 				Places.Kind kind = Places.at(pos);
-				String text = (kind == null ? "No known building here" : "In a " + kind.id().replace('_', ' ')) + " (" + Places.count() + " places on this map)";
+				String text = (kind == null ? "No known building here" : "In " + name(kind)) + " (" + Places.count() + " places on this map)";
 				ctx.getSource().sendSuccess(() -> Component.literal(text), false);
 				return kind == null ? 0 : 1;
 			})));
+	}
+
+	private static String name(Places.Kind kind) {
+		return switch (kind) {
+			case MILITARY -> "a military site";
+			case FUEL -> "a petrol station";
+			case CLOTHES -> "a clothes shop";
+			case ELECTRONICS -> "an electronics shop";
+			case BOOKS -> "a bookshop or library";
+			case INDUSTRIAL -> "an industrial building";
+			case OFFICE -> "an office";
+			case POLICE -> "a police station";
+			case STORE -> "a shop";
+			default -> "a " + kind.id().replace('_', ' ');
+		};
 	}
 
 	private static int set(CommandSourceStack source, boolean water, boolean on) {

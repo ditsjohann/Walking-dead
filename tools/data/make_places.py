@@ -216,8 +216,8 @@ def main():
     places = add_bounds(places)
     buildings = [box_of(e) for e in fetch("around", BUILDINGS) if box_of(e)]
     # A degree of latitude is 111 km; of longitude here, 111 km x cos(53.2).
-    pad_lat = 8 / 111000
-    pad_lng = 8 / (111000 * math.cos(math.radians(53.2)))
+    pad_lat = 12 / 111000
+    pad_lng = 12 / (111000 * math.cos(math.radians(53.2)))
     out = []
     seen = set()
     kinds = {}

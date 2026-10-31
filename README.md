@@ -42,6 +42,7 @@ python3 tools/servertest/driver.py . tools/servertest/combat.txt run/combat.log
 python3 tools/servertest/driver.py . tools/servertest/phase5.txt run/phase5.log
 python3 tools/servertest/driver.py . tools/servertest/phase6.txt run/phase6.log
 python3 tools/servertest/driver.py . tools/servertest/guns.txt run/guns.log
+python3 tools/servertest/driver.py . tools/servertest/phase7.txt run/phase7.log
 python3 tools/servertest/driver.py . tools/servertest/spawning.txt run/spawning.log
 python3 tools/servertest/driver.py . tools/servertest/wallblood.txt run/wallblood.log
 python3 tools/servertest/driver.py . tools/servertest/persist_a.txt run/persist_a.log
